@@ -1,0 +1,296 @@
+{
+  "customers": [
+    {
+      "id": "c_1001",
+      "name": "John Smith",
+      "email": "john.smith@example.com",
+      "phone": "+1 415 555 0134",
+      "country": "US",
+      "currency": "USD",
+      "registeredAt": "2026-01-12T09:30:00Z",
+      "notes": "VIP customer, prefers DDP shipping",
+      "status": "active"
+    },
+    {
+      "id": "c_1002",
+      "name": "Maria Garcia",
+      "email": "maria.garcia@example.es",
+      "phone": "+34 612 345 678",
+      "country": "ES",
+      "currency": "EUR",
+      "registeredAt": "2026-02-03T14:22:00Z",
+      "notes": "Ordered wireless earbuds, wants tracking updates",
+      "status": "active"
+    },
+    {
+      "id": "c_1003",
+      "name": "Ahmed Al-Rashid",
+      "email": "ahmed@example.ae",
+      "phone": "+971 50 123 4567",
+      "country": "AE",
+      "currency": "AED",
+      "registeredAt": "2026-03-18T11:05:00Z",
+      "notes": "",
+      "status": "inactive"
+    },
+    {
+      "id": "c_1004",
+      "name": "Tanaka Yuki",
+      "email": "yuki.tanaka@example.jp",
+      "phone": "+81 90 1234 5678",
+      "country": "JP",
+      "currency": "JPY",
+      "registeredAt": "2026-04-02T08:45:00Z",
+      "notes": "Bulk buyer for resale",
+      "status": "active"
+    }
+  ],
+  "addresses": [
+    {
+      "id": "a_2001",
+      "customerId": "c_1001",
+      "label": "Home",
+      "recipient": "John Smith",
+      "line1": "1234 Market Street, Apt 5B",
+      "line2": "",
+      "city": "San Francisco",
+      "state": "CA",
+      "postal": "94103",
+      "country": "US",
+      "phone": "+1 415 555 0134",
+      "isDefault": true
+    },
+    {
+      "id": "a_2002",
+      "customerId": "c_1002",
+      "label": "Home",
+      "recipient": "Maria Garcia",
+      "line1": "Calle Gran Via 45, 3B",
+      "line2": "",
+      "city": "Madrid",
+      "state": "Madrid",
+      "postal": "28013",
+      "country": "ES",
+      "phone": "+34 612 345 678",
+      "isDefault": true
+    },
+    {
+      "id": "a_2003",
+      "customerId": "c_1004",
+      "label": "Office",
+      "recipient": "Tanaka Yuki",
+      "line1": "1-2-3 Shibuya, Shibuya-ku",
+      "line2": "Tokyo Building 8F",
+      "city": "Tokyo",
+      "state": "Tokyo",
+      "postal": "150-0002",
+      "country": "JP",
+      "phone": "+81 90 1234 5678",
+      "isDefault": true
+    }
+  ],
+  "orders": [
+    {
+      "id": "o_3001",
+      "orderNo": "CB20260318001",
+      "customerId": "c_1001",
+      "addressId": "a_2001",
+      "status": "delivered",
+      "items": [
+        {
+          "itemId": "tb_1001",
+          "title": "无线蓝牙耳机 真无线入耳式降噪运动跑步耳机 超长续航",
+          "platform": "taobao",
+          "quantity": 1,
+          "priceCny": 89,
+          "landedPrice": 12.43,
+          "currency": "USD"
+        },
+        {
+          "itemId": "pdd_4002",
+          "title": "蓝牙耳机无线 半入耳式 降噪 运动跑步 迷你便携",
+          "platform": "pdd",
+          "quantity": 2,
+          "priceCny": 29.9,
+          "landedPrice": 5.29,
+          "currency": "USD"
+        }
+      ],
+      "subtotalCny": 148.8,
+      "shippingCny": 71.3,
+      "dutyCny": 0,
+      "vatCny": 0,
+      "serviceFeeCny": 7.44,
+      "tipCny": 3,
+      "totalCny": 230.54,
+      "totalCurrency": 32,
+      "currency": "USD",
+      "tipRate": 0.05,
+      "trackingNo": "YT7890123456789",
+      "carrier": "云途专线",
+      "createdAt": "2026-03-18T11:05:00Z",
+      "updatedAt": "2026-03-28T15:40:00Z",
+      "notes": "Customer requested gift packaging"
+    },
+    {
+      "id": "o_3002",
+      "orderNo": "CB20260401002",
+      "customerId": "c_1002",
+      "addressId": "a_2002",
+      "status": "shipped",
+      "items": [
+        {
+          "itemId": "jd_3002",
+          "title": "蓝牙耳机 无线运动跑步耳机 降噪入耳式 防水防汗",
+          "platform": "jd",
+          "quantity": 1,
+          "priceCny": 79,
+          "landedPrice": 14.2,
+          "currency": "EUR"
+        }
+      ],
+      "subtotalCny": 79,
+      "shippingCny": 54.7,
+      "dutyCny": 0,
+      "vatCny": 26.7,
+      "serviceFeeCny": 3.95,
+      "tipCny": 4,
+      "totalCny": 168.35,
+      "totalCurrency": 21.5,
+      "currency": "EUR",
+      "tipRate": 0.05,
+      "trackingNo": "YT5678901234567",
+      "carrier": "云途专线",
+      "createdAt": "2026-04-01T09:22:00Z",
+      "updatedAt": "2026-04-03T10:15:00Z",
+      "notes": ""
+    },
+    {
+      "id": "o_3003",
+      "orderNo": "CB20260415003",
+      "customerId": "c_1004",
+      "addressId": "a_2003",
+      "status": "processing",
+      "items": [
+        {
+          "itemId": "al_8001",
+          "title": "保温杯工厂 316不锈钢 大容量 OEM定制 跨境批发",
+          "platform": "1688",
+          "quantity": 10,
+          "priceCny": 18.5,
+          "landedPrice": 3.85,
+          "currency": "JPY"
+        }
+      ],
+      "subtotalCny": 185,
+      "shippingCny": 102.4,
+      "dutyCny": 0,
+      "vatCny": 0,
+      "serviceFeeCny": 9.25,
+      "tipCny": 18.5,
+      "totalCny": 315.15,
+      "totalCurrency": 6510,
+      "currency": "JPY",
+      "tipRate": 0.1,
+      "trackingNo": "",
+      "carrier": "云途专线",
+      "createdAt": "2026-04-15T07:50:00Z",
+      "updatedAt": "2026-04-16T02:30:00Z",
+      "notes": "Bulk order, ship in 2 boxes"
+    },
+    {
+      "id": "o_7d79bd32",
+      "customerId": "c_1001",
+      "addressId": "a_2001",
+      "items": [
+        {
+          "itemId": "tb_1001",
+          "title": "test item",
+          "platform": "taobao",
+          "quantity": 1,
+          "priceCny": 50
+        }
+      ],
+      "currency": "USD",
+      "status": "pending",
+      "tipRate": 0.05,
+      "notes": "",
+      "trackingNo": "",
+      "carrier": "云途专线",
+      "subtotalCny": 0,
+      "shippingCny": 0,
+      "dutyCny": 0,
+      "vatCny": 0,
+      "serviceFeeCny": 0,
+      "tipCny": 0,
+      "totalCny": 0,
+      "totalCurrency": 0,
+      "updatedAt": "2026-08-28T04:14:20.655Z",
+      "orderNo": "CB202608284099",
+      "createdAt": "2026-08-28T04:14:20.655Z"
+    }
+  ],
+  "settings": {
+    "minServiceFeeRate": 0.05,
+    "defaultTipOptions": [
+      0,
+      0.03,
+      0.05,
+      0.08,
+      0.1,
+      0.15
+    ]
+  },
+  "carriers": [
+    {
+      "id": "carrier_yuntrack",
+      "code": "yuntrack",
+      "name": "云途专线",
+      "mode": "economy",
+      "enabled": true,
+      "markupRate": 0
+    },
+    {
+      "id": "carrier_4px",
+      "code": "4px",
+      "name": "4PX 递四方",
+      "mode": "standard",
+      "enabled": true,
+      "markupRate": 0
+    },
+    {
+      "id": "carrier_dhl",
+      "code": "dhl",
+      "name": "DHL Express",
+      "mode": "express",
+      "enabled": true,
+      "markupRate": 0.1,
+      "apiKey": "MY-DHL-KEY-123",
+      "apiSecret": "MY-SECRET"
+    },
+    {
+      "id": "carrier_ups",
+      "code": "ups",
+      "name": "UPS",
+      "mode": "express",
+      "enabled": true,
+      "markupRate": 0
+    },
+    {
+      "id": "carrier_fedex",
+      "code": "fedex",
+      "name": "FedEx",
+      "mode": "express",
+      "enabled": true,
+      "markupRate": 0
+    },
+    {
+      "id": "carrier_ems",
+      "code": "ems",
+      "name": "EMS",
+      "mode": "standard",
+      "enabled": true,
+      "markupRate": 0
+    }
+  ]
+}

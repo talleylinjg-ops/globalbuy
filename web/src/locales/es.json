@@ -1,0 +1,88 @@
+{
+  "app": {
+    "name": "CrossBuy Compare",
+    "tagline": "Comparador de precios transfronterizo y agente de compra en China",
+    "subtagline": "Busca en Taobao, Tmall, JD, Pinduoduo y 1688 en un solo lugar: ve el coste real de llegada con envío internacional e impuestos incluidos"
+  },
+  "search": {
+    "placeholder": "Prueba: auriculares inalámbricos, esterilla de yoga, funda móvil…",
+    "button": "Buscar",
+    "buttonSearching": "Buscando…",
+    "keywordTranslated": "Buscando con palabra clave en chino",
+    "suggestions": "Populares:",
+    "tabKeyword": "Palabra clave",
+    "tabLink": "Enlace de producto",
+    "placeholderLink": "Pega un enlace de Taobao / JD / Pinduoduo / 1688…"
+  },
+  "settings": {
+    "deliveryCountry": "Destino",
+    "currency": "Moneda",
+    "platforms": "Plataformas",
+    "profitRate": "Margen de servicio",
+    "profitHelp": "Tu comisión / beneficio añadido",
+    "weightsTitle": "Pesos de ordenación"
+  },
+  "result": {
+    "total": "ofertas encontradas",
+    "fromPlatforms": "de",
+    "sortedBy": "Ordenado por coste total de llegada y confianza",
+    "topPick": "MEJOR OPCIÓN",
+    "recommended": "Recomendado",
+    "price": "Precio",
+    "landedTotal": "Coste total de llegada",
+    "originalPrice": "Precio de lista",
+    "shipping": "Envío intl.",
+    "duty": "Arancel",
+    "vat": "IVA",
+    "serviceFee": "Comisión de servicio",
+    "paymentFee": "Comisión de pago",
+    "profit": "Margen",
+    "sales": "ventas",
+    "reviews": "reseñas",
+    "rating": "Valoración",
+    "shop": "Tienda",
+    "platform": "Plataforma",
+    "deliveryTime": "Entrega est.",
+    "days": "días",
+    "weight": "Peso",
+    "commission": "Comisión",
+    "inStock": "En stock",
+    "breakdown": "Desglose de costes",
+    "viewBreakdown": "Ver desglose",
+    "hideBreakdown": "Ocultar desglose",
+    "noResults": "No se encontraron productos. Prueba con otra palabra clave.",
+    "score": "Puntuación",
+    "source": "Fuente de datos",
+    "taxNote": "Nota fiscal",
+    "deMinimis": "Umbral de franquicia",
+    "orderCta": "Pedir a través del agente",
+    "linkMatched": "Enlace reconocido:",
+    "totalLabel": "{total} ofertas encontradas de {platforms} plataformas"
+  },
+  "platform": {
+    "taobao": "Taobao",
+    "tmall": "Tmall",
+    "jd": "JD",
+    "pdd": "Pinduoduo",
+    "1688": "1688"
+  },
+  "source": {
+    "mock": "Datos demo",
+    "api": "API en vivo"
+  },
+  "footer": {
+    "note": "Los precios son estimaciones que incluyen envío internacional, aranceles e IVA. La aduana real puede variar.",
+    "disclaimer": "Sistema de demostración: conecta las API reales de afiliados mediante server/.env para producción."
+  },
+  "error": {
+    "search": "La búsqueda falló. Inténtalo de nuevo."
+  },
+  "sort": {
+    "recommended": "Recomendado",
+    "priceAsc": "Precio ↑",
+    "priceDesc": "Precio ↓",
+    "rating": "Valoración",
+    "sales": "Ventas",
+    "speed": "Entrega rápida"
+  }
+}

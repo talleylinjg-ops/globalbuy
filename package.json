@@ -1,0 +1,20 @@
+{
+  "name": "cross-border-price-comparison",
+  "version": "1.0.0",
+  "private": true,
+  "description": "中国电商跨境比价代购系统 - 多平台搜索、归一化、国际运费税费总成本计算、推荐排序",
+  "workspaces": [
+    "server",
+    "web"
+  ],
+  "scripts": {
+    "dev": "concurrently -n server,web -c blue,green \"npm run dev -w server\" \"npm run dev -w web\"",
+    "dev:server": "npm run dev -w server",
+    "dev:web": "npm run dev -w web",
+    "build": "npm run build -w web",
+    "start": "node server/src/index.js"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
