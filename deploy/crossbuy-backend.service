@@ -1,0 +1,18 @@
+[Unit]
+Description=CrossBuy API Server
+After=network.target mariadb.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=__APP_DIR__/server
+ExecStart=/usr/bin/node src/index.js
+Environment=NODE_ENV=production
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
