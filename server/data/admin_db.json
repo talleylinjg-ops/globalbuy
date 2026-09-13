@@ -31,7 +31,8 @@
       "currency": "AED",
       "registeredAt": "2026-03-18T11:05:00Z",
       "notes": "",
-      "status": "inactive"
+      "status": "active",
+      "updatedAt": "2026-09-08T02:15:57.143Z"
     },
     {
       "id": "c_1004",
@@ -239,6 +240,29 @@
       0.08,
       0.1,
       0.15
+    ],
+    "adminProfile": {
+      "name": "CrossBuy Admin",
+      "email": "admin@crossbuy.com"
+    },
+    "adminPassword": "admin123",
+    "admins": [
+      {
+        "id": "admin_1",
+        "username": "admin",
+        "role": "super",
+        "createdAt": "2026-09-06T22:59:55.770Z",
+        "salt": "88669924737f8fae8d2c1c5e",
+        "passwordHash": "1b371e49035513a80a362e3c5f11d90dade7efacd66c5fdacf223efe783f0b07"
+      },
+      {
+        "id": "admin_mts1fknx",
+        "username": "staff1",
+        "role": "operator",
+        "createdAt": "2026-09-08T02:15:57.021Z",
+        "salt": "fca61c52bcb9b61d06350e90",
+        "passwordHash": "265b0cdb498402f29b9cab902b5f5eafc769f14193b7a59dd686da6665796894"
+      }
     ]
   },
   "carriers": [
@@ -291,6 +315,27 @@
       "mode": "standard",
       "enabled": true,
       "markupRate": 0
+    },
+    {
+      "code": "ptdsgj",
+      "name": "PTD 国际速递",
+      "enabled": true,
+      "mode": "standard",
+      "markupRate": 0,
+      "token": "6a94f475df2c124cb83a7aa06a94f475b1ed03883",
+      "pickupZone": "深圳",
+      "id": "carrier_ptdsgj_mtkqzrfp"
+    },
+    {
+      "code": "zjhygj",
+      "name": "华源国际专线",
+      "enabled": true,
+      "mode": "economy",
+      "markupRate": 0,
+      "account": "XMLD",
+      "password": "123456",
+      "branchId": 3470,
+      "id": "carrier_zjhygj_mtkqzrg0"
     }
   ]
 }

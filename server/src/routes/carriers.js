@@ -5,7 +5,7 @@ import {
   getCarrierConfigs, getCarrierConfig, upsertCarrier, deleteCarrier,
 } from '../services/carrierStore.js';
 import { createCarrierAdapter, CARRIER_ADAPTERS } from '../carriers/index.js';
-import { authMiddleware as auth } from '../services/auth.js';
+import { authMiddleware as auth, requireSuper } from '../services/auth.js';
 
 const router = Router();
 
@@ -28,7 +28,7 @@ router.get('/:id', auth, (req, res) => {
 });
 
 // 新增
-router.post('/', auth, (req, res) => {
+router.post('/', auth, requireSuper, (req, res) => {
   const { code, name } = req.body || {};
   if (!code || !CARRIER_ADAPTERS[code]) return res.status(400).json({ error: 'valid code required' });
   const record = upsertCarrier({
@@ -43,7 +43,7 @@ router.post('/', auth, (req, res) => {
 });
 
 // 更新
-router.put('/:id', auth, (req, res) => {
+router.put('/:id', auth, requireSuper, (req, res) => {
   const existing = getCarrierConfig(req.params.id);
   if (!existing) return res.status(404).json({ error: 'not found' });
   const merged = {
@@ -56,7 +56,7 @@ router.put('/:id', auth, (req, res) => {
 });
 
 // 删除
-router.delete('/:id', auth, (req, res) => {
+router.delete('/:id', auth, requireSuper, (req, res) => {
   const ok = deleteCarrier(req.params.id);
   if (!ok) return res.status(404).json({ error: 'not found' });
   res.json({ ok: true });

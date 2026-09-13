@@ -113,7 +113,7 @@ export function computeLandedCost(product, opts = {}) {
 }
 
 // 税率换算辅助：目标币种到 CNY 的汇率（近似，用于 deMinimis 折算）
-function taxRateCny(currency, destCountry, tax) {
+export function taxRateCny(currency, destCountry, tax) {
   // deMinimis 使用目的国货币计，转为 CNY 估算（USD/EUR/GBP 基准汇率）
   const approx = {
     USD: 7.2, EUR: 7.8, GBP: 9.1, CAD: 5.3, AUD: 4.7, JPY: 0.05,
@@ -129,7 +129,7 @@ function round(n, digits = 2) {
   return Number(n.toFixed(digits));
 }
 
-function curSymbol(currency) {
+export function curSymbol(currency) {
   const symbols = {
     USD: '$', EUR: '€', GBP: '£', JPY: '¥', KRW: '₩', CNY: '¥', SGD: 'S$',
     CAD: 'C$', AUD: 'A$', HKD: 'HK$', TWD: 'NT$', INR: '₹', BRL: 'R$',

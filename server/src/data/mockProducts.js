@@ -6,7 +6,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'taobao',
     itemId: 'tb_1001',
-    imageUrl: 'https://p11-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/fa8c3006be074e15b2576afd2555b783~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075766&x-signature=34vc1HMmblGxDkstfJThl0QpetI%3D',
+    imageUrl: '/images/tb_1001.jpg',
     title: '无线蓝牙耳机 真无线入耳式降噪运动跑步耳机 超长续航 华为苹果通用',
     price: 89.0,
     originalPrice: 129.0,
@@ -22,7 +22,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'taobao',
     itemId: 'tb_1002',
-    imageUrl: 'https://p3-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/e5dddfa67e974e48a6aa2aaf26f00172~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075766&x-signature=eHHewzss25ZK5rzNWPpZzbpM%2Buc%3D',
+    imageUrl: '/images/tb_1002.jpg',
     title: '蓝牙耳机无线运动耳机 半入耳式耳机 降噪超长续航 小米安卓苹果通用',
     price: 59.9,
     originalPrice: 99.0,
@@ -38,7 +38,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'tmall',
     itemId: 'tm_2001',
-    imageUrl: 'https://p3-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/c3f1dc51eb68440aab7e93473ac96109~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075766&x-signature=WK2i6szjktkLlownPmslNND%2Bn1A%3D',
+    imageUrl: '/images/tm_2001.jpg',
     title: '【官方旗舰】无线蓝牙耳机主动降噪 真无线入耳式耳机 低延迟 苹果适用',
     price: 199.0,
     originalPrice: 299.0,
@@ -54,7 +54,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'jd',
     itemId: 'jd_3001',
-    imageUrl: 'https://p11-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/4857c8e4a18e43b6939c193817da70e8~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075766&x-signature=ueLuvZgyEQOQZYt8GgHB2JVlAzs%3D',
+    imageUrl: '/images/jd_3001.jpg',
     title: '无线蓝牙耳机 真无线半入耳 降噪通话 超长续航 官方正品 一年质保',
     price: 149.0,
     originalPrice: 199.0,
@@ -70,7 +70,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'jd',
     itemId: 'jd_3002',
-    imageUrl: 'https://p26-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/312ae3eeb00342e68c98057209a00640~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075766&x-signature=zcGPUappSdRu8sXtjecvjabiOvg%3D',
+    imageUrl: '/images/jd_3002.jpg',
     title: '蓝牙耳机 无线运动跑步耳机 降噪入耳式 防水防汗 磁吸长续航',
     price: 79.0,
     originalPrice: 129.0,
@@ -86,7 +86,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'pdd',
     itemId: 'pdd_4001',
-    imageUrl: 'https://p11-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/fa8c3006be074e15b2576afd2555b783~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075766&x-signature=34vc1HMmblGxDkstfJThl0QpetI%3D',
+    imageUrl: '/images/pdd_4001.jpg',
     title: '无线蓝牙耳机 真无线耳机 降噪 超长续航 苹果安卓通用 高性价比',
     price: 39.9,
     originalPrice: 79.9,
@@ -102,7 +102,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'pdd',
     itemId: 'pdd_4002',
-    imageUrl: 'https://p3-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/e5dddfa67e974e48a6aa2aaf26f00172~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075766&x-signature=eHHewzss25ZK5rzNWPpZzbpM%2Buc%3D',
+    imageUrl: '/images/pdd_4002.jpg',
     title: '蓝牙耳机无线 半入耳式 降噪 运动跑步 迷你便携 一年保修',
     price: 29.9,
     originalPrice: 69.9,
@@ -118,7 +118,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: '1688',
     itemId: 'al_5001',
-    imageUrl: 'https://p3-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/c3f1dc51eb68440aab7e93473ac96109~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075766&x-signature=WK2i6szjktkLlownPmslNND%2Bn1A%3D',
+    imageUrl: '/images/al_5001.jpg',
     title: '厂家直销无线蓝牙耳机 真无线降噪 批发代发 支持跨境 量大从优',
     price: 28.5,
     originalPrice: 45.0,
@@ -135,7 +135,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: '1688',
     itemId: 'al_5002',
-    imageUrl: 'https://p11-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/4857c8e4a18e43b6939c193817da70e8~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075766&x-signature=ueLuvZgyEQOQZYt8GgHB2JVlAzs%3D',
+    imageUrl: '/images/al_5002.jpg',
     title: '蓝牙耳机工厂 无线运动耳机 OEM ODM 跨境专供 可贴牌 双芯片',
     price: 22.0,
     originalPrice: 38.0,
@@ -154,7 +154,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'taobao',
     itemId: 'tb_2001',
-    imageUrl: 'https://p11-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/18d25a07004c47eaba6f8c12b2bbf352~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075766&x-signature=bPPkQ4i40KFDvLKDE7NMO5TtmR0%3D',
+    imageUrl: '/images/tb_2001.jpg',
     title: '无线充电器 15W快充 苹果华为小米通用 桌面充电板 简约',
     price: 45.0,
     originalPrice: 69.0,
@@ -170,7 +170,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'jd',
     itemId: 'jd_4001',
-    imageUrl: 'https://p26-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/f16243de06ac4a7391663cad60b22a3c~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075766&x-signature=4Op49luZELz9Tt%2B8vtTCrSrrUEY%3D',
+    imageUrl: '/images/jd_4001.jpg',
     title: '无线充电器 磁吸15W快充 适配苹果华为小米 官方认证安全',
     price: 69.0,
     originalPrice: 99.0,
@@ -186,7 +186,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'pdd',
     itemId: 'pdd_5001',
-    imageUrl: 'https://p3-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/e395c6aebf974028b6b09f2c984d9e94~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075766&x-signature=jkGH5LMzBRsNwT5nl79UzcGmrj4%3D',
+    imageUrl: '/images/pdd_5001.jpg',
     title: '无线充电器 15W快充 苹果华为小米通用 三线圈 超薄便携',
     price: 25.9,
     originalPrice: 59.9,
@@ -202,7 +202,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: '1688',
     itemId: 'al_6001',
-    imageUrl: 'https://p26-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/cbd2f58256c14781846d5d138e96087e~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075766&x-signature=MfAwJ%2BlqUNTEywK%2FApw5bhvICHs%3D',
+    imageUrl: '/images/al_6001.jpg',
     title: '无线充电器 厂家直销 15W快充 三线圈 跨境批发 支持OEM',
     price: 16.8,
     originalPrice: 30.0,
@@ -221,7 +221,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'taobao',
     itemId: 'tb_3001',
-    imageUrl: 'https://p26-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/b836cba38c784f23abf6cfa09eaf1cfc~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075766&x-signature=pNIlYzw4XQK80qQicIX%2FGuR8WR8%3D',
+    imageUrl: '/images/tb_3001.jpg',
     title: '瑜伽垫加厚防滑 健身垫 初学者TPE环保 双面纹理 附赠收纳袋',
     price: 39.9,
     originalPrice: 79.0,
@@ -237,7 +237,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'jd',
     itemId: 'jd_5001',
-    imageUrl: 'https://p11-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/38a74e26f10f455784ea047e5cc06272~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075766&x-signature=2s6VxxNvYijz0Bds9%2BRTuGEcasY%3D',
+    imageUrl: '/images/jd_5001.jpg',
     title: '瑜伽垫 加厚防滑 TPE环保材质 健身训练垫 双面可用 品质保障',
     price: 59.0,
     originalPrice: 99.0,
@@ -253,7 +253,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'pdd',
     itemId: 'pdd_6001',
-    imageUrl: 'https://p11-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/d6b94a58187e40a29cc1f38681566879~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075766&x-signature=pg%2Bts%2F4XC58OS4uF%2B64LLqVWLGg%3D',
+    imageUrl: '/images/pdd_6001.jpg',
     title: '瑜伽垫 加厚防滑 家用健身垫 TPE环保 折叠便携 高颜值',
     price: 19.9,
     originalPrice: 49.9,
@@ -269,7 +269,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: '1688',
     itemId: 'al_7001',
-    imageUrl: 'https://p11-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/531b59285ffe4322b6526bdc01c83d11~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075766&x-signature=i6oSzL%2BALkKQGDcpWiw5bCJojak%3D',
+    imageUrl: '/images/al_7001.jpg',
     title: '瑜伽垫工厂 TPE加厚防滑 健身垫批发 跨境专供 支持定制',
     price: 12.8,
     originalPrice: 25.0,
@@ -288,7 +288,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'taobao',
     itemId: 'tb_4001',
-    imageUrl: 'https://p3-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/8adbb71b1af04cd6a28bd4cdc3470808~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075767&x-signature=z%2BXf%2BLdbnhD%2BkuOP9WsftLOqLas%3D',
+    imageUrl: '/images/tb_4001.jpg',
     title: '保温杯 316不锈钢 大容量便携 男女款 商务办公 防漏',
     price: 49.0,
     originalPrice: 89.0,
@@ -304,7 +304,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'jd',
     itemId: 'jd_6001',
-    imageUrl: 'https://p26-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/1b9e7344522b4bec813c8d0130916916~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075767&x-signature=3qwvRl9kXyT%2Fa7Wp%2B%2BlRb0aT9Os%3D',
+    imageUrl: '/images/jd_6001.jpg',
     title: '保温杯 316不锈钢 大容量 保温保冷 便携 官方自营 放心购',
     price: 79.0,
     originalPrice: 129.0,
@@ -320,7 +320,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'pdd',
     itemId: 'pdd_7001',
-    imageUrl: 'https://p11-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/2c4942871d0044c6a285fb5fc12b887f~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075767&x-signature=7AtzCbrI%2BzSo%2B8EVNLu78TSFptc%3D',
+    imageUrl: '/images/pdd_7001.jpg',
     title: '保温杯 316不锈钢 大容量 便携 超值 学生办公 秋冬必备',
     price: 23.9,
     originalPrice: 59.9,
@@ -336,7 +336,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: '1688',
     itemId: 'al_8001',
-    imageUrl: 'https://p11-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/2bc5c1145ff44558a6e902fe742a16df~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075767&x-signature=I3Kwf0h9%2BwZ7z1Hesn%2F0RF626ho%3D',
+    imageUrl: '/images/al_8001.jpg',
     title: '保温杯工厂 316不锈钢 大容量 OEM定制 跨境批发 一件代发',
     price: 18.5,
     originalPrice: 35.0,
@@ -355,7 +355,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'taobao',
     itemId: 'tb_5001',
-    imageUrl: 'https://p3-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/287b88aaa02a4f31971e9c822ba561f8~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075767&x-signature=KiTcXsP%2BqKrd2xnX8%2FaTxZ6S2xw%3D',
+    imageUrl: '/images/tb_5001.jpg',
     title: '苹果手机壳 iPhone 15 14 13 硅胶防摔 简约磨砂 全包边',
     price: 19.9,
     originalPrice: 39.0,
@@ -371,7 +371,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'jd',
     itemId: 'jd_7001',
-    imageUrl: 'https://p11-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/14e1f26ec3744ced9b5acfc5d76fa361~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075767&x-signature=kec7sBna98PLncQdvyey1qIfixI%3D',
+    imageUrl: '/images/jd_7001.jpg',
     title: '苹果手机壳 iPhone 15 Pro 磁吸透明 防摔 官方配件 正品保障',
     price: 29.0,
     originalPrice: 49.0,
@@ -387,7 +387,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'pdd',
     itemId: 'pdd_8001',
-    imageUrl: 'https://p3-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/952764e30425402c9ea6af0ec2723311~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075767&x-signature=6cLRH9As0J9U2QT%2BiQCwMca%2BawY%3D',
+    imageUrl: '/images/pdd_8001.jpg',
     title: '苹果手机壳 iPhone 全系列 硅胶软壳 防摔 简约 多色可选',
     price: 8.9,
     originalPrice: 29.9,
@@ -403,7 +403,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: '1688',
     itemId: 'al_9001',
-    imageUrl: 'https://p3-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/f0756a609c08464cb3a378d32ae9ea05~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075767&x-signature=AAKrD%2Bf5g47YOT%2BdPM5Ng6OnPqI%3D',
+    imageUrl: '/images/al_9001.jpg',
     title: '手机壳工厂 硅胶手机壳 苹果全系列 批发 跨境专供 定制LOGO',
     price: 3.5,
     originalPrice: 8.0,
@@ -422,7 +422,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'taobao',
     itemId: 'tb_6001',
-    imageUrl: 'https://p26-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/86da1303031b4f60a1c91c0fc1dec1b1~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075767&x-signature=wpKVHdS%2B8U0MZ2Th0N%2BYjjj1Xd8%3D',
+    imageUrl: '/images/tb_6001.jpg',
     title: '机械键盘 87键 茶轴青轴 背光有线 办公游戏 电脑键盘',
     price: 89.0,
     originalPrice: 159.0,
@@ -438,7 +438,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'jd',
     itemId: 'jd_8001',
-    imageUrl: 'https://p26-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/97b0a0d56f7a4c589622d1aa7237ad57~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075767&x-signature=2aYG%2FDNgdGFfrz6V3h1SBpmBazY%3D',
+    imageUrl: '/images/jd_8001.jpg',
     title: '机械键盘 87键 热插拔 RGB背光 游戏办公 官方自营 两年质保',
     price: 149.0,
     originalPrice: 219.0,
@@ -454,7 +454,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'pdd',
     itemId: 'pdd_9001',
-    imageUrl: 'https://p11-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/58e040028a99498dba692852b3ca9054~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075767&x-signature=xVUNHmUXbdAkFezlv5127Ka%2BYew%3D',
+    imageUrl: '/images/pdd_9001.jpg',
     title: '机械键盘 87键 青轴 背光 电竞游戏 办公 高性价比 包邮',
     price: 49.9,
     originalPrice: 129.0,
@@ -470,7 +470,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: '1688',
     itemId: 'al_10001',
-    imageUrl: 'https://p26-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/f39b844115af41cf9e5054a174cf4a69~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851075767&x-signature=mLmEFM6%2Bik%2BpyhSTde00XVqg1UM%3D',
+    imageUrl: '/images/al_10001.jpg',
     title: '机械键盘工厂 87键 热插拔 轴体可选 批发 OEM 跨境专供',
     price: 39.0,
     originalPrice: 78.0,
@@ -489,7 +489,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'taobao',
     itemId: 'tb_7001',
-    imageUrl: 'https://p3-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/adde3fe989b149d1b338f8e891eba9e6~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851116701&x-signature=1AYBgmdMItQZpdaILnCBJBxVRVg%3D',
+    imageUrl: '/images/tb_7001.jpg',
     title: '智能手表 蓝牙通话 心率监测 运动防水 多种表盘 长续航',
     price: 159.0,
     originalPrice: 299.0,
@@ -504,7 +504,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'jd',
     itemId: 'jd_9001',
-    imageUrl: 'https://p11-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/ab8129f5d4d94b809b8891f38226f138~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851116701&x-signature=YJlBiwVO%2BMicdBSXt7enI%2BhfDqo%3D',
+    imageUrl: '/images/jd_9001.jpg',
     title: '智能手表 高清大屏 AMOLED 血氧心率 支付宝 NFC 运动模式',
     price: 239.0,
     originalPrice: 399.0,
@@ -519,7 +519,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'pdd',
     itemId: 'pdd_10001',
-    imageUrl: 'https://p26-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/76cea83d196e480c9eb887a3f29da8fe~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851116701&x-signature=lNoinDkRtqyF2VsnkVrw5UQ5DCk%3D',
+    imageUrl: '/images/pdd_10001.jpg',
     title: '智能手表 男款 大屏 计步 睡眠监测 来电提醒 平价爆款',
     price: 49.9,
     originalPrice: 199.0,
@@ -536,7 +536,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'taobao',
     itemId: 'tb_7002',
-    imageUrl: 'https://p11-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/92cfcfa886ed42c2af98a48ea67f60c9~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851116701&x-signature=SyZ1yj7%2BHG%2BS0eX9XYlEHZEVJc8%3D',
+    imageUrl: '/images/tb_7002.jpg',
     title: '运动鞋 跑步鞋 轻便透气 缓震回弹 男女同款 时尚百搭',
     price: 199.0,
     originalPrice: 499.0,
@@ -551,7 +551,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'jd',
     itemId: 'jd_9002',
-    imageUrl: 'https://p3-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/7625f25ed1b242d4b9996ddc58254005~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851116701&x-signature=RDA3pkbayQk%2BHGN02HU9D1QbNf4%3D',
+    imageUrl: '/images/jd_9002.jpg',
     title: '跑步鞋 缓震支撑 专业运动鞋 轻量化 网面透气 官方自营',
     price: 359.0,
     originalPrice: 699.0,
@@ -566,7 +566,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'pdd',
     itemId: 'pdd_10002',
-    imageUrl: 'https://p11-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/370e9c42d289407c901b810ab359aabf~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851116701&x-signature=IBMoOA7jEml02mRuOn8PMmX6bZA%3D',
+    imageUrl: '/images/pdd_10002.jpg',
     title: '运动鞋 休闲跑步鞋 透气网面 软底增高 男女鞋 清仓特价',
     price: 39.9,
     originalPrice: 99.0,
@@ -581,7 +581,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: '1688',
     itemId: 'al_11001',
-    imageUrl: 'https://p11-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/ca5274ce68664007a543268c79836e6c~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851116701&x-signature=vpg%2FV2tacavffNLUPqqesc2C4k0%3D',
+    imageUrl: '/images/al_11001.jpg',
     title: '运动鞋工厂 跑步鞋 网面透气 男女同款 OEM 贴牌 跨境批发',
     price: 35.0,
     originalPrice: 68.0,
@@ -599,7 +599,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'taobao',
     itemId: 'tb_7003',
-    imageUrl: 'https://p26-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/8331e06c1ffb4def9dfdac22ef87f8b4~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851116701&x-signature=65aWZy1fa10HbH1lE%2BG1OjQUscE%3D',
+    imageUrl: '/images/tb_7003.jpg',
     title: '行李箱 20寸 登机箱 轻便万向轮 加密拉链 磨砂抗刮',
     price: 259.0,
     originalPrice: 599.0,
@@ -614,7 +614,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'jd',
     itemId: 'jd_9003',
-    imageUrl: 'https://p3-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/557ac089b72248468c78299914459e09~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851116701&x-signature=mxYU%2BHlNnHMadZg170A1YQ1Z9Uc%3D',
+    imageUrl: '/images/jd_9003.jpg',
     title: '行李箱 24寸 万向轮 铝合金拉杆 TSA锁 硬壳行李箱 官方自营',
     price: 459.0,
     originalPrice: 899.0,
@@ -629,7 +629,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'pdd',
     itemId: 'pdd_10003',
-    imageUrl: 'https://p26-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/ee17e77d142a45db988894f74345f4f3~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851116701&x-signature=iJ5V9FOtjFJYHMbCd47VoiZK%2FxE%3D',
+    imageUrl: '/images/pdd_10003.jpg',
     title: '行李箱 20寸登机箱 硬壳万向轮 大容量 学生旅行 特价',
     price: 79.0,
     originalPrice: 299.0,
@@ -644,7 +644,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: '1688',
     itemId: 'al_11002',
-    imageUrl: 'https://p26-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/95b751ea19cd441d80f95f8c16018e9d~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851116701&x-signature=7wf6H5Yi4T57utQLpQLeh5bdvD8%3D',
+    imageUrl: '/images/al_11002.jpg',
     title: '行李箱工厂 铝合金箱体 20/24寸 万向轮 OEM 定制 外贸批发',
     price: 68.0,
     originalPrice: 120.0,
@@ -662,7 +662,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'taobao',
     itemId: 'tb_7004',
-    imageUrl: 'https://p3-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/9b8e6b44ebb24ccfb39b431a8d78bc02~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851116702&x-signature=4rL0ctmxfMUSbP8ojlz5tbwpLwI%3D',
+    imageUrl: '/images/tb_7004.jpg',
     title: 'LED台灯 护眼学习灯 触控调光 无极调色 阅读写字 桌面灯',
     price: 89.0,
     originalPrice: 199.0,
@@ -677,7 +677,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'jd',
     itemId: 'jd_9004',
-    imageUrl: 'https://p3-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/9b8e6b44ebb24ccfb39b431a8d78bc02~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851116702&x-signature=4rL0ctmxfMUSbP8ojlz5tbwpLwI%3D',
+    imageUrl: '/images/jd_9004.jpg',
     title: 'LED台灯 国AA级护眼 无频闪 全光谱 智能感光 官方自营',
     price: 179.0,
     originalPrice: 349.0,
@@ -692,7 +692,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'pdd',
     itemId: 'pdd_10004',
-    imageUrl: 'https://p3-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/9b8e6b44ebb24ccfb39b431a8d78bc02~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851116702&x-signature=4rL0ctmxfMUSbP8ojlz5tbwpLwI%3D',
+    imageUrl: '/images/pdd_10004.jpg',
     title: 'LED台灯 宿舍神器 充电式 折叠 三档调光 学生床头灯',
     price: 19.9,
     originalPrice: 59.0,
@@ -709,7 +709,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'taobao',
     itemId: 'tb_7005',
-    imageUrl: 'https://p11-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/9f59fb0f5b9849c7a01a9618574821e9~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851116727&x-signature=XTVwb2lPEv%2BcSyxEzwmLhTr1Q6U%3D',
+    imageUrl: '/images/tb_7005.jpg',
     title: '猫咪自动逗猫玩具 电动自嗨球 猫玩耍 解闷 宠物用品',
     price: 49.9,
     originalPrice: 129.0,
@@ -724,7 +724,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'jd',
     itemId: 'jd_9005',
-    imageUrl: 'https://p26-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/aadf3abc03454e42ba99ac06dc2fb007~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851116727&x-signature=o2aB9aNAMHbdY4bsZkogyevDahg%3D',
+    imageUrl: '/images/jd_9005.jpg',
     title: '猫咪玩具 转盘球 逗猫棒 自嗨解闷 益智互动 官方自营',
     price: 29.9,
     originalPrice: 69.0,
@@ -739,7 +739,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'pdd',
     itemId: 'pdd_10005',
-    imageUrl: 'https://p26-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/810d660aaee14b54a4aa1204f67e393d~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851116727&x-signature=AvNt2KQwOdysAXdwtMH2NjOA3y8%3D',
+    imageUrl: '/images/pdd_10005.jpg',
     title: '猫薄荷玩具 仿真鱼 猫咪咬咬乐 磨牙 安抚 去毛球 便宜',
     price: 9.9,
     originalPrice: 29.0,
@@ -756,7 +756,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'taobao',
     itemId: 'tb_7006',
-    imageUrl: 'https://p26-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/eeb48b897c4a43639ab3e950f3e62307~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851116702&x-signature=s3FkLa%2F%2BVgj%2FvxXeuV93gzJIpps%3D',
+    imageUrl: '/images/tb_7006.jpg',
     title: '冻干火龙果干 无添加 水果脆片 零食 休闲食品 孕妇可吃',
     price: 29.9,
     originalPrice: 69.0,
@@ -771,7 +771,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'jd',
     itemId: 'jd_9006',
-    imageUrl: 'https://p26-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/7aa65029c5f844a09c6318a1251a0dbd~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851116702&x-signature=8uXJFsj6hlFA%2FiIk%2BFXrJPnIu88%3D',
+    imageUrl: '/images/jd_9006.jpg',
     title: '冻干混合水果干 100%真果肉 无糖 多种水果 健康零食 自营',
     price: 45.0,
     originalPrice: 99.0,
@@ -786,7 +786,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: 'pdd',
     itemId: 'pdd_10006',
-    imageUrl: 'https://p26-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/e1b595aff91249788a14b7c77d8cfb82~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851116702&x-signature=ppx%2FzHanbH8CoOuLprJlraaB5Jk%3D',
+    imageUrl: '/images/pdd_10006.jpg',
     title: '冰糖葫芦 山楂果干 糖葫芦零食 酸甜开胃 散装 超值',
     price: 15.9,
     originalPrice: 39.0,
@@ -801,7 +801,7 @@ export const MOCK_PRODUCTS = [
   {
     platform: '1688',
     itemId: 'al_11003',
-    imageUrl: 'https://p26-volcsearch-sign.byteimg.com/tos-cn-i-xstd03g9pf/facebffcb0984c99be098f3619cb54b4~tplv-obj.jpeg?lk3s=7acb411c&scene=volc_search&x-expires=1851116702&x-signature=skM5dtIlAz2dCvXKzbc3tKAWYQI%3D',
+    imageUrl: '/images/al_11003.jpg',
     title: '坚果零食礼盒 OEM 混合果干 批发 贴牌 跨境出口 年货',
     price: 22.0,
     originalPrice: 45.0,
@@ -853,3 +853,11 @@ export function listMockCategories() {
     '智能手表', '运动鞋', '行李箱', 'LED台灯', '宠物玩具', '零食果干',
   ];
 }
+
+// 热门搜索词（单行展示，全部可命中 mock 数据）
+export const HOT_KEYWORDS = [
+  '蓝牙耳机', '无线充电器', '智能手表', '保温杯',
+  '手机壳', '机械键盘', '行李箱', 'LED台灯',
+  '瑜伽垫', '猫玩具', '零食', '运动鞋',
+  '降噪',
+];

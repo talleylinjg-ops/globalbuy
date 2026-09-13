@@ -1,11 +1,10 @@
 // 国际快递报价服务：并行询价 -> 自动排序 -> 推荐最优
-// 数据源优先级：已配置 API 的快递商走真实接口；未配置的走估算模式；均失败返回估算兜底
+// 生产模式：仅返回已配置真实 API 的快递商报价；估算兜底已停用
 import { getCarrierConfigs, hasRealCarrier } from './carrierStore.js';
 import { createCarrierAdapter } from '../carriers/index.js';
-import { EstimateAdapter } from '../carriers/estimate.js';
 
 /**
- * 并行获取所有已启用快递商的报价
+ * 并行获取所有已启用且已配置真实 API 的快递商报价
  * @param {object} p
  * @param {string} p.country 目的国
  * @param {number} p.weightKg 重量
@@ -13,50 +12,73 @@ import { EstimateAdapter } from '../carriers/estimate.js';
  * @param {number} [p.valueUsd] 申报货值
  * @returns {Promise<{quotes: Array, recommended: string|null, hasRealData: boolean}>}
  */
+// 报价缓存：真实 API 慢（部分接口 40s+），TTL 内复用结果；失败时降级用上次成功值
+const QUOTE_TTL = 30 * 60 * 1000;
+const quoteCache = new Map(); // key: `${country}:${weightGrams}` -> { at, value }
+
 export async function getCarrierQuotes(p) {
+  const key = `${p.country}:${Math.ceil((p.weightKg || 0.5) * 1000)}`;
+  const hit = quoteCache.get(key);
+  if (hit && Date.now() - hit.at < QUOTE_TTL) return hit.value;
+
+  const fresh = await fetchQuotes(p);
+  if (fresh.quotes.length > 0) {
+    quoteCache.set(key, { at: Date.now(), value: fresh });
+    return fresh;
+  }
+  // 全部失败：有旧缓存则用旧值，否则返回空
+  if (hit) return hit.value;
+  return fresh;
+}
+
+async function fetchQuotes(p) {
   const configs = getCarrierConfigs().filter((c) => c.enabled !== false);
 
-  // 全部走估算模式（未配置任何真实 API）
-  const anyReal = configs.some((c) => {
-    const adapter = createCarrierAdapter(c);
-    return adapter && adapter.configured;
-  });
-
-  const jobs = configs.map(async (cfg) => {
-    const adapter = createCarrierAdapter(cfg) || new EstimateAdapter(cfg);
-    if (adapter.configured) {
+  // 只询价已配置真实 API 的快递商；未接入的直接跳过（生产模式不返回估算价）
+  const jobs = configs
+    .filter((cfg) => {
+      const adapter = createCarrierAdapter(cfg);
+      return adapter && adapter.configured;
+    })
+    .map(async (cfg) => {
+      const adapter = createCarrierAdapter(cfg);
       try {
-        const quote = await adapter.quote(p);
-        return { ...quote, status: 'ok', configId: cfg.id };
+        // 单快递商可能返回多渠道报价（如华源多条专线），统一 flatten
+        const result = await adapter.quote(p);
+        return (Array.isArray(result) ? result : [result]).map((q) => ({
+          ...q,
+          status: 'ok',
+          configId: cfg.id,
+        }));
       } catch (e) {
-        // 真实 API 失败：回退到该快递商的估算报价，并标记 error
-        const est = new EstimateAdapter({ ...cfg, mode: cfg.mode || 'standard' });
-        try {
-          const q = await est.quote(p);
-          return { ...q, status: 'error', error: e.message, configId: cfg.id };
-        } catch {
-          return { status: 'error', error: e.message, carrier: cfg.code, carrierName: cfg.name, configId: cfg.id };
-        }
+        // 真实 API 失败：该渠道标记错误并标记不可用，不回退估算
+        return [{
+          status: 'error',
+          error: e.message,
+          carrier: cfg.code,
+          carrierName: cfg.name,
+          configId: cfg.id,
+          available: false,
+        }];
       }
-    }
-    const est = new EstimateAdapter({ ...cfg, mode: cfg.mode || 'standard' });
-    const q = await est.quote(p);
-    return { ...q, status: 'ok', configId: cfg.id };
-  });
+    });
 
   const settled = await Promise.allSettled(jobs);
   const quotes = [];
   settled.forEach((r) => {
-    if (r.status === 'fulfilled' && r.value) quotes.push(r.value);
+    if (r.status === 'fulfilled' && Array.isArray(r.value)) quotes.push(...r.value);
   });
 
   const available = quotes.filter((q) => q.available);
-  const recommended = available.length ? pickBest(available).carrier : null;
+  const best = available.length ? pickBest(available) : null;
+  // 推荐精确到具体渠道（同一快递商多渠道时按 routeCode/渠道名区分）
+  const recommendedKey = best ? (best.raw?.routeCode || best.productName) : null;
 
   return {
     quotes: sortQuotes(available),
-    recommended,
-    hasRealData: anyReal,
+    recommended: best ? best.carrier : null,
+    recommendedKey,
+    hasRealData: available.length > 0,
     countries: configs.map((c) => c.code),
   };
 }

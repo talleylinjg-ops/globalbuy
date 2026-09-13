@@ -30,7 +30,7 @@ function fmtInt(n) {
   return String(n);
 }
 
-export default function ProductCard({ item, currency, currencySymbol, t }) {
+export default function ProductCard({ item, currency, currencySymbol, shippingTiers, inCombine, onToggleCombine, onOrder, t }) {
   const [showBreakdown, setShowBreakdown] = useState(false);
   const b = item.landed.breakdown;
   const platformClass = PLATFORM_CLASS[item.platform] || '';
@@ -69,17 +69,43 @@ export default function ProductCard({ item, currency, currencySymbol, t }) {
         </div>
 
         <div className="price-line">
-          <span className="price-total">{fmt(b.total, currencySymbol, currency)}</span>
-          <span className="price-unit">{currency}</span>
-          {item.originalPrice > item.price && (
-            <span className="price-orig">{fmt(b.goodsValue, currencySymbol, currency)}</span>
-          )}
+          <span className="price-total">{b.goodsValue != null ? fmt(b.goodsValue, currencySymbol, currency) : fmt(item.price, '¥', 'CNY')}</span>
+          <span className="price-unit">{b.goodsValue != null ? currency : 'CNY'}</span>
         </div>
+        <div className="price-note">{t('result.purchaseNote')}</div>
 
-        <div className="cost-strip">
-          <span>{t('result.landedTotal')}</span>
-          <span className="val">{fmt(b.total, currencySymbol, currency)}</span>
-        </div>
+        {shippingTiers && shippingTiers.length > 0 ? (() => {
+          // 三个快递价格位置：每档显示"该档运费 + 固定成本"重算的到手总价
+          // 运费换算比例 = 当前 breakdown 运费 / 其对应 USD 报价；税费/服务费与运费无关，可直接换运费重算
+          const refUsd = item.landed.shipping.quoteUsd;
+          const rate = refUsd ? b.intlShipping / refUsd : null;
+          return (
+            <div className="ship-tiers">
+              {shippingTiers.map((tr) => {
+                const tierPrice = rate != null ? tr.quote.priceUsd * rate : null;
+                const tierTotal = tierPrice != null ? b.total - b.intlShipping + tierPrice : null;
+                const isCurrent = tr.quote.carrierName === item.landed.shipping.carrier;
+                return (
+                  <div className={`ship-tier ${isCurrent ? 'current' : ''}`} key={tr.labels.join('+')}>
+                    <span className="tier-tags">
+                      {tr.labels.map((label) => (
+                        <em key={label} className={`tier-tag ${label}`}>{t(`result.${label}`)}</em>
+                      ))}
+                    </span>
+                    <span className="tier-name">{tr.quote.carrierName || tr.quote.carrier}{tr.quote.productName ? ` · ${tr.quote.productName}` : ''}</span>
+                    <span className="tier-days">{tr.quote.daysMin}-{tr.quote.daysMax}{t('result.days')}</span>
+                    <span className="tier-price">{tierTotal != null ? fmt(tierTotal, currencySymbol, currency) : fmt(tr.quote.priceUsd, '$', 'USD')}</span>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })() : (
+          <div className="cost-strip">
+            <span>{t('result.landedTotal')}</span>
+            <span className="val">{fmt(b.total, currencySymbol, currency)}</span>
+          </div>
+        )}
 
         <div className="card-stats">
           <div className="stat">
@@ -110,6 +136,12 @@ export default function ProductCard({ item, currency, currencySymbol, t }) {
           <button className="btn btn-ghost btn-sm" onClick={() => setShowBreakdown(!showBreakdown)}>
             {showBreakdown ? t('result.hideBreakdown') : t('result.viewBreakdown')}
           </button>
+          <button
+            className={`btn btn-sm ${inCombine ? 'btn-primary' : 'btn-ghost'}`}
+            onClick={onToggleCombine}
+          >
+            {inCombine ? t('combine.inCombine') : t('combine.addToCombine')}
+          </button>
 
           {showBreakdown && (
             <div className="breakdown">
@@ -137,10 +169,6 @@ export default function ProductCard({ item, currency, currencySymbol, t }) {
                 <span>{t('result.paymentFee')}</span>
                 <span className="val">{fmt(b.paymentFee, currencySymbol, currency)}</span>
               </div>
-              <div className="breakdown-row">
-                <span>{t('result.profit')}</span>
-                <span className="val">{fmt(b.profit, currencySymbol, currency)}</span>
-              </div>
               <div className="breakdown-row total">
                 <span>{t('result.landedTotal')}</span>
                 <span className="val">{fmt(b.total, currencySymbol, currency)}</span>
@@ -149,7 +177,7 @@ export default function ProductCard({ item, currency, currencySymbol, t }) {
             </div>
           )}
 
-          <button className="btn-order" style={{ marginTop: '12px' }}>
+          <button className="btn-order" style={{ marginTop: '12px' }} onClick={onOrder}>
             {t('result.orderCta')}
           </button>
         </div>

@@ -2,6 +2,10 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
+import {
+  ensureSchema, loadTable, loadSettings, saveSetting,
+  loadAdmins, upsertAdmin, deleteAdminRow, upsertRecord, deleteRow,
+} from './mysql.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.resolve(__dirname, '../../data');
@@ -216,35 +220,110 @@ const seed = () => ({
 });
 
 let db = null;
+let initPromise = null;
 
-function ensureDir() {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+// 读取旧 JSON 文件（仅用于一次性迁移）
+function readLegacyJson() {
+  try {
+    if (fs.existsSync(DB_FILE)) return JSON.parse(fs.readFileSync(DB_FILE, 'utf-8'));
+  } catch {
+    /* ignore */
+  }
+  return null;
 }
 
-export function loadDb() {
-  if (db) return db;
-  ensureDir();
-  if (!fs.existsSync(DB_FILE)) {
-    db = seed();
-    saveDb();
-  } else {
-    try {
-      db = JSON.parse(fs.readFileSync(DB_FILE, 'utf-8'));
-    } catch {
-      db = seed();
-      saveDb();
+// 启动初始化：建表 -> 从 MySQL 加载；空库则迁移旧 JSON（或种子数据）灌入
+async function initFromMysql() {
+  await ensureSchema();
+  const [cust, addr, ords, st, admins] = await Promise.all([
+    loadTable('customers'),
+    loadTable('addresses'),
+    loadTable('orders'),
+    loadSettings(),
+    loadAdmins(),
+  ]);
+  const settings = { ...st };
+  settings.admins = admins; // admins 独立表 -> 内存模型保持 db.settings.admins
+  const loaded = { customers: cust, addresses: addr, orders: ords, settings };
+
+  // 动态键（carriers 等）存在 settings kv 里，内存模型读顶层：非系统键全部提升
+  const SYSTEM_KEYS = new Set(['admins', 'minServiceFeeRate', 'defaultTipOptions', 'adminProfile', 'adminPassword']);
+  for (const [k, v] of Object.entries(settings)) {
+    if (!SYSTEM_KEYS.has(k)) {
+      loaded[k] = v;
+      delete settings[k];
     }
+  }
+
+  const isEmpty = cust.length === 0 && addr.length === 0 && ords.length === 0 && admins.length === 0;
+  if (isEmpty) {
+    db = seed();
+    const legacy = readLegacyJson();
+    if (legacy) {
+      db = {
+        customers: legacy.customers || db.customers,
+        addresses: legacy.addresses || db.addresses,
+        orders: legacy.orders || db.orders,
+        settings: { ...db.settings, ...(legacy.settings || {}) },
+      };
+    }
+    await flushAll(db);
+  } else {
+    db = loaded;
   }
   return db;
 }
 
+export async function loadDb() {
+  if (db) return db;
+  if (!initPromise) {
+    initPromise = initFromMysql().catch((e) => {
+      initPromise = null;
+      throw e;
+    });
+  }
+  await initPromise;
+  return db;
+}
+
+// 全量灌库（仅初始化/迁移用）
+async function flushAll(data) {
+  for (const c of data.customers || []) await upsertRecord('customers', c);
+  for (const a of data.addresses || []) await upsertRecord('addresses', a);
+  for (const o of data.orders || []) await upsertRecord('orders', o);
+  for (const a of data.settings?.admins || []) await upsertAdmin(a);
+  for (const [k, v] of Object.entries(data.settings || {})) {
+    if (k !== 'admins') await saveSetting(k, v);
+  }
+  for (const [k, v] of Object.entries(data)) {
+    if (!['customers', 'addresses', 'orders', 'settings'].includes(k)) await saveSetting(k, v);
+  }
+}
+
+// saveDb 保持同步签名（旧调用点零改动）：settings/动态键全量写，行级 CRUD 走 upsertRow
 export function saveDb() {
-  ensureDir();
-  fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
+  if (!db) return;
+  for (const [k, v] of Object.entries(db.settings || {})) {
+    if (k === 'admins') {
+      // admins 全量比对写：简单起见逐条 upsert（账号数量极小）
+      for (const a of v || []) upsertAdmin(a).catch((e) => console.error('[mysql] upsertAdmin:', e.message));
+    } else {
+      saveSetting(k, v).catch((e) => console.error('[mysql] saveSetting:', e.message));
+    }
+  }
+  for (const [k, v] of Object.entries(db)) {
+    if (!['customers', 'addresses', 'orders', 'settings'].includes(k)) {
+      saveSetting(k, v).catch((e) => console.error('[mysql] saveSetting:', e.message));
+    }
+  }
 }
 
 export function getDb() {
-  if (!db) loadDb();
+  if (!db) {
+    // 兼容同步调用点：未初始化时阻塞不可行，触发异步初始化并返回空骨架
+    loadDb().catch((e) => console.error('[mysql] init failed:', e.message));
+    db = seed();
+  }
   return db;
 }
 
@@ -259,7 +338,7 @@ export function genOrderNo() {
   return `CB${ymd}${rand}`;
 }
 
-// ===== 通用 CRUD 辅助 =====
+// ===== 通用 CRUD 辅助（内存即时生效 + MySQL 写穿持久化） =====
 export function listCollection(name) {
   return getDb()[name] || [];
 }
@@ -283,7 +362,8 @@ export function createRecord(name, data) {
     record.createdAt = now;
   }
   col.push(record);
-  saveDb();
+  upsertRecord(name, record)
+    .catch((e) => console.error(`[mysql] create ${name}:`, e.message));
   return record;
 }
 
@@ -293,7 +373,8 @@ export function updateRecord(name, id, data) {
   if (idx === -1) return null;
   const now = new Date().toISOString();
   col[idx] = { ...col[idx], ...data, id, updatedAt: now };
-  saveDb();
+  upsertRecord(name, col[idx])
+    .catch((e) => console.error(`[mysql] update ${name}:`, e.message));
   return col[idx];
 }
 
@@ -302,6 +383,7 @@ export function deleteRecord(name, id) {
   const idx = col.findIndex((x) => x.id === id);
   if (idx === -1) return false;
   col.splice(idx, 1);
-  saveDb();
+  deleteRow(name, id)
+    .catch((e) => console.error(`[mysql] delete ${name}:`, e.message));
   return true;
 }

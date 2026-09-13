@@ -20,10 +20,16 @@ export async function searchAndCompare(rawKeyword, opts = {}) {
     valueUsd: 20,
   };
   const carrierResult = await getCarrierQuotes(carrierOpts);
+  // carrier 参数支持渠道名（productName，多渠道场景）或快递商 code
   const preferred = opts.carrier
-    ? carrierResult.quotes.find((q) => q.carrier === opts.carrier || q.configId === opts.carrier)
+    ? carrierResult.quotes.find((q) => q.productName === opts.carrier) ||
+      carrierResult.quotes.find((q) => q.carrier === opts.carrier || q.configId === opts.carrier)
     : null;
-  const carrierQuote = preferred || carrierResult.quotes.find((q) => q.carrier === carrierResult.recommended) || carrierResult.quotes[0] || null;
+  const carrierQuote = preferred
+    || carrierResult.quotes.find((q) => q.productName === carrierResult.recommendedKey)
+    || carrierResult.quotes.find((q) => q.carrier === carrierResult.recommended)
+    || carrierResult.quotes[0]
+    || null;
 
   const adapters = createAdapters();
   const selected = opts.platforms && opts.platforms.length
@@ -97,7 +103,7 @@ export async function searchAndCompare(rawKeyword, opts = {}) {
       daysMin: q.daysMin,
       daysMax: q.daysMax,
       source: q.source,
-      recommended: q.carrier === carrierResult.recommended,
+      recommended: (q.raw?.routeCode || q.productName) === carrierResult.recommendedKey,
     })),
   };
 }

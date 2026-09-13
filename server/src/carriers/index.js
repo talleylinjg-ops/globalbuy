@@ -6,6 +6,8 @@ import { DHLAdapter } from './dhl.js';
 import { UPSAdapter } from './ups.js';
 import { FedExAdapter } from './fedex.js';
 import { EMSAdapter } from './ems.js';
+import { PtdsgjAdapter } from './ptdsgj.js';
+import { ZjhygjAdapter } from './zjhygj.js';
 
 export const CARRIER_ADAPTERS = {
   yuntrack: { name: '云途物流', adapter: YunTrackAdapter, fields: ['appId', 'appToken'] },
@@ -14,6 +16,8 @@ export const CARRIER_ADAPTERS = {
   ups: { name: 'UPS', adapter: UPSAdapter, fields: ['clientId', 'clientSecret'] },
   fedex: { name: 'FedEx', adapter: FedExAdapter, fields: ['apiKey', 'apiSecret'] },
   ems: { name: 'EMS', adapter: EMSAdapter, fields: ['userId', 'apiKey'] },
+  ptdsgj: { name: 'PTD 国际速递', adapter: PtdsgjAdapter, fields: ['token', 'pickupZone'] },
+  zjhygj: { name: '华源国际', adapter: ZjhygjAdapter, fields: ['account', 'password', 'branchId'] },
 };
 
 // 内置默认快递商（未配置密钥时走估算模式，保证开箱可用）
@@ -25,6 +29,8 @@ export function defaultCarriers() {
     { code: 'ups', name: 'UPS', mode: 'express', enabled: true, markupRate: 0 },
     { code: 'fedex', name: 'FedEx', mode: 'express', enabled: true, markupRate: 0 },
     { code: 'ems', name: 'EMS', mode: 'standard', enabled: true, markupRate: 0 },
+    { code: 'ptdsgj', name: 'PTD 国际速递', mode: 'standard', enabled: true, markupRate: 0 },
+    { code: 'zjhygj', name: '华源国际专线', mode: 'economy', enabled: true, markupRate: 0 },
   ];
 }
 

@@ -1,48 +1,41 @@
 import { useState } from 'react';
 
+// 单输入智能搜索：默认关键词模式，"商品链接"胶囊（搜索栏内第一个元素）切换为链接解析模式
 export default function SearchPanel({ query, setQuery, onSearch, onParseLink, loading, parsing, t, categories }) {
-  const [mode, setMode] = useState('keyword');
+  const [linkMode, setLinkMode] = useState(false);
 
   const submit = (e) => {
     e.preventDefault();
-    if (mode === 'keyword') {
-      onSearch(query.trim());
-    } else {
+    if (linkMode) {
       onParseLink(query.trim());
+    } else {
+      onSearch(query.trim());
     }
   };
 
   return (
     <div className="search-panel">
-      <div className="mode-tabs">
+      <form className="search-row" onSubmit={submit}>
         <button
           type="button"
-          className={`mode-tab ${mode === 'keyword' ? 'active' : ''}`}
-          onClick={() => setMode('keyword')}
-        >
-          {t('search.tabKeyword')}
-        </button>
-        <button
-          type="button"
-          className={`mode-tab ${mode === 'link' ? 'active' : ''}`}
-          onClick={() => setMode('link')}
+          className={`link-toggle ${linkMode ? 'active' : ''}`}
+          title={t('search.placeholderLink')}
+          onClick={() => setLinkMode((v) => !v)}
         >
           {t('search.tabLink')}
         </button>
-      </div>
-      <form className="search-row" onSubmit={submit}>
         <input
           className="search-input"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder={mode === 'keyword' ? t('search.placeholder') : t('search.placeholderLink')}
+          placeholder={linkMode ? t('search.placeholderLink') : t('search.placeholder')}
           autoFocus
         />
         <button className="btn btn-primary" type="submit" disabled={loading || parsing || !query.trim()}>
           {loading || parsing ? t('search.buttonSearching') : t('search.button')}
         </button>
       </form>
-      {mode === 'keyword' && (
+      {!linkMode && (
         <div className="suggestions">
           <span>{t('search.suggestions')}</span>
           {categories.map((c) => (

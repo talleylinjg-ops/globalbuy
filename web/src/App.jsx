@@ -1,24 +1,70 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useI18n } from './i18n.js';
-import { fetchMeta, searchProducts, parseLink } from './api.js';
+import { fetchMeta, searchProducts, parseLink, apiUrl } from './api.js';
 import ProductCard from './components/ProductCard.jsx';
 import SearchPanel from './components/SearchPanel.jsx';
 import SettingsPanel from './components/SettingsPanel.jsx';
 import Loading from './components/Loading.jsx';
 import CarrierPicker from './components/CarrierPicker.jsx';
+import CombineBar from './components/CombineBar.jsx';
+import OrderModal from './components/OrderModal.jsx';
 import AdminPanel from './components/AdminPanel.jsx';
 
 const DEFAULT_COUNTRY = 'US';
 const DEFAULT_CURRENCY = 'USD';
 const DEFAULT_PLATFORMS = ['taobao', 'jd', 'pdd', '1688'];
+const DEFAULT_HOT_KEYWORDS = [
+  '蓝牙耳机', '无线充电器', '智能手表', '保温杯',
+  '手机壳', '机械键盘', '行李箱', 'LED台灯',
+  '瑜伽垫', '猫玩具', '零食', '运动鞋',
+  '降噪',
+];
 
 function getAdminRoute() {
   return window.location.hash.startsWith('#/admin');
 }
 
+// 从全部快递报价中挑三档：最快 / 最便宜 / 居中；三档尽量为三个不同报价
+function pickShippingTiers(quotes) {
+  if (!Array.isArray(quotes) || quotes.length === 0) return [];
+  const byPrice = [...quotes].sort((a, b) => a.priceUsd - b.priceUsd);
+  const byDays = [...quotes].sort(
+    (a, b) => (a.daysMin + a.daysMax) / 2 - (b.daysMin + b.daysMax) / 2
+  );
+  const cheapest = byPrice[0];
+  const fastest = byDays[0];
+  // 按价格数字去重：三个档位的价格数值必须互不相同，视觉上才是三个价格
+  const usedPrices = new Set([cheapest, fastest].map((q) => q.priceUsd));
+
+  // 居中：从价格中位出发向两侧找与最便宜/最快价格不同的报价
+  let middle = null;
+  const start = Math.floor(byPrice.length / 2);
+  for (let d = 0; d < byPrice.length && !middle; d++) {
+    for (const i of [start + d, start - d]) {
+      if (i >= 0 && i < byPrice.length) {
+        const q = byPrice[i];
+        if (!usedPrices.has(q.priceUsd)) {
+          middle = q;
+          break;
+        }
+      }
+    }
+  }
+
+  const tiers = [];
+  const push = (label, quote) => {
+    const existing = tiers.find((tr) => tr.quote === quote);
+    if (existing) existing.labels.push(label);
+    else tiers.push({ labels: [label], quote });
+  };
+  push('shipFastest', fastest);
+  push('shipCheapest', cheapest);
+  if (middle) push('shipMiddle', middle);
+  return tiers;
+}
+
 export default function App() {
-  const { t, lang, setLang, languages } = useI18n();
-  const [isAdmin, setIsAdmin] = useState(getAdminRoute());
+  const { t, lang, setLang, languages } = useI18n();  const [isAdmin, setIsAdmin] = useState(getAdminRoute());
   const [meta, setMeta] = useState(null);
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -34,7 +80,12 @@ export default function App() {
   const [platforms, setPlatforms] = useState([...DEFAULT_PLATFORMS]);
   const [profitRate, setProfitRate] = useState(8);
   const [sortBy, setSortBy] = useState('recommended');
-  const [carrier, setCarrier] = useState(null);
+  const [carrier, setCarrier] = useState(null); // 选中的报价对象（渠道级）
+  // 合并包裹：多商品统一运费/关税/增值税
+  const [combineList, setCombineList] = useState([]);
+  const [combineResult, setCombineResult] = useState(null);
+  const [orderItem, setOrderItem] = useState(null);
+  const [combineLoading, setCombineLoading] = useState(false);
 
   useEffect(() => {
     const onHash = () => setIsAdmin(getAdminRoute());
@@ -53,6 +104,43 @@ export default function App() {
       .catch(() => {});
   }, []);
 
+  // 合并包裹：切换选中、调用统一计价接口
+  const toggleCombine = useCallback((item) => {
+    setCombineList((prev) => {
+      if (prev.some((x) => x.itemId === item.itemId)) {
+        return prev.filter((x) => x.itemId !== item.itemId);
+      }
+      setCombineResult(null);
+      return [...prev, item];
+    });
+  }, []);
+
+  const removeCombine = useCallback((itemId) => {
+    setCombineList((prev) => prev.filter((x) => x.itemId !== itemId));
+    setCombineResult(null);
+  }, []);
+
+  const calcCombine = useCallback(async () => {
+    if (combineList.length === 0) return;
+    setCombineLoading(true);
+    try {
+      const res = await fetch(apiUrl('/api/combine'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          itemIds: combineList.map((x) => x.itemId),
+          country,
+          currency,
+          profitRate,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) setCombineResult(data);
+    } finally {
+      setCombineLoading(false);
+    }
+  }, [combineList, country, currency, profitRate]);
+
   const doSearch = useCallback(async (q) => {
     if (!q) return;
     setLoading(true);
@@ -65,7 +153,7 @@ export default function App() {
         currency,
         platforms,
         profitRate: profitRate / 100,
-        carrier: carrier || undefined,
+        carrier: carrier ? (carrier.productName || carrier.carrier) : undefined,
       });
       setResults(data);
       setLastSearch({ q, country, currency });
@@ -157,6 +245,8 @@ export default function App() {
     { id: 'speed', label: t('sort.speed') },
   ], [t]);
 
+  const shippingTiers = pickShippingTiers(results?.carrierQuotes);
+
   return (
     <div>
       <header className="header">
@@ -173,9 +263,8 @@ export default function App() {
           </select>
         </div>
         <div className="container header-inner">
-          <h1 className="logo">CrossBuy <span>Compare</span></h1>
-          <p className="tagline">{t('app.tagline')}</p>
-          <p className="subtagline">{t('app.subtagline')}</p>
+          <h1 className="logo">CrossBuy</h1>
+          <p className="tagline">Buy More Save More</p>
         </div>
       </header>
 
@@ -192,7 +281,7 @@ export default function App() {
           loading={loading}
           parsing={parsing}
           t={t}
-          categories={meta?.categories || ['无线蓝牙耳机', '无线充电器', '瑜伽垫', '保温杯', '手机壳', '机械键盘']}
+          categories={meta?.hotKeywords || meta?.categories || DEFAULT_HOT_KEYWORDS}
         />
 
         {linkMatched && linkMatched.ok && linkMatched.product && (
@@ -213,48 +302,40 @@ export default function App() {
           profitRate={profitRate}
           setProfitRate={setProfitRate}
           t={t}
-        />
-
-        {lastSearch && results && results.carrierQuotes && results.carrierQuotes.length > 0 && (
-          <CarrierPicker
-            quotes={results.carrierQuotes}
-            current={results.carrier?.carrier}
-            onSelect={(c) => {
-              setCarrier(c);
-              if (lastSearch?.q) doSearch(lastSearch.q);
-            }}
-            t={t}
-          />
-        )}
+        >
+          {lastSearch && results && results.carrierQuotes && results.carrierQuotes.length > 0 && (
+            <CarrierPicker
+              quotes={results.carrierQuotes}
+              current={results.carrier}
+              onSelect={(q) => {
+                setCarrier(q);
+                if (lastSearch?.q) doSearch(lastSearch.q);
+              }}
+              t={t}
+            />
+          )}
+        </SettingsPanel>
 
         {lastSearch && results && (
           <div className="results-head">
-            <div>
-              <div className="results-count">
-                {t('result.totalLabel', { total: results.total, platforms: results.sourceInfo.filter((s) => s.count > 0).length })}
-              </div>
+            <div className="results-count">
               {results.translatedKeyword && results.translatedKeyword !== results.inputKeyword && (
-                <div className="translate-badge">
-                  {t('search.keywordTranslated')}: <b>{results.translatedKeyword}</b>
-                </div>
+                <span className="translate-badge">{t('search.keywordTranslated')}: <b>{results.translatedKeyword}</b></span>
               )}
+              <span>{t('result.totalLabel', { total: results.total, platforms: results.sourceInfo.filter((s) => s.count > 0).length })}</span>
             </div>
-            <span className="results-count">{t('result.sortedBy')}</span>
-          </div>
-        )}
-
-        {!loading && sortedResults && sortedResults.length > 0 && (
-          <div className="sort-bar">
-            {sortOptions.map((o) => (
-              <button
-                key={o.id}
-                type="button"
-                className={`btn-chip ${sortBy === o.id ? 'active' : ''}`}
-                onClick={() => setSortBy(o.id)}
-              >
-                {o.label}
-              </button>
-            ))}
+            <div className="sort-bar">
+              {sortOptions.map((o) => (
+                <button
+                  key={o.id}
+                  type="button"
+                  className={`btn-chip ${sortBy === o.id ? 'active' : ''}`}
+                  onClick={() => setSortBy(o.id)}
+                >
+                  {o.label}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
@@ -275,6 +356,10 @@ export default function App() {
                 rank={item.rank}
                 currency={currency}
                 currencySymbol={currencySymbol}
+                shippingTiers={shippingTiers}
+                inCombine={combineList.some((x) => x.itemId === item.itemId)}
+                onToggleCombine={() => toggleCombine(item)}
+                onOrder={() => setOrderItem(item)}
                 t={t}
               />
             ))}
@@ -283,6 +368,28 @@ export default function App() {
         </>
         )}
       </main>
+
+      <CombineBar
+        items={combineList}
+        result={combineResult}
+        loading={combineLoading}
+        onCalc={calcCombine}
+        onClear={() => { setCombineList([]); setCombineResult(null); }}
+        onRemove={removeCombine}
+        t={t}
+      />
+
+      {orderItem && (
+        <OrderModal
+          item={orderItem}
+          country={country}
+          currency={currency}
+          carrier={carrier}
+          quotes={results?.carrierQuotes}
+          onClose={() => setOrderItem(null)}
+          t={t}
+        />
+      )}
 
       <footer className="footer">
         <p className="note">{t('footer.note')}</p>

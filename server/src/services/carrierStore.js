@@ -15,6 +15,12 @@ function seedFromEnv() {
     ups: { clientId: process.env.CARRIER_UPS_CLIENT_ID, clientSecret: process.env.CARRIER_UPS_CLIENT_SECRET },
     fedex: { apiKey: process.env.CARRIER_FEDEX_API_KEY, apiSecret: process.env.CARRIER_FEDEX_API_SECRET },
     ems: { userId: process.env.CARRIER_EMS_USER_ID, apiKey: process.env.CARRIER_EMS_API_KEY },
+    ptdsgj: { token: process.env.CARRIER_PTDSGJ_TOKEN, pickupZone: process.env.CARRIER_PTDSGJ_PICKUP_ZONE },
+    zjhygj: {
+      account: process.env.CARRIER_ZJHYGJ_ACCOUNT,
+      password: process.env.CARRIER_ZJHYGJ_PASSWORD,
+      branchId: process.env.CARRIER_ZJHYGJ_BRANCH_ID,
+    },
   };
   return defaultCarriers().map((c) => {
     const env = map[c.code] || {};
@@ -70,7 +76,7 @@ export function deleteCarrier(id) {
 // 是否存在真实（非估算）快递商配置
 export function hasRealCarrier() {
   return getCarrierConfigs().some((c) => {
-    const keys = ['apiKey', 'appKey', 'appId', 'clientId', 'userId'];
+    const keys = ['apiKey', 'appKey', 'appId', 'clientId', 'userId', 'token', 'account'];
     return keys.some((k) => c[k]);
   });
 }

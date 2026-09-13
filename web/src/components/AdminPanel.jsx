@@ -7,6 +7,9 @@ import {
   adminListAddresses, adminCreateAddress, adminUpdateAddress, adminDeleteAddress,
   adminListOrders, adminCreateOrder, adminUpdateOrder, adminDeleteOrder,
   adminGetSettings, adminUpdateSettings, setAdminToken, quoteCarriers,
+  adminGetProfile, adminUpdateProfile, adminUpdatePassword, adminVerify,
+  adminListAdmins, adminCreateAdmin, adminUpdateAdmin, adminDeleteAdmin,
+  adminAddOrderNote,
 } from '../api.js';
 
 const FIELD_LABELS = {
@@ -16,6 +19,8 @@ const FIELD_LABELS = {
   ups: { clientId: 'Client ID', clientSecret: 'Client Secret' },
   fedex: { apiKey: 'API Key', apiSecret: 'API Secret' },
   ems: { userId: 'User ID', apiKey: 'API Key' },
+  ptdsgj: { token: 'API Token', pickupZone: '收货区域' },
+  zjhygj: { account: '账号', password: '密码', branchId: '租户 ID（branchId）' },
 };
 
 const MODE_OPTIONS = [
@@ -24,7 +29,7 @@ const MODE_OPTIONS = [
   { id: 'express', label: '特快' },
 ];
 
-const ORDER_STATUSES = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+const ORDER_STATUSES = ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'];
 const CUSTOMER_STATUSES = ['active', 'inactive'];
 const CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CNY', 'CAD', 'AUD', 'HKD', 'SGD', 'KRW'];
 
@@ -34,6 +39,8 @@ const emptyOrder = { customerId: '', addressId: '', status: 'pending', carrier: 
 
 export default function AdminPanel({ t }) {
   const [token, setToken] = useState(localStorage.getItem('cb_admin_token') || '');
+  const [username, setUsername] = useState('');
+  const [role, setRole] = useState('operator');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [tab, setTab] = useState('customers');
@@ -49,7 +56,6 @@ export default function AdminPanel({ t }) {
   const [customerQuery, setCustomerQuery] = useState('');
   const [orders, setOrders] = useState([]);
   const [orderQuery, setOrderQuery] = useState('');
-  const [orderStatusFilter, setOrderStatusFilter] = useState('');
   const [addresses, setAddresses] = useState([]);
   const [settings, setSettings] = useState({});
 
@@ -69,10 +75,12 @@ export default function AdminPanel({ t }) {
     e.preventDefault();
     setLoginError('');
     try {
-      const res = await adminLogin(password);
+      const res = await adminLogin(username || 'admin', password);
       setToken(res.token);
+      setRole(res.role || 'operator');
+      setUsername(res.username || 'admin');
     } catch {
-      setLoginError(t('admin.loginError') || 'Invalid password');
+      setLoginError(t('admin.loginError') || 'Invalid username or password');
     }
   };
 
@@ -109,9 +117,24 @@ export default function AdminPanel({ t }) {
   }, [showNotice]);
 
   useEffect(() => {
-    if (token) loadAll();
+    if (token) {
+      // 恢复角色与用户名（刷新页面后 localStorage 只有 token）
+      adminVerify()
+        .then((d) => {
+          setRole(d.role || 'operator');
+          setUsername(d.username || 'admin');
+        })
+        .catch(() => setToken(''));
+      loadAll();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
+
+  // WooCommerce 后台行为：每次切换页面都重新拉取最新数据
+  const switchTab = useCallback((next) => {
+    setTab(next);
+    loadAll();
+  }, [loadAll]);
 
   const customerById = useCallback((id) => customers.find((c) => c.id === id), [customers]);
   const addressById = useCallback((id) => addresses.find((a) => a.id === id), [addresses]);
@@ -244,6 +267,12 @@ export default function AdminPanel({ t }) {
     showNotice('Updated');
   };
 
+  const addOrderNote = async (id, content, type) => {
+    await adminAddOrderNote(id, content, type);
+    await loadAll();
+    showNotice(t('admin.noteAdded') || 'Note added');
+  };
+
   // ===== 设置保存 =====
   const saveSettings = async () => {
     await adminUpdateSettings(settings);
@@ -251,26 +280,96 @@ export default function AdminPanel({ t }) {
     showNotice('Saved');
   };
 
+  // ===== 会员资料 =====
+  const [profile, setProfile] = useState({ name: '', email: '' });
+  const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirm: '' });
+  const [pwError, setPwError] = useState('');
+
+  useEffect(() => {
+    if (token) {
+      adminGetProfile().then(setProfile).catch(() => {});
+    }
+  }, [token]);
+
+  const saveProfile = async (e) => {
+    e.preventDefault();
+    try {
+      const updated = await adminUpdateProfile(profile);
+      setProfile(updated);
+      showNotice('Saved');
+    } catch (err) {
+      showNotice(err.message);
+    }
+  };
+
+  const changePassword = async (e) => {
+    e.preventDefault();
+    setPwError('');
+    if (pwForm.newPassword !== pwForm.confirm) {
+      setPwError(t('admin.passwordMismatch') || 'New passwords do not match');
+      return;
+    }
+    try {
+      await adminUpdatePassword(pwForm.currentPassword, pwForm.newPassword);
+      setPwForm({ currentPassword: '', newPassword: '', confirm: '' });
+      showNotice(t('admin.passwordUpdated') || 'Password updated');
+    } catch (err) {
+      setPwError(err.message);
+    }
+  };
+
   if (!token) {
     return (
       <div className="admin-login">
-        <div className="card" style={{ maxWidth: 360, margin: '40px auto', padding: 24 }}>
-          <h2 className="admin-title">{t('admin.title')}</h2>
-          <h3>{t('admin.login')}</h3>
+        <div className="login-glow login-glow-1" />
+        <div className="login-glow login-glow-2" />
+        <div className="login-glow login-glow-3" />
+
+        <div className="login-card">
+          <div className="login-brand">
+            <span className="login-logo">CrossBuy</span>
+            <span className="login-tagline">{t('common.brandTagline') || 'Buy More Save More'}</span>
+          </div>
+
+          <h2 className="login-title">{t('admin.title')}</h2>
+          <p className="login-sub">{t('admin.loginHint') || 'Sign in to manage orders, customers and carriers'}</p>
+
           <form onSubmit={handleLogin}>
-            <label className="settings-label" style={{ marginTop: 10 }}>{t('admin.password')}</label>
-            <input
-              className="settings-control"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoFocus
-            />
-            {loginError && <div className="error-text">{loginError}</div>}
-            <button type="submit" className="btn btn-primary" style={{ marginTop: 14, width: '100%' }} disabled={busy}>
+            <label className="login-field">
+              <span className="login-field-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+              </span>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder={t('admin.username') || 'Username'}
+                autoFocus
+              />
+            </label>
+            <label className="login-field">
+              <span className="login-field-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+              </span>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder={t('admin.password') || 'Password'}
+              />
+            </label>
+
+            {loginError && <div className="login-error">{loginError}</div>}
+
+            <button type="submit" className="login-submit" disabled={busy}>
               {t('admin.loginBtn')}
             </button>
           </form>
+
+          <div className="login-mode-badge">
+            <span className="login-mode-dot" />
+            {t('admin.productionMode') || 'Production mode'}
+          </div>
         </div>
       </div>
     );
@@ -282,167 +381,84 @@ export default function AdminPanel({ t }) {
 
       <div className="admin-head">
         <h2 className="admin-title">{t('admin.title')}</h2>
-        <button className="btn btn-ghost btn-sm" onClick={handleLogout}>{t('admin.logout')}</button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button className="btn btn-ghost btn-sm" onClick={() => loadAll()}>{t('admin.refresh')}</button>
+          <button className="btn btn-ghost btn-sm" onClick={handleLogout}>{t('admin.logout')}</button>
+        </div>
       </div>
 
       <div className="admin-tabs">
-        <button className={tab === 'customers' ? 'active' : ''} onClick={() => setTab('customers')}>
+        <button className={tab === 'customers' ? 'active' : ''} onClick={() => switchTab('customers')}>
           {t('admin.customers')}
         </button>
-        <button className={tab === 'orders' ? 'active' : ''} onClick={() => setTab('orders')}>
+        <button className={tab === 'orders' ? 'active' : ''} onClick={() => switchTab('orders')}>
           {t('admin.orders')}
         </button>
-        <button className={tab === 'addresses' ? 'active' : ''} onClick={() => setTab('addresses')}>
+        <button className={tab === 'addresses' ? 'active' : ''} onClick={() => switchTab('addresses')}>
           {t('admin.addresses')}
         </button>
-        <button className={tab === 'carriers' ? 'active' : ''} onClick={() => setTab('carriers')}>
+        <button className={tab === 'carriers' ? 'active' : ''} onClick={() => switchTab('carriers')}>
           {t('admin.carriers') || 'Carriers'}
         </button>
-        <button className={tab === 'settings' ? 'active' : ''} onClick={() => setTab('settings')}>
-          {t('admin.settings')}
+        <button className={tab === 'settings' ? 'active' : ''} onClick={() => switchTab('settings')}>
+          {t('admin.systemSettings')}
         </button>
       </div>
 
       {busy && <div className="loading">Loading…</div>}
 
-      {/* ================= 客户管理 ================= */}
+      {/* ================= 客户管理（WooCommerce 风格） ================= */}
       {tab === 'customers' && !busy && (
-        <div>
-          <div className="admin-section-head">
-            <h3>{t('admin.customers')}</h3>
-            <div style={{ display: 'flex', gap: 10 }}>
-              <input
-                className="settings-control"
-                style={{ maxWidth: 220 }}
-                placeholder={t('admin.search')}
-                value={customerQuery}
-                onChange={(e) => setCustomerQuery(e.target.value)}
-              />
-              <button className="btn btn-primary btn-sm" onClick={() => setCustomerForm({ ...emptyCustomer, _editing: null })}>
-                {t('admin.addCustomer') || '新增客户'}
-              </button>
-            </div>
-          </div>
-
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>{t('admin.name')}</th><th>{t('admin.email')}</th><th>{t('admin.phone')}</th>
-                <th>{t('admin.country')}</th><th>{t('admin.currency')}</th><th>{t('admin.status')}</th><th>{t('admin.actions')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {customers
-                .filter((c) => !customerQuery || [c.name, c.email, c.phone, c.country].some((v) => v?.toLowerCase().includes(customerQuery.toLowerCase())))
-                .map((c) => (
-                  <tr key={c.id}>
-                    <td><b>{c.name}</b>{c.notes && <div className="muted-note">{c.notes}</div>}</td>
-                    <td>{c.email}</td>
-                    <td>{c.phone}</td>
-                    <td>{c.country}</td>
-                    <td>{c.currency}</td>
-                    <td><StatusPill value={c.status} /></td>
-                    <td>
-                      <button className="btn btn-ghost btn-sm" onClick={() => setCustomerForm({ ...c, _editing: c })}>{t('admin.edit')}</button>
-                      <button className="btn btn-ghost btn-sm danger" onClick={() => removeCustomer(c.id)}>{t('admin.delete')}</button>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-
-          {customerForm && (
-            <CustomerForm
-              customers={customers}
-              initial={customerForm}
-              editing={customerForm._editing}
-              onSave={(d) => saveCustomer({ ...d, id: customerForm._editing?.id })}
-              onCancel={() => setCustomerForm(null)}
-              t={t}
-            />
-          )}
-        </div>
+        <CustomersTab
+          customers={customers}
+          query={customerQuery}
+          onQuery={setCustomerQuery}
+          onAdd={() => setCustomerForm({ ...emptyCustomer, _editing: null })}
+          onEdit={(c) => setCustomerForm({ ...c, _editing: c })}
+          onDelete={removeCustomer}
+          t={t}
+        />
       )}
 
-      {/* ================= 订单管理 ================= */}
+      {customerForm && (
+        <CustomerForm
+          customers={customers}
+          initial={customerForm}
+          editing={customerForm._editing}
+          onSave={(d) => saveCustomer({ ...d, id: customerForm._editing?.id })}
+          onCancel={() => setCustomerForm(null)}
+          t={t}
+        />
+      )}
+
+      {/* ================= 订单管理（WooCommerce 风格） ================= */}
       {tab === 'orders' && !busy && (
-        <div>
-          <div className="admin-section-head">
-            <h3>{t('admin.orders')}</h3>
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-              <input
-                className="settings-control"
-                style={{ maxWidth: 220 }}
-                placeholder={t('admin.search')}
-                value={orderQuery}
-                onChange={(e) => setOrderQuery(e.target.value)}
-              />
-              <select
-                className="settings-control"
-                style={{ maxWidth: 160 }}
-                value={orderStatusFilter}
-                onChange={(e) => setOrderStatusFilter(e.target.value)}
-              >
-                <option value="">全部</option>
-                {ORDER_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-              </select>
-              <button className="btn btn-primary btn-sm" onClick={() => setOrderForm({ ...emptyOrder, _editing: null })}>
-                {t('admin.addOrder') || '新增订单'}
-              </button>
-            </div>
-          </div>
+        <OrdersTab
+          orders={orders}
+          customers={customers}
+          query={orderQuery}
+          onQuery={setOrderQuery}
+          onAdd={() => setOrderForm({ ...emptyOrder, _editing: null })}
+          onEdit={(o) => setOrderForm({ ...o, _editing: o })}
+          onDelete={removeOrder}
+          onStatus={updateOrderStatus}
+          onAddNote={addOrderNote}
+          selected={selectedOrder}
+          onSelect={setSelectedOrder}
+          t={t}
+        />
+      )}
 
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>{t('admin.orderNo')}</th><th>{t('admin.customerInfo')}</th><th>{t('admin.items')}</th>
-                <th>{t('admin.total')}</th><th>{t('admin.status')}</th><th>{t('admin.actions')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders
-                .filter((o) => !orderStatusFilter || o.status === orderStatusFilter)
-                .filter((o) => !orderQuery || (o.orderNo || '').toLowerCase().includes(orderQuery.toLowerCase()) || (o.trackingNo || '').toLowerCase().includes(orderQuery.toLowerCase()))
-                .map((o) => (
-                  <tr key={o.id}>
-                    <td><b>{o.orderNo}</b><br /><small>{o.createdAt?.slice(0, 10)}</small></td>
-                    <td>{o.customer?.name || o.customerId}<br /><small>{o.customer?.email || ''}</small></td>
-                    <td>{(o.items || []).length} 件</td>
-                    <td>{o.totalCurrency} {o.currency}</td>
-                    <td><StatusPill value={o.status} /></td>
-                    <td>
-                      <button className="btn btn-ghost btn-sm" onClick={() => setSelectedOrder(o)}>{t('admin.view') || '查看'}</button>
-                      <button className="btn btn-ghost btn-sm" onClick={() => setOrderForm({ ...o, _editing: o })}>{t('admin.edit')}</button>
-                      <button className="btn btn-ghost btn-sm danger" onClick={() => removeOrder(o.id)}>{t('admin.delete')}</button>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-
-          {selectedOrder && !orderForm && (
-            <OrderDetail
-              order={selectedOrder}
-              customer={customerById(selectedOrder.customerId)}
-              address={addressById(selectedOrder.addressId)}
-              onStatus={(s) => updateOrderStatus(selectedOrder.id, s)}
-              onClose={() => setSelectedOrder(null)}
-              t={t}
-            />
-          )}
-
-          {orderForm && (
-            <OrderForm
-              customers={customers}
-              addresses={addresses}
-              initial={orderForm}
-              editing={orderForm._editing}
-              onSave={(d) => saveOrder({ ...d, id: orderForm._editing?.id })}
-              onCancel={() => setOrderForm(null)}
-              t={t}
-            />
-          )}
-        </div>
+      {orderForm && (
+        <OrderForm
+          customers={customers}
+          addresses={addresses}
+          initial={orderForm}
+          editing={orderForm._editing}
+          onSave={(d) => saveOrder({ ...d, id: orderForm._editing?.id })}
+          onCancel={() => setOrderForm(null)}
+          t={t}
+        />
       )}
 
       {/* ================= 地址管理 ================= */}
@@ -500,7 +516,7 @@ export default function AdminPanel({ t }) {
           <div className="admin-section-head">
             <h3>{t('admin.carriers') || '国际快递商户对接'}</h3>
             <span className="admin-hint">
-              在后台填写各快递公司 API 密钥；报价时自动并行询价并推荐最低成本快递。未配置密钥时使用估算模式。
+              {t('admin.productionHint') || 'Production mode: all shipping quotes come from real API channels'}
             </span>
           </div>
 
@@ -519,8 +535,8 @@ export default function AdminPanel({ t }) {
                     <span className="pill">{c.code}</span>
                     <span className="pill">{MODE_OPTIONS.find((m) => m.id === c.mode)?.label || c.mode}</span>
                     {c.hasRealConfig
-                      ? <span className="pill good">{t('admin.connected') || 'API 已配置'}</span>
-                      : <span className="pill">{t('admin.estimateMode') || '估算模式'}</span>}
+                      ? <span className="pill good">{t('admin.connected') || 'Connected · Production'}</span>
+                      : <span className="pill">{t('admin.estimateMode') || 'Not connected'}</span>}
                   </div>
                   <div className="carrier-fields">
                     {fields.map((f) => (
@@ -589,7 +605,7 @@ export default function AdminPanel({ t }) {
                   <table className="admin-table">
                     <thead>
                       <tr>
-                        <th>快递</th><th>渠道</th><th>运费 (USD)</th><th>时效</th><th>来源</th><th>推荐</th>
+                        <th>快递</th><th>渠道</th><th>运费 (USD)</th><th>时效</th><th>推荐</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -599,8 +615,7 @@ export default function AdminPanel({ t }) {
                           <td>{q.productName}</td>
                           <td>{q.priceUsd.toFixed(2)}</td>
                           <td>{q.daysMin}-{q.daysMax} 天</td>
-                          <td>{q.source === 'api' ? 'API' : '估算'}</td>
-                          <td>{q.recommended ? '★ BEST' : ''}</td>
+                          <td>{q.recommended ? '★ ' + (t('result.recommended') || 'Best') : ''}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -612,13 +627,15 @@ export default function AdminPanel({ t }) {
         </div>
       )}
 
-      {/* ================= 系统设置 ================= */}
+      {/* ================= 系统设置（系统参数 + 管理员账号[super] + 个人资料 + 修改密码） ================= */}
       {tab === 'settings' && !busy && (
         <div>
           <div className="admin-section-head">
             <h3>{t('admin.settings')}</h3>
           </div>
+
           <div className="card admin-form">
+            <h4>{t('admin.systemSettings') || '系统参数'}</h4>
             <label className="settings-label">{t('admin.minServiceFee')}</label>
             <input
               className="settings-control"
@@ -635,8 +652,261 @@ export default function AdminPanel({ t }) {
             />
             <button className="btn btn-primary" style={{ marginTop: 14 }} onClick={saveSettings}>{t('admin.saveSettings')}</button>
           </div>
+
+          {role === 'super' && (
+            <AdminsTab username={username} showNotice={showNotice} t={t} />
+          )}
+
+          <div className="card admin-form">
+            <h4>{t('admin.adminProfile') || '会员资料'}</h4>
+            <form onSubmit={saveProfile}>
+              <div className="form-grid">
+                <div>
+                  <label className="settings-label">{t('admin.name')}</label>
+                  <input
+                    className="settings-control"
+                    value={profile.name}
+                    onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="settings-label">{t('admin.email')}</label>
+                  <input
+                    className="settings-control"
+                    type="email"
+                    value={profile.email}
+                    onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                  />
+                </div>
+              </div>
+              <button type="submit" className="btn btn-primary" style={{ marginTop: 14 }}>
+                {t('admin.save')}
+              </button>
+            </form>
+          </div>
+
+          <div className="card admin-form">
+            <h4>{t('admin.changePassword') || '修改密码'}</h4>
+            <form onSubmit={changePassword}>
+              <div className="form-grid">
+                <div>
+                  <label className="settings-label">{t('admin.currentPassword') || '当前密码'}</label>
+                  <input
+                    className="settings-control"
+                    type="password"
+                    value={pwForm.currentPassword}
+                    onChange={(e) => setPwForm({ ...pwForm, currentPassword: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="settings-label">{t('admin.newPassword') || '新密码'}</label>
+                  <input
+                    className="settings-control"
+                    type="password"
+                    value={pwForm.newPassword}
+                    onChange={(e) => setPwForm({ ...pwForm, newPassword: e.target.value })}
+                    minLength={6}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="settings-label">{t('admin.confirmPassword') || '确认新密码'}</label>
+                  <input
+                    className="settings-control"
+                    type="password"
+                    value={pwForm.confirm}
+                    onChange={(e) => setPwForm({ ...pwForm, confirm: e.target.value })}
+                    minLength={6}
+                    required
+                  />
+                </div>
+              </div>
+              {pwError && <div className="error-text">{pwError}</div>}
+              <button type="submit" className="btn btn-primary" style={{ marginTop: 14 }}>
+                {t('admin.updatePassword') || '更新密码'}
+              </button>
+            </form>
+          </div>
         </div>
       )}
+    </div>
+  );
+}
+
+// ===== 管理员账号管理（super 专属）：账号列表 / 新增 / 改角色 / 改密 / 删除 =====
+function AdminsTab({ username: currentUsername, showNotice, t }) {
+  const [admins, setAdmins] = useState([]);
+  const [form, setForm] = useState({ username: '', password: '', role: 'operator' });
+  const [editing, setEditing] = useState(null); // {id, password, role}
+  const [error, setError] = useState('');
+
+  const load = useCallback(async () => {
+    try {
+      setAdmins(await adminListAdmins());
+    } catch (e) {
+      showNotice(e.message);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  const addAdmin = async (e) => {
+    e.preventDefault();
+    setError('');
+    try {
+      await adminCreateAdmin(form);
+      setForm({ username: '', password: '', role: 'operator' });
+      await load();
+      showNotice(t('admin.adminAdded') || 'Admin added');
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const saveEdit = async (id) => {
+    setError('');
+    try {
+      const payload = { role: editing.role };
+      if (editing.password) payload.password = editing.password;
+      await adminUpdateAdmin(id, payload);
+      setEditing(null);
+      await load();
+      showNotice(t('admin.adminUpdated') || 'Admin updated');
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const removeAdmin = async (id) => {
+    if (!window.confirm(t('admin.confirmDelete'))) return;
+    try {
+      await adminDeleteAdmin(id);
+      await load();
+      showNotice(t('admin.adminDeleted') || 'Admin deleted');
+    } catch (err) {
+      showNotice(err.message);
+    }
+  };
+
+  return (
+    <div>
+      <div className="admin-section-head">
+        <h3>{t('admin.admins')}</h3>
+      </div>
+
+      <div className="card admin-form">
+        <h4>{t('admin.addAdmin')}</h4>
+        <form onSubmit={addAdmin}>
+          <div className="form-grid">
+            <div>
+              <label className="settings-label">{t('admin.username')} *</label>
+              <input
+                className="settings-control"
+                value={form.username}
+                onChange={(e) => setForm({ ...form, username: e.target.value })}
+                placeholder="admin2"
+                required
+              />
+            </div>
+            <div>
+              <label className="settings-label">{t('admin.password')} *</label>
+              <input
+                className="settings-control"
+                type="password"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                minLength={6}
+                required
+              />
+            </div>
+            <div>
+              <label className="settings-label">{t('admin.role')}</label>
+              <select
+                className="settings-control"
+                value={form.role}
+                onChange={(e) => setForm({ ...form, role: e.target.value })}
+              >
+                <option value="operator">{t('admin.roleOperator')}</option>
+                <option value="super">{t('admin.roleSuper')}</option>
+              </select>
+            </div>
+          </div>
+          {error && <div className="error-text">{error}</div>}
+          <button type="submit" className="btn btn-primary" style={{ marginTop: 14 }}>
+            {t('admin.addAdmin')}
+          </button>
+        </form>
+      </div>
+
+      <div className="admin-table">
+        <table>
+          <thead>
+            <tr>
+              <th>{t('admin.username')}</th>
+              <th>{t('admin.role')}</th>
+              <th>{t('admin.createdAt') || 'Created'}</th>
+              <th>{t('admin.actions') || 'Actions'}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {admins.map((a) => (
+              <tr key={a.id}>
+                <td>
+                  <b>{a.username}</b>
+                  {a.username === currentUsername && <span className="pill" style={{ marginLeft: 6 }}>{t('admin.you') || 'You'}</span>}
+                </td>
+                <td>
+                  {editing?.id === a.id ? (
+                    <select
+                      className="settings-control"
+                      style={{ width: 140 }}
+                      value={editing.role}
+                      onChange={(e) => setEditing({ ...editing, role: e.target.value })}
+                    >
+                      <option value="operator">{t('admin.roleOperator')}</option>
+                      <option value="super">{t('admin.roleSuper')}</option>
+                    </select>
+                  ) : (
+                    <span className={`role-badge ${a.role}`}>{a.role === 'super' ? t('admin.roleSuper') : t('admin.roleOperator')}</span>
+                  )}
+                </td>
+                <td>{String(a.createdAt || '').slice(0, 10)}</td>
+                <td>
+                  {editing?.id === a.id ? (
+                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                      <input
+                        className="settings-control"
+                        style={{ width: 130 }}
+                        type="password"
+                        placeholder={t('admin.newPassword') || 'New password'}
+                        value={editing.password}
+                        onChange={(e) => setEditing({ ...editing, password: e.target.value })}
+                      />
+                      <button className="btn btn-primary btn-sm" onClick={() => saveEdit(a.id)}>{t('admin.save')}</button>
+                      <button className="btn btn-ghost btn-sm" onClick={() => setEditing(null)}>{t('admin.cancel')}</button>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      <button className="btn btn-ghost btn-sm" onClick={() => setEditing({ id: a.id, role: a.role, password: '' })}>
+                        {t('admin.edit')}
+                      </button>
+                      <button className="btn btn-ghost btn-sm" disabled={a.username === currentUsername} onClick={() => removeAdmin(a.id)}>
+                        {t('admin.delete')}
+                      </button>
+                    </div>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="admin-notice" style={{ background: 'var(--bg-soft)', color: 'var(--text-dim)', marginTop: 12 }}>
+        {t('admin.roleHelp')}
+      </div>
     </div>
   );
 }
@@ -871,72 +1141,501 @@ function OrderForm({ customers, addresses, initial, editing, onSave, onCancel, t
   );
 }
 
-// ===== 订单详情 =====
-function OrderDetail({ order, customer, address, onStatus, onClose, t }) {
+// ===== 状态胶囊（WooCommerce pill 风格） =====
+function StatusPill({ value, t }) {
+  const cls = {
+    active: 'good',
+    delivered: 'good',
+    completed: 'good',
+    processing: 'info',
+    shipped: 'info',
+    pending: 'warn',
+    onhold: 'warn',
+    cancelled: 'muted',
+    refunded: 'warn2',
+    inactive: 'muted',
+  }[value] || '';
+  const label = t ? t(`admin.status_${value}`) || value : value;
+  return <span className={`status-pill ${cls}`}>{label}</span>;
+}
+
+// ===== 分页（WooCommerce 风格） =====
+function Pagination({ page, perPage, total, onPage, onPerPage, t }) {
+  const pages = Math.max(1, Math.ceil(total / perPage));
+  const cur = Math.min(page, pages);
   return (
-    <div className="card admin-form">
-      <div className="admin-section-head">
-        <h4>订单详情 · {order.orderNo}</h4>
-        <button className="btn btn-ghost btn-sm" onClick={onClose}>{t('admin.cancel')}</button>
+    <div className="wc-pagination">
+      <div className="wc-pagination-left">
+        <select
+          className="settings-control wc-perpage"
+          value={perPage}
+          onChange={(e) => onPerPage(Number(e.target.value))}
+        >
+          {[10, 20, 50].map((n) => <option key={n} value={n}>{n}</option>)}
+        </select>
+        <span className="wc-perpage-label">{t('admin.perPage')}</span>
+        <span className="wc-count">— {t('admin.showing', { n: total }) || `${total} items`}</span>
       </div>
-      <div className="order-detail-grid">
-        <div>
-          <div className="detail-label">客户</div>
-          <div>{customer?.name || order.customerId}</div>
-          <div className="muted-note">{customer?.email || ''} {customer?.phone ? `· ${customer.phone}` : ''}</div>
-        </div>
-        <div>
-          <div className="detail-label">送货地址</div>
-          {address
-            ? <div>{[address.recipient, address.line1, address.line2, address.city, address.state, address.postal, address.country].filter(Boolean).join(', ')}</div>
-            : <div>—</div>}
-        </div>
-        <div>
-          <div className="detail-label">快递 / 运单号</div>
-          <div>{order.carrier || '—'} {order.trackingNo && `/ ${order.trackingNo}`}</div>
-        </div>
-        <div>
-          <div className="detail-label">状态</div>
-          <select className="settings-control" value={order.status} onChange={(e) => onStatus(e.target.value)}>
-            {ORDER_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-          </select>
-        </div>
-      </div>
-      <table className="admin-table" style={{ marginTop: 12 }}>
-        <thead>
-          <tr><th>商品</th><th>单价</th><th>数量</th><th>小计</th></tr>
-        </thead>
-        <tbody>
-          {(order.items || []).map((it, i) => (
-            <tr key={i}>
-              <td>{it.title}</td>
-              <td>{it.price}</td>
-              <td>{it.qty}</td>
-              <td>{((Number(it.price) || 0) * (Number(it.qty) || 1)).toFixed(2)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="order-detail-total">
-        合计: <b>{order.totalCurrency || order.totalCny || '—'} {order.currency}</b>
-        {order.notes && <div className="muted-note">备注: {order.notes}</div>}
+      <div className="wc-pagination-right">
+        <button className="btn btn-ghost btn-sm" disabled={cur <= 1} onClick={() => onPage(cur - 1)}>{t('admin.prev')}</button>
+        <span className="wc-page-ind">{t('admin.pageOf', { p: cur, t: pages }) || `${cur} / ${pages}`}</span>
+        <button className="btn btn-ghost btn-sm" disabled={cur >= pages} onClick={() => onPage(cur + 1)}>{t('admin.next')}</button>
       </div>
     </div>
   );
 }
 
-// ===== 状态胶囊 =====
-function StatusPill({ value }) {
-  const cls = {
-    active: 'good',
-    delivered: 'good',
-    processing: '',
-    shipped: '',
-    pending: 'warn',
-    cancelled: 'bad',
-    inactive: 'bad',
-  }[value] || '';
-  return <span className={`status-pill ${cls}`}>{value}</span>;
+// ===== 客户管理（WooCommerce 风格：统计列 + 分页 + 详情） =====
+function CustomersTab({ customers, query, onQuery, onAdd, onEdit, onDelete, t }) {
+  const [statusFilter, setStatusFilter] = useState('');
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
+  const [selected, setSelected] = useState(null);
+
+  const filtered = customers
+    .filter((c) => !statusFilter || c.status === statusFilter)
+    .filter((c) => !query || [c.name, c.email, c.phone, c.country].some((v) => v && String(v).toLowerCase().includes(query.toLowerCase())));
+  const pages = Math.max(1, Math.ceil(filtered.length / perPage));
+  const cur = Math.min(page, pages);
+  const rows = filtered.slice((cur - 1) * perPage, cur * perPage);
+  const fmtUsd = (n) => `$${(Number(n) || 0).toFixed(2)}`;
+  const fmtDate = (iso) => (iso ? String(iso).slice(0, 10) : '—');
+
+  return (
+    <div>
+      <div className="admin-section-head">
+        <h3>{t('admin.customersTitle')}</h3>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <input
+            className="settings-control"
+            style={{ maxWidth: 240 }}
+            placeholder={t('admin.search')}
+            value={query}
+            onChange={(e) => onQuery(e.target.value)}
+          />
+          <select className="settings-control" style={{ maxWidth: 150 }} value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}>
+            <option value="">{t('admin.all')}</option>
+            {CUSTOMER_STATUSES.map((s) => <option key={s} value={s}>{t(`admin.status_${s}`) || s}</option>)}
+          </select>
+          <button className="btn btn-primary btn-sm" onClick={onAdd}>
+            {t('admin.addCustomer') || 'Add customer'}
+          </button>
+        </div>
+      </div>
+
+      <table className="admin-table wc-table">
+        <thead>
+          <tr>
+            <th>{t('admin.name')}</th>
+            <th>{t('admin.email')}</th>
+            <th>{t('admin.location')}</th>
+            <th>{t('admin.registered')}</th>
+            <th>{t('admin.ordersCount')}</th>
+            <th>{t('admin.lastOrder')}</th>
+            <th>{t('admin.totalSpend')}</th>
+            <th>{t('admin.aov')}</th>
+            <th>{t('admin.status')}</th>
+            <th>{t('admin.actions')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((c) => {
+            const st = c.stats || {};
+            return (
+              <tr key={c.id} className={selected?.id === c.id ? 'wc-row-active' : ''}>
+                <td>
+                  <button className="wc-name-link" onClick={() => setSelected(selected?.id === c.id ? null : c)}>{c.name}</button>
+                  {c.notes && <div className="muted-note">{c.notes}</div>}
+                </td>
+                <td>{c.email}</td>
+                <td>{c.country || '—'}</td>
+                <td>{fmtDate(c.registeredAt)}</td>
+                <td><b>{st.ordersCount ?? 0}</b></td>
+                <td>{st.lastOrderAt ? <span>{fmtDate(st.lastOrderAt)}<br /><small>{st.lastOrderNo}</small></span> : '—'}</td>
+                <td>{st.totalSpendUsd ? <b>{fmtUsd(st.totalSpendUsd)}</b> : '—'}</td>
+                <td>{st.aovUsd ? fmtUsd(st.aovUsd) : '—'}</td>
+                <td><StatusPill value={c.status} t={t} /></td>
+                <td>
+                  <button className="btn btn-ghost btn-sm" onClick={() => onEdit(c)}>{t('admin.edit')}</button>
+                  <button className="btn btn-ghost btn-sm danger" onClick={() => onDelete(c.id)}>{t('admin.delete')}</button>
+                </td>
+              </tr>
+            );
+          })}
+          {rows.length === 0 && (
+            <tr><td colSpan={10} className="wc-empty">{t('admin.emptyList')}</td></tr>
+          )}
+        </tbody>
+      </table>
+
+      <Pagination page={cur} perPage={perPage} total={filtered.length} onPage={setPage} onPerPage={(n) => { setPerPage(n); setPage(1); }} t={t} />
+
+      {selected && (
+        <CustomerDetail
+          customer={selected}
+          onEdit={() => onEdit(selected)}
+          onClose={() => setSelected(null)}
+          t={t}
+        />
+      )}
+    </div>
+  );
+}
+
+// ===== 客户详情卡（WooCommerce 式：资料 + 统计 + 订单历史） =====
+function CustomerDetail({ customer, onEdit, onClose, t }) {
+  return (
+    <div className="card admin-form wc-customer-detail">
+      <div className="admin-section-head">
+        <h4>{customer.name} <StatusPill value={customer.status} t={t} /></h4>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button className="btn btn-ghost btn-sm" onClick={onEdit}>{t('admin.edit')}</button>
+          <button className="btn btn-ghost btn-sm" onClick={onClose}>{t('admin.cancel')}</button>
+        </div>
+      </div>
+      <div className="wc-stat-grid">
+        <div className="wc-stat">
+          <div className="wc-stat-num">{customer.stats?.ordersCount ?? 0}</div>
+          <div className="wc-stat-label">{t('admin.ordersCount')}</div>
+        </div>
+        <div className="wc-stat">
+          <div className="wc-stat-num">${(Number(customer.stats?.totalSpendUsd) || 0).toFixed(2)}</div>
+          <div className="wc-stat-label">{t('admin.totalSpend')}</div>
+        </div>
+        <div className="wc-stat">
+          <div className="wc-stat-num">${(Number(customer.stats?.aovUsd) || 0).toFixed(2)}</div>
+          <div className="wc-stat-label">{t('admin.aov')}</div>
+        </div>
+        <div className="wc-stat">
+          <div className="wc-stat-num wc-stat-sm">{customer.stats?.lastOrderAt ? String(customer.stats.lastOrderAt).slice(0, 10) : '—'}</div>
+          <div className="wc-stat-label">{t('admin.lastOrder')}</div>
+        </div>
+      </div>
+      <div className="wc-detail-cols">
+        <div>
+          <div className="detail-label">{t('admin.contactInfo')}</div>
+          <div>{customer.email || '—'}</div>
+          <div>{customer.phone || '—'}</div>
+          <div className="muted-note">{t('admin.customerSince')} {customer.registeredAt ? String(customer.registeredAt).slice(0, 10) : '—'}</div>
+        </div>
+        <div>
+          <div className="detail-label">{t('admin.addressInfo')}</div>
+          <div>{[customer.country].filter(Boolean).join(', ') || '—'}</div>
+          <div className="muted-note">{customer.currency}</div>
+        </div>
+      </div>
+      {customer.notes && <div className="muted-note" style={{ marginTop: 10 }}>{customer.notes}</div>}
+    </div>
+  );
+}
+
+// ===== 订单管理（WooCommerce 风格：状态 tabs + 批量操作 + 分页） =====
+function OrdersTab({ orders, customers, query, onQuery, onAdd, onEdit, onDelete, onStatus, onAddNote, selected, onSelect, t }) {
+  const [statusTab, setStatusTab] = useState('all');
+  const [selection, setSelection] = useState(new Set());
+  const [bulkStatus, setBulkStatus] = useState('');
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
+
+  const countBy = (s) => orders.filter((o) => o.status === s).length;
+  const filtered = orders
+    .filter((o) => statusTab === 'all' || o.status === statusTab)
+    .filter((o) => {
+      if (!query) return true;
+      const q = query.toLowerCase();
+      return [o.orderNo, o.trackingNo, o.customer?.name, o.customer?.email].some((v) => v && String(v).toLowerCase().includes(q));
+    });
+  const pages = Math.max(1, Math.ceil(filtered.length / perPage));
+  const cur = Math.min(page, pages);
+  const rows = filtered.slice((cur - 1) * perPage, cur * perPage);
+  const customerById = (id) => customers.find((c) => c.id === id);
+
+  const toggleAll = () => {
+    const allSelected = rows.length > 0 && rows.every((o) => selection.has(o.id));
+    setSelection(allSelected ? new Set() : new Set(rows.map((o) => o.id)));
+  };
+  const toggleOne = (id) => {
+    const next = new Set(selection);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    setSelection(next);
+  };
+  const applyBulk = async () => {
+    if (!bulkStatus || selection.size === 0) return;
+    for (const id of selection) {
+      await onStatus(id, bulkStatus);
+    }
+    setSelection(new Set());
+    setBulkStatus('');
+  };
+  const fmtDate = (iso) => (iso ? String(iso).slice(0, 10) : '—');
+
+  return (
+    <div>
+      <div className="admin-section-head">
+        <h3>{t('admin.ordersTitle')}</h3>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <input
+            className="settings-control"
+            style={{ maxWidth: 240 }}
+            placeholder={t('admin.search')}
+            value={query}
+            onChange={(e) => onQuery(e.target.value)}
+          />
+          <button className="btn btn-primary btn-sm" onClick={onAdd}>
+            {t('admin.addOrder') || 'Add order'}
+          </button>
+        </div>
+      </div>
+
+      {/* 状态 tabs（带计数） */}
+      <div className="wc-subsubsim">
+        <button className={statusTab === 'all' ? 'active' : ''} onClick={() => { setStatusTab('all'); setPage(1); }}>
+          {t('admin.all')} <span className="wc-count-pill">{orders.length}</span>
+        </button>
+        {ORDER_STATUSES.map((s) => (
+          <button key={s} className={statusTab === s ? 'active' : ''} onClick={() => { setStatusTab(s); setPage(1); }}>
+            {t(`admin.status_${s}`) || s} <span className="wc-count-pill">{countBy(s)}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* 批量操作栏 */}
+      <div className="wc-bulkbar">
+        <select className="settings-control" value={bulkStatus} onChange={(e) => setBulkStatus(e.target.value)}>
+          <option value="">{t('admin.bulkActions')}</option>
+          {ORDER_STATUSES.map((s) => <option key={s} value={s}>{t('admin.markAs')}: {t(`admin.status_${s}`) || s}</option>)}
+        </select>
+        <button className="btn btn-ghost btn-sm" disabled={!bulkStatus || selection.size === 0} onClick={applyBulk}>
+          {t('admin.apply')}
+        </button>
+        {selection.size > 0 && <span className="wc-selected-hint">{(t('admin.selected') || '{n} selected').replace('{n}', selection.size)}</span>}
+      </div>
+
+      <table className="admin-table wc-table">
+        <thead>
+          <tr>
+            <th style={{ width: 36 }}>
+              <input type="checkbox" checked={rows.length > 0 && rows.every((o) => selection.has(o.id))} onChange={toggleAll} />
+            </th>
+            <th>{t('admin.orderNo')}</th>
+            <th>{t('admin.date')}</th>
+            <th>{t('admin.status')}</th>
+            <th>{t('admin.total')}</th>
+            <th>{t('admin.actions')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((o) => {
+            const cust = o.customer || customerById(o.customerId);
+            const custName = cust?.name || o.contact?.name || o.customerId || '—';
+            const custEmail = cust?.email || o.contact?.email || '';
+            return (
+              <tr key={o.id} className={selected?.id === o.id ? 'wc-row-active' : ''}>
+                <td><input type="checkbox" checked={selection.has(o.id)} onChange={() => toggleOne(o.id)} /></td>
+                <td>
+                  <button className="wc-name-link" onClick={() => onSelect(selected?.id === o.id ? null : o)}><b>#{o.orderNo}</b></button>
+                  <div className="muted-note">{custName}<br />{custEmail}</div>
+                </td>
+                <td>{fmtDate(o.createdAt)}</td>
+                <td><StatusPill value={o.status} t={t} /></td>
+                <td><b>{o.currency} {o.totalCurrency ?? '—'}</b><br /><small>{(o.items || []).length} {t('admin.items')}</small></td>
+                <td>
+                  <button className="btn btn-ghost btn-sm" onClick={() => onSelect(o)}>{t('admin.viewOrder')}</button>
+                  <button className="btn btn-ghost btn-sm" onClick={() => onEdit(o)}>{t('admin.editOrder')}</button>
+                  <button className="btn btn-ghost btn-sm danger" onClick={() => onDelete(o.id)}>{t('admin.delete')}</button>
+                </td>
+              </tr>
+            );
+          })}
+          {rows.length === 0 && (
+            <tr><td colSpan={6} className="wc-empty">{t('admin.emptyList')}</td></tr>
+          )}
+        </tbody>
+      </table>
+
+      <Pagination page={cur} perPage={perPage} total={filtered.length} onPage={setPage} onPerPage={(n) => { setPerPage(n); setPage(1); }} t={t} />
+
+      {selected && (
+        <OrderDetail
+          order={selected}
+          customer={customerById(selected.customerId)}
+          onStatus={(s) => onStatus(selected.id, s)}
+          onEdit={() => onEdit(selected)}
+          onDelete={() => onDelete(selected.id)}
+          onAddNote={onAddNote}
+          onClose={() => onSelect(null)}
+          t={t}
+        />
+      )}
+    </div>
+  );
+}
+
+// ===== 订单详情（WooCommerce 编辑订单布局：主列 General/Billing/Shipping/Items/Totals + 侧列 Actions/Notes） =====
+function OrderDetail({ order, customer, onStatus, onEdit, onDelete, onAddNote, onClose, t }) {
+  const [note, setNote] = useState('');
+  const timeline = Array.isArray(order.timeline) ? order.timeline : [];
+  const fmtCny = (n) => `¥${(Number(n) || 0).toFixed(2)}`;
+  const itemsSubtotal = (order.items || []).reduce(
+    (s, it) => s + (Number(it.price ?? it.priceCny) || 0) * (Number(it.qty ?? it.quantity) || 1),
+    0
+  );
+
+  const submitNote = (e) => {
+    e.preventDefault();
+    if (!note.trim()) return;
+    onAddNote(order.id, note.trim());
+    setNote('');
+  };
+
+  return (
+    <div className="wc-order-detail">
+      <div className="admin-section-head">
+        <h4>#{order.orderNo} <StatusPill value={order.status} t={t} /></h4>
+        <button className="btn btn-ghost btn-sm" onClick={onClose}>{t('admin.cancel')}</button>
+      </div>
+
+      <div className="wc-order-cols">
+        {/* 主列 */}
+        <div className="wc-order-main">
+          {/* General */}
+          <div className="wc-box">
+            <div className="wc-box-title">{t('admin.generalDetails')}</div>
+            <div className="wc-box-body">
+              <div className="wc-detail-row">
+                <span className="wc-detail-label">{t('admin.created')}</span>
+                <span>{String(order.createdAt || '').slice(0, 16).replace('T', ' ')}</span>
+              </div>
+              <div className="wc-detail-row">
+                <span className="wc-detail-label">{t('admin.status')}</span>
+                <select className="settings-control wc-status-select" value={order.status} onChange={(e) => onStatus(e.target.value)}>
+                  {ORDER_STATUSES.map((s) => <option key={s} value={s}>{t(`admin.status_${s}`) || s}</option>)}
+                </select>
+              </div>
+              <div className="wc-detail-row">
+                <span className="wc-detail-label">{t('admin.customer')}</span>
+                <span>{customer ? <b>{customer.name}</b> : (order.contact?.name || order.customerId || '—')}<br /><small>{customer?.email || order.contact?.email || ''}</small></span>
+              </div>
+            </div>
+          </div>
+
+          {/* Billing / Shipping */}
+          <div className="wc-box-row">
+            <div className="wc-box">
+              <div className="wc-box-title">{t('admin.billingDetails')}</div>
+              <div className="wc-box-body">
+                <div>{order.contact?.name || customer?.name || '—'}</div>
+                <div>{order.contact?.email || customer?.email || '—'}</div>
+                <div>{order.contact?.phone || customer?.phone || '—'}</div>
+              </div>
+            </div>
+            <div className="wc-box">
+              <div className="wc-box-title">{t('admin.shippingDetails')}</div>
+              <div className="wc-box-body">
+                {(order.address
+                  ? [order.address.line1, order.address.line2, order.address.city, order.address.state, order.address.postal, order.address.country]
+                  : []
+                ).filter(Boolean).map((line, i) => <div key={i}>{line}</div>)}
+                {!order.address && <div>—</div>}
+              </div>
+            </div>
+          </div>
+
+          {/* Items（明细为人民币采购价） */}
+          <div className="wc-box">
+            <div className="wc-box-title">{t('admin.items')} <small className="muted-note">CNY</small></div>
+            <table className="wc-items-table">
+              <thead>
+                <tr><th>{t('admin.item')}</th><th>{t('admin.qty')}</th><th>{t('admin.unitPrice')}</th><th style={{ textAlign: 'right' }}>{t('admin.subtotal')}</th></tr>
+              </thead>
+              <tbody>
+                {(order.items || []).map((it, i) => {
+                  const qty = Number(it.qty ?? it.quantity) || 1;
+                  const price = Number(it.price ?? it.priceCny) || 0;
+                  return (
+                    <tr key={i}>
+                      <td>{it.title || it.itemId || '—'}</td>
+                      <td>× {qty}</td>
+                      <td>{fmtCny(price)}</td>
+                      <td style={{ textAlign: 'right' }}>{fmtCny(price * qty)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+              <tfoot>
+                <tr><td colSpan={3}>{t('admin.subtotal')}</td><td style={{ textAlign: 'right' }}>{fmtCny(itemsSubtotal)}</td></tr>
+              </tfoot>
+            </table>
+          </div>
+
+          {/* Totals（人民币成本明细 + 客户应付目的币） */}
+          <div className="wc-box wc-totals-box">
+            <div className="wc-box-title">{t('admin.orderTotal')}</div>
+            <div className="wc-box-body">
+              <div className="wc-detail-row"><span>{t('admin.subtotal')}</span><span>{fmtCny(order.subtotalCny ?? itemsSubtotal)}</span></div>
+              <div className="wc-detail-row"><span>{t('admin.shipping')}</span><span>{fmtCny(order.shippingCny)}</span></div>
+              {order.dutyCny != null && <div className="wc-detail-row"><span>{t('admin.duty')}</span><span>{fmtCny(order.dutyCny)}</span></div>}
+              {order.vatCny != null && <div className="wc-detail-row"><span>{t('admin.vat')}</span><span>{fmtCny(order.vatCny)}</span></div>}
+              {order.serviceFeeCny != null && <div className="wc-detail-row"><span>{t('admin.serviceFee')}</span><span>{fmtCny(order.serviceFeeCny)}</span></div>}
+              {order.paymentFeeCny != null && <div className="wc-detail-row"><span>{t('admin.paymentFee')}</span><span>{fmtCny(order.paymentFeeCny)}</span></div>}
+              <div className="wc-detail-row wc-grand-total"><span>{t('admin.orderTotal')}</span><span><b>{fmtCny(order.totalCny)}</b></span></div>
+              <div className="wc-detail-row muted"><span>{t('admin.payAmount')}</span><span><b>{order.currency} {order.totalCurrency ?? '—'}</b></span></div>
+              <div className="wc-detail-row muted"><span>{t('admin.carrierLabel')}</span><span>{order.carrier || '—'}{order.trackingNo ? ` · ${t('admin.tracking')} ${order.trackingNo}` : ''}</span></div>
+            </div>
+          </div>
+        </div>
+
+        {/* 侧列 */}
+        <div className="wc-order-side">
+          {/* Order actions */}
+          <div className="wc-box">
+            <div className="wc-box-title">{t('admin.orderActions')}</div>
+            <div className="wc-box-body wc-actions-body">
+              {ORDER_STATUSES.filter((s) => s !== order.status).map((s) => (
+                <button key={s} className="btn btn-ghost btn-sm wc-action-btn" onClick={() => onStatus(s)}>
+                  {t('admin.markAs')}: {t(`admin.status_${s}`) || s}
+                </button>
+              ))}
+              <button className="btn btn-ghost btn-sm wc-action-btn" onClick={onEdit}>{t('admin.editOrder')}</button>
+              <button className="btn btn-ghost btn-sm danger wc-action-btn" onClick={onDelete}>{t('admin.delete')}</button>
+            </div>
+          </div>
+
+          {/* Order notes */}
+          <div className="wc-box">
+            <div className="wc-box-title">{t('admin.orderNotes')}</div>
+            <div className="wc-box-body">
+              <div className="wc-notes-list">
+                {timeline.length === 0 && <div className="muted-note">{t('admin.noNotes')}</div>}
+                {timeline.map((n, i) => (
+                  <div key={i} className={`wc-note ${n.type === 'customer' ? 'wc-note-customer' : ''}`}>
+                    <div className="wc-note-meta">{String(n.at || '').slice(0, 16).replace('T', ' ')} · {n.author || 'admin'} · {n.type === 'customer' ? t('admin.noteCustomer') : t('admin.noteInternal')}</div>
+                    <div className="wc-note-body">{n.content}</div>
+                  </div>
+                ))}
+              </div>
+              <form onSubmit={submitNote} className="wc-note-form">
+                <textarea
+                  className="settings-control"
+                  rows={3}
+                  placeholder={t('admin.notePlaceholder')}
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                />
+                <button type="submit" className="btn btn-primary btn-sm" style={{ marginTop: 8, width: '100%' }} disabled={!note.trim()}>
+                  {t('admin.addNote')}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function o_custFallback(order) {
+  return order.customerId || '—';
 }
 
 // ===== 快递商表单 =====

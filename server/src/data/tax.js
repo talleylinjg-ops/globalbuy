@@ -8,11 +8,11 @@ export const TAX_RULES = {
   US: {
     name: '美国',
     currency: 'USD',
-    deMinimis: 800,       // 低于 $800 免关税
-    vatThreshold: 800,    // 且无 VAT
+    deMinimis: 0,         // 2025-08-29 起 $800 小额豁免正式取消
+    vatThreshold: 0,      // 美国无联邦增值税
     vatRate: 0,
     importDutyRate: 0.025,
-    note: '低于 $800 货值通常免关税和增值税',
+    note: '2025-08-29 起 $800 小额包裹豁免取消，大多数进口包裹需缴纳关税；仅低于 $100 的个人文件及礼品可能免税',
   },
   GB: {
     name: '英国',
@@ -21,7 +21,7 @@ export const TAX_RULES = {
     vatThreshold: 0,      // 但 VAT 自 2021 年起对小包全面征收
     vatRate: 0.20,
     importDutyRate: 0.03,
-    note: '低于 £135 免关税，需缴纳 20% VAT',
+    note: '申报价值 ≤£135 免关税，需缴纳 20% VAT；皮革鞋类等除外',
   },
   DE: {
     name: '德国',
@@ -30,7 +30,7 @@ export const TAX_RULES = {
     vatThreshold: 0,
     vatRate: 0.19,
     importDutyRate: 0.03,
-    note: '低于 €150 免关税，需缴纳 19% VAT',
+    note: '低于 €150 免关税，需缴纳 19% VAT；计划 2028 年 3 月起取消 €150 豁免',
   },
   FR: {
     name: '法国',
@@ -39,7 +39,7 @@ export const TAX_RULES = {
     vatThreshold: 0,
     vatRate: 0.20,
     importDutyRate: 0.03,
-    note: '需缴纳 20% VAT',
+    note: '需缴纳 20% VAT；计划 2028 年 3 月起取消 €150 关税豁免',
   },
   NL: {
     name: '荷兰',
@@ -48,6 +48,7 @@ export const TAX_RULES = {
     vatThreshold: 0,
     vatRate: 0.21,
     importDutyRate: 0.03,
+    note: '需缴纳 21% VAT；计划 2028 年 3 月起取消 €150 关税豁免',
   },
   IT: {
     name: '意大利',
@@ -56,6 +57,7 @@ export const TAX_RULES = {
     vatThreshold: 0,
     vatRate: 0.22,
     importDutyRate: 0.03,
+    note: '需缴纳 22% VAT；计划 2028 年 3 月起取消 €150 关税豁免',
   },
   ES: {
     name: '西班牙',
@@ -64,6 +66,7 @@ export const TAX_RULES = {
     vatThreshold: 0,
     vatRate: 0.21,
     importDutyRate: 0.03,
+    note: '需缴纳 21% VAT；计划 2028 年 3 月起取消 €150 关税豁免',
   },
   CA: {
     name: '加拿大',
@@ -89,6 +92,7 @@ export const TAX_RULES = {
     vatThreshold: 10000,
     vatRate: 0.10,
     importDutyRate: 0.03,
+    note: '申报价值 ≤10,000 日元免税；皮革制品、鞋类等特定商品除外',
   },
   KR: {
     name: '韩国',
@@ -194,6 +198,7 @@ export const TAX_RULES = {
     vatThreshold: 200,
     vatRate: 0.20,
     importDutyRate: 0.10,
+    note: '计划 2027 年起逐步取消 200 欧元以下包裹免税',
   },
   TR: {
     name: '土耳其',

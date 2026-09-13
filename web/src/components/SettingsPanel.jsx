@@ -10,17 +10,15 @@ const ALL_PLATFORMS = [
 
 export default function SettingsPanel({
   meta, country, setCountry, currency, setCurrency,
-  platforms, setPlatforms, profitRate, setProfitRate, t,
+  platforms, setPlatforms, profitRate, setProfitRate, t, children,
 }) {
-  const { lang, setLang } = useI18n();
-
   const togglePlatform = (id) => {
     setPlatforms((prev) => (prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]));
   };
 
   return (
     <div className="settings-panel">
-      <div>
+      <div className="settings-field field-country">
         <label className="settings-label">{t('settings.deliveryCountry')}</label>
         <select className="settings-control" value={country} onChange={(e) => setCountry(e.target.value)}>
           {(meta?.countries || []).map((c) => (
@@ -29,7 +27,7 @@ export default function SettingsPanel({
         </select>
       </div>
 
-      <div>
+      <div className="settings-field field-currency">
         <label className="settings-label">{t('settings.currency')}</label>
         <select className="settings-control" value={currency} onChange={(e) => setCurrency(e.target.value)}>
           {(meta?.countries || []).map((c) => (
@@ -38,7 +36,7 @@ export default function SettingsPanel({
         </select>
       </div>
 
-      <div>
+      <div className="settings-field field-platforms">
         <label className="settings-label">{t('settings.platforms')}</label>
         <div className="platform-row">
           {ALL_PLATFORMS.map((p) => (
@@ -54,7 +52,7 @@ export default function SettingsPanel({
         </div>
       </div>
 
-      <div>
+      <div className="settings-field field-profit">
         <label className="settings-label" title={t('settings.profitHelp')}>{t('settings.profitRate')}: {profitRate}%</label>
         <input
           className="settings-control"
@@ -63,18 +61,12 @@ export default function SettingsPanel({
           max="30"
           step="1"
           value={profitRate}
+          style={{ '--fill': `${(profitRate / 30) * 100}%` }}
           onChange={(e) => setProfitRate(Number(e.target.value))}
         />
       </div>
 
-      <div>
-        <label className="settings-label">Language</label>
-        <select className="settings-control" value={lang} onChange={(e) => setLang(e.target.value)}>
-          <option value="en">English</option>
-          <option value="es">Español</option>
-          <option value="zh">中文</option>
-        </select>
-      </div>
+      {children}
     </div>
   );
 }

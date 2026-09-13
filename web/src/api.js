@@ -1,5 +1,11 @@
+// 静态托管：构建时用 VITE_API_BASE 指向后端（如 https://api.example.com）；开发模式同源走 vite 代理
+export const API_BASE = import.meta.env.VITE_API_BASE || '';
+export function apiUrl(path) {
+  return `${API_BASE}${path}`;
+}
+
 async function getJSON(url) {
-  const res = await fetch(url);
+  const res = await fetch(apiUrl(url));
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error || `HTTP ${res.status}`);
@@ -25,7 +31,7 @@ async function adminFetch(url, options = {}) {
     Authorization: `Bearer ${getAdminToken()}`,
     ...(options.headers || {}),
   };
-  const res = await fetch(url, { ...options, headers });
+  const res = await fetch(apiUrl(url), { ...options, headers });
   if (res.status === 401) {
     setAdminToken(null);
     throw new Error('unauthorized');
@@ -37,11 +43,11 @@ async function adminFetch(url, options = {}) {
   return res.json();
 }
 
-export async function adminLogin(password) {
-  const res = await fetch('/api/admin/login', {
+export async function adminLogin(username, password) {
+  const res = await fetch(apiUrl('/api/admin/login'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ password }),
+    body: JSON.stringify({ username, password }),
   });
   if (!res.ok) throw new Error('invalid credentials');
   const data = await res.json();
@@ -49,8 +55,36 @@ export async function adminLogin(password) {
   return data;
 }
 
+// ===== 管理员账号管理（super）=====
+export async function adminListAdmins() {
+  return adminFetch('/api/admin/admins');
+}
+export async function adminCreateAdmin(data) {
+  return adminFetch('/api/admin/admins', { method: 'POST', body: JSON.stringify(data) });
+}
+export async function adminUpdateAdmin(id, data) {
+  return adminFetch(`/api/admin/admins/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+}
+export async function adminDeleteAdmin(id) {
+  return adminFetch(`/api/admin/admins/${id}`, { method: 'DELETE' });
+}
+
 export async function adminVerify() {
   return adminFetch('/api/admin/me');
+}
+
+// 会员资料 / 密码
+export async function adminGetProfile() {
+  return adminFetch('/api/admin/profile');
+}
+export async function adminUpdateProfile(data) {
+  return adminFetch('/api/admin/profile', { method: 'PUT', body: JSON.stringify(data) });
+}
+export async function adminUpdatePassword(currentPassword, newPassword) {
+  return adminFetch('/api/admin/password', {
+    method: 'PUT',
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
 }
 
 // 客户
@@ -103,6 +137,9 @@ export async function adminUpdateOrder(id, data) {
 export async function adminDeleteOrder(id) {
   return adminFetch(`/api/admin/orders/${id}`, { method: 'DELETE' });
 }
+export async function adminAddOrderNote(id, content, type = 'note') {
+  return adminFetch(`/api/admin/orders/${id}/notes`, { method: 'POST', body: JSON.stringify({ content, type }) });
+}
 
 // 设置
 export async function adminGetSettings() {
@@ -137,7 +174,7 @@ export async function fetchCarriers() {
   return getJSON('/api/carriers');
 }
 export async function quoteCarriers(params) {
-  const res = await fetch('/api/carriers/quote', {
+  const res = await fetch(apiUrl('/api/carriers/quote'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(params),
