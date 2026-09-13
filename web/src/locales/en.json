@@ -214,6 +214,7 @@
     "vat": "VAT",
     "serviceFee": "Service fee",
     "paymentFee": "Payment fee",
+    "profit": "Profit",
     "orderTotal": "Order total",
     "billingDetails": "Billing / Contact",
     "shippingDetails": "Shipping address",

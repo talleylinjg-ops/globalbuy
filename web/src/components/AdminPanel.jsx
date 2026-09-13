@@ -1578,6 +1578,7 @@ function OrderDetail({ order, customer, onStatus, onEdit, onDelete, onAddNote, o
               {order.vatCny != null && <div className="wc-detail-row"><span>{t('admin.vat')}</span><span>{fmtCny(order.vatCny)}</span></div>}
               {order.serviceFeeCny != null && <div className="wc-detail-row"><span>{t('admin.serviceFee')}</span><span>{fmtCny(order.serviceFeeCny)}</span></div>}
               {order.paymentFeeCny != null && <div className="wc-detail-row"><span>{t('admin.paymentFee')}</span><span>{fmtCny(order.paymentFeeCny)}</span></div>}
+              {order.profitCny != null && <div className="wc-detail-row" style={{ color: 'var(--good)' }}><span>{t('admin.profit')}</span><span><b>{fmtCny(order.profitCny)}</b></span></div>}
               <div className="wc-detail-row wc-grand-total"><span>{t('admin.orderTotal')}</span><span><b>{fmtCny(order.totalCny)}</b></span></div>
               <div className="wc-detail-row muted"><span>{t('admin.payAmount')}</span><span><b>{order.currency} {order.totalCurrency ?? '—'}</b></span></div>
               <div className="wc-detail-row muted"><span>{t('admin.carrierLabel')}</span><span>{order.carrier || '—'}{order.trackingNo ? ` · ${t('admin.tracking')} ${order.trackingNo}` : ''}</span></div>

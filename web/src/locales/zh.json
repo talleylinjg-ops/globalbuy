@@ -201,6 +201,7 @@
     "vat": "增值税",
     "serviceFee": "服务费",
     "paymentFee": "支付手续费",
+    "profit": "利润",
     "orderTotal": "订单合计",
     "billingDetails": "账单/联系人",
     "shippingDetails": "收货信息",
