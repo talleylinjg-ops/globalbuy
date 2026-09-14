@@ -80,7 +80,7 @@ router.post('/combine', async (req, res, next) => {
 // 游客下单：商品 + 数量 + 收货信息 -> 统一计价 -> 订单入库（MySQL）
 router.post('/orders', async (req, res, next) => {
   try {
-    const { items, contact, address, country, currency, carrier } = req.body || {};
+    const { items, contact, address, country, currency, carrier, serviceFeeRate } = req.body || {};
     if (!Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: 'missing items' });
     }
@@ -103,6 +103,10 @@ router.post('/orders', async (req, res, next) => {
       country: destCountry,
       currency: destCurrency,
       carrier: carrier || undefined,
+      // 服务费由买家确定（0-30%，默认 5%），独立于利润加成
+      serviceFeeRate: serviceFeeRate !== undefined
+        ? Math.min(Math.max(Number(serviceFeeRate) || 0, 0), 0.3)
+        : undefined,
     });
     const b = quote.breakdown;
 
@@ -152,8 +156,9 @@ router.post('/orders', async (req, res, next) => {
       shippingCny: b.intlShippingCny,
       dutyCny: b.dutyCny,
       vatCny: b.vatCny,
-      serviceFeeCny: Number((b.goodsValueCny * 0.05).toFixed(2)),
-      paymentFeeCny: Number((b.goodsValueCny * 0.03).toFixed(2)),
+      serviceFeeCny: b.serviceFeeCny,
+      paymentFeeCny: b.paymentFeeCny,
+      serviceFeeRate: b.serviceFeeRate,
       profitCny: Number((b.totalCny - b.goodsValueCny - b.intlShippingCny - b.dutyCny - b.vatCny
         - b.goodsValueCny * 0.05 - b.goodsValueCny * 0.03).toFixed(2)),
       totalCny: b.totalCny,

@@ -20,8 +20,8 @@
     "deliveryCountry": "To",
     "currency": "Currency",
     "platforms": "Platforms",
-    "profitRate": "Service fee",
-    "profitHelp": "Service fee rate added on top of goods",
+    "profitRate": "Profit margin",
+    "profitHelp": "Pricing markup: sell price = cost x (1 + margin)",
     "tipRate": "Tip",
     "tipHelp": "A voluntary tip for the purchasing service",
     "weightsTitle": "Ranking weights"
@@ -267,6 +267,8 @@
   },
   "order": {
     "title": "Place order",
+    "serviceFee": "Service fee",
+    "serviceFeeHelp": "Optional service fee to support the platform, 5% by default",
     "quantity": "Quantity",
     "contact": "Recipient",
     "email": "Email",

@@ -20,6 +20,8 @@ export function computeLandedCost(product, opts = {}) {
   const destCountry = opts.destCountry || config.defaultDestCountry;
   const currency = opts.currency || config.defaultCurrency;
   const profitRate = opts.profitRate !== undefined ? opts.profitRate : config.profitRate;
+  // 服务费率：买家下单时自选（默认 5%），独立于利润加成
+  const serviceFeeRate = opts.serviceFeeRate !== undefined ? opts.serviceFeeRate : config.serviceFeeRate;
 
   const priceCny = Number(product.price) || 0;
   const weightKg = (product.weightGrams || 500) / 1000;
@@ -64,7 +66,7 @@ export function computeLandedCost(product, opts = {}) {
   const vatBaseCny = Math.max(goodsValueCny - vatThresholdCny, 0);
   const vatCny = vatBaseCny > 0 ? (vatBaseCny + dutyCny) * tax.vatRate : 0;
 
-  const serviceFeeCny = goodsValueCny * config.serviceFeeRate;
+  const serviceFeeCny = goodsValueCny * serviceFeeRate;
   const paymentFeeCny = goodsValueCny * config.paymentFeeRate;
   const profitCny = goodsValueCny * profitRate;
 

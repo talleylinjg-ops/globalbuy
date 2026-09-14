@@ -4,6 +4,9 @@ import { apiUrl } from '../api.js';
 // 游客下单弹窗：商品 + 数量 + 快递渠道 + 收货信息 -> POST /api/orders
 export default function OrderModal({ item, country, currency, carrier, quotes, onClose, onPlaced, t }) {
   const [selCarrier, setSelCarrier] = useState(carrier?.productName || quotes?.find((q) => q.recommended)?.productName || quotes?.[0]?.productName || '');
+  // 服务费由买家确定（自愿性质，默认 5%），独立于商品定价中的利润
+  const SERVICE_FEE_OPTIONS = [0, 3, 5, 8, 10, 15];
+  const [serviceFee, setServiceFee] = useState(5);
   const [form, setForm] = useState({
     quantity: 1,
     name: '', email: '', phone: '',
@@ -33,6 +36,7 @@ export default function OrderModal({ item, country, currency, carrier, quotes, o
           },
           currency,
           carrier: selCarrier || undefined,
+          serviceFeeRate: serviceFee / 100,
         }),
       });
       const data = await res.json();
@@ -100,6 +104,22 @@ export default function OrderModal({ item, country, currency, carrier, quotes, o
                 </select>
               </div>
             )}
+
+            <div className="order-carrier-row">
+              <label className="settings-label" title={t('order.serviceFeeHelp')}>{t('order.serviceFee')}</label>
+              <div className="service-fee-options">
+                {SERVICE_FEE_OPTIONS.map((v) => (
+                  <button
+                    key={v}
+                    type="button"
+                    className={`btn-chip ${serviceFee === v ? 'active' : ''}`}
+                    onClick={() => setServiceFee(v)}
+                  >
+                    {v}%
+                  </button>
+                ))}
+              </div>
+            </div>
 
             <form onSubmit={submit}>
               <div className="order-grid">

@@ -106,7 +106,9 @@ export async function computeCombinedQuote(opts) {
     };
   });
 
-  const serviceFeeCny = goodsValueCny * config.serviceFeeRate;
+  // 服务费率：买家下单时自选（默认 5%），独立于利润加成
+  const serviceFeeRate = opts.serviceFeeRate !== undefined ? opts.serviceFeeRate : config.serviceFeeRate;
+  const serviceFeeCny = goodsValueCny * serviceFeeRate;
   const paymentFeeCny = goodsValueCny * config.paymentFeeRate;
   const profitCny = goodsValueCny * profitRate;
   const totalCny = goodsValueCny + shippingCny + dutyCnyTotal + vatCnyTotal + serviceFeeCny + paymentFeeCny + profitCny;
@@ -117,6 +119,7 @@ export async function computeCombinedQuote(opts) {
       destCountry,
       currency,
       profitRate,
+      serviceFeeRate,
       carrierQuote: chosen ? { ...chosen, chargedKg: Math.max(totalWeightKg, 0.1) } : null,
     }).breakdown.totalCny,
     0
@@ -142,8 +145,12 @@ export async function computeCombinedQuote(opts) {
       vat: round(cnyToCurrency(vatCnyTotal, currency)),
       vatCny: round(vatCnyTotal, 2),
       serviceFee: round(cnyToCurrency(serviceFeeCny, currency)),
+      serviceFeeCny: round(serviceFeeCny, 2),
+      serviceFeeRate: round(serviceFeeRate, 4),
       paymentFee: round(cnyToCurrency(paymentFeeCny, currency)),
+      paymentFeeCny: round(paymentFeeCny, 2),
       profit: round(cnyToCurrency(profitCny, currency)),
+      profitCny: round(profitCny, 2),
       total: round(cnyToCurrency(totalCny, currency)),
       totalCny: round(totalCny, 2),
     },

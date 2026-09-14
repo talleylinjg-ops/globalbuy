@@ -832,6 +832,8 @@ body {
 }
 .order-carrier-row .settings-label { margin: 0; flex-shrink: 0; }
 .order-carrier-row select { flex: 1; }
+.service-fee-options { display: flex; gap: 6px; flex: 1; flex-wrap: wrap; }
+.service-fee-options .btn-chip { padding: 6px 12px; font-size: 0.84rem; }
 
 .order-grid {
   display: grid;

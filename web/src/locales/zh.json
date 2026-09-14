@@ -16,8 +16,8 @@
     "deliveryCountry": "To",
     "currency": "货币",
     "platforms": "平台",
-    "profitRate": "服务费",
-    "profitHelp": "在商品基础上叠加的服务费率",
+    "profitRate": "服务利润",
+    "profitHelp": "商品定价加成：售价 = 原价 x (1 + 利润率)",
     "weightsTitle": "排序权重"
   },
   "result": {
@@ -254,6 +254,8 @@
   },
   "order": {
     "title": "确认下单",
+    "serviceFee": "服务费",
+    "serviceFeeHelp": "自愿支付的服务费，用于支持平台服务，默认 5%",
     "quantity": "数量",
     "contact": "收货人",
     "email": "邮箱",
