@@ -42,7 +42,7 @@ export const config = {
   defaultCurrency: process.env.DEFAULT_CURRENCY || 'USD',
   serviceFeeRate: num(process.env.SERVICE_FEE_RATE, 0.05),
   paymentFeeRate: num(process.env.PAYMENT_FEE_RATE, 0.03),
-  profitRate: num(process.env.PROFIT_RATE, 0.08),
+  profitRate: num(process.env.PROFIT_RATE, 0.5),
   domesticShippingCnyPerKg: num(process.env.DOMESTIC_SHIPPING_CNY_PER_KG, 0),
   fxCacheMinutes: num(process.env.FX_CACHE_MINUTES, 720),
 };

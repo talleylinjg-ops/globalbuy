@@ -58,10 +58,10 @@ export default function SettingsPanel({
           className="settings-control"
           type="range"
           min="0"
-          max="30"
+          max="100"
           step="1"
           value={profitRate}
-          style={{ '--fill': `${(profitRate / 30) * 100}%` }}
+          style={{ '--fill': `${(profitRate / 100) * 100}%` }}
           onChange={(e) => setProfitRate(Number(e.target.value))}
         />
       </div>

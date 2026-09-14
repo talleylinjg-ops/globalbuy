@@ -78,7 +78,7 @@ export default function App() {
   const [country, setCountry] = useState(DEFAULT_COUNTRY);
   const [currency, setCurrency] = useState(DEFAULT_CURRENCY);
   const [platforms, setPlatforms] = useState([...DEFAULT_PLATFORMS]);
-  const [profitRate, setProfitRate] = useState(8);
+  const [profitRate, setProfitRate] = useState(50);
   const [sortBy, setSortBy] = useState('recommended');
   const [carrier, setCarrier] = useState(null); // 选中的报价对象（渠道级）
   // 合并包裹：多商品统一运费/关税/增值税
