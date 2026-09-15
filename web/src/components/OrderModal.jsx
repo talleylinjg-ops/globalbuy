@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { apiUrl } from '../api.js';
 
 // 游客下单弹窗：商品 + 数量 + 快递渠道 + 收货信息 -> POST /api/orders
-export default function OrderModal({ item, country, currency, carrier, quotes, onClose, onPlaced, t }) {
+export default function OrderModal({ item, country, currency, carrier, quotes, defaultServiceFee, onClose, onPlaced, t }) {
   const [selCarrier, setSelCarrier] = useState(carrier?.productName || quotes?.find((q) => q.recommended)?.productName || quotes?.[0]?.productName || '');
-  // 服务费由买家确定（自愿性质，默认 5%），独立于商品定价中的利润
+  // 服务费由买家确定（自愿性质，默认 5%，继承搜索页选择），独立于商品定价中的利润
   const SERVICE_FEE_OPTIONS = [0, 3, 5, 8, 10, 15];
-  const [serviceFee, setServiceFee] = useState(5);
+  const [serviceFee, setServiceFee] = useState(defaultServiceFee ?? 5);
   const [form, setForm] = useState({
     quantity: 1,
     name: '', email: '', phone: '',

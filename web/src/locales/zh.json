@@ -16,8 +16,8 @@
     "deliveryCountry": "To",
     "currency": "货币",
     "platforms": "平台",
-    "profitRate": "服务利润",
-    "profitHelp": "商品定价加成：售价 = 原价 x (1 + 利润率)",
+    "serviceFee": "服务费",
+    "serviceFeeHelp": "自愿支付的服务费，由买家确定，默认 5%；商品定价已含利润",
     "weightsTitle": "排序权重"
   },
   "result": {

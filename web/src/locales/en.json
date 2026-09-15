@@ -20,8 +20,8 @@
     "deliveryCountry": "To",
     "currency": "Currency",
     "platforms": "Platforms",
-    "profitRate": "Profit margin",
-    "profitHelp": "Pricing markup: sell price = cost x (1 + margin)",
+    "serviceFee": "Service fee",
+    "serviceFeeHelp": "Optional fee chosen by buyer, 5% by default; pricing already includes margin",
     "tipRate": "Tip",
     "tipHelp": "A voluntary tip for the purchasing service",
     "weightsTitle": "Ranking weights"

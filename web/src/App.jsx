@@ -78,7 +78,7 @@ export default function App() {
   const [country, setCountry] = useState(DEFAULT_COUNTRY);
   const [currency, setCurrency] = useState(DEFAULT_CURRENCY);
   const [platforms, setPlatforms] = useState([...DEFAULT_PLATFORMS]);
-  const [profitRate, setProfitRate] = useState(50);
+  const [serviceFee, setServiceFee] = useState(5);
   const [sortBy, setSortBy] = useState('recommended');
   const [carrier, setCarrier] = useState(null); // 选中的报价对象（渠道级）
   // 合并包裹：多商品统一运费/关税/增值税
@@ -131,7 +131,7 @@ export default function App() {
           itemIds: combineList.map((x) => x.itemId),
           country,
           currency,
-          profitRate,
+          serviceFeeRate: serviceFee / 100,
         }),
       });
       const data = await res.json();
@@ -139,7 +139,7 @@ export default function App() {
     } finally {
       setCombineLoading(false);
     }
-  }, [combineList, country, currency, profitRate]);
+  }, [combineList, country, currency, serviceFee]);
 
   const doSearch = useCallback(async (q) => {
     if (!q) return;
@@ -152,7 +152,7 @@ export default function App() {
         country,
         currency,
         platforms,
-        profitRate: profitRate / 100,
+        serviceFeeRate: serviceFee / 100,
         carrier: carrier ? (carrier.productName || carrier.carrier) : undefined,
       });
       setResults(data);
@@ -163,7 +163,7 @@ export default function App() {
     } finally {
       setLoading(false);
     }
-  }, [country, currency, platforms, profitRate, carrier]);
+  }, [country, currency, platforms, serviceFee, carrier]);
 
   const handleParseLink = useCallback(async (url) => {
     if (!url) return;
@@ -299,8 +299,8 @@ export default function App() {
           setCurrency={setCurrency}
           platforms={platforms}
           setPlatforms={setPlatforms}
-          profitRate={profitRate}
-          setProfitRate={setProfitRate}
+          serviceFee={serviceFee}
+          setServiceFee={setServiceFee}
           t={t}
         >
           {lastSearch && results && results.carrierQuotes && results.carrierQuotes.length > 0 && (
@@ -386,6 +386,7 @@ export default function App() {
           currency={currency}
           carrier={carrier}
           quotes={results?.carrierQuotes}
+          defaultServiceFee={serviceFee}
           onClose={() => setOrderItem(null)}
           t={t}
         />

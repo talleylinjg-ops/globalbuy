@@ -36,7 +36,10 @@ router.get('/search', async (req, res, next) => {
     const opts = {
       destCountry: (req.query.country || 'US').toUpperCase(),
       currency: (req.query.currency || 'USD').toUpperCase(),
-      profitRate: req.query.profitRate !== undefined ? parseFloat(req.query.profitRate) : undefined,
+      // 服务费由买家自选（默认 5%），利润为固定定价加成不走参数
+      serviceFeeRate: req.query.serviceFeeRate !== undefined
+        ? Math.min(Math.max(parseFloat(req.query.serviceFeeRate) || 0, 0), 0.3)
+        : undefined,
       platforms: req.query.platforms ? String(req.query.platforms).split(',') : [],
       carrier: req.query.carrier || undefined,
     };
@@ -57,7 +60,7 @@ router.get('/search', async (req, res, next) => {
 // 多商品合并包裹统一计价：统一运费 + 统一关税/增值税
 router.post('/combine', async (req, res, next) => {
   try {
-    const { itemIds, country, currency, profitRate, carrier } = req.body || {};
+    const { itemIds, country, currency, serviceFeeRate, carrier } = req.body || {};
     if (!Array.isArray(itemIds) || itemIds.length === 0) {
       return res.status(400).json({ error: 'missing itemIds' });
     }
@@ -68,7 +71,9 @@ router.post('/combine', async (req, res, next) => {
       itemIds,
       country: (country || 'US').toUpperCase(),
       currency: (currency || 'USD').toUpperCase(),
-      profitRate: profitRate !== undefined ? profitRate / 100 : undefined,
+      serviceFeeRate: serviceFeeRate !== undefined
+        ? Math.min(Math.max(Number(serviceFeeRate) || 0, 0), 0.3)
+        : undefined,
       carrier: carrier || undefined,
     });
     res.json(result);

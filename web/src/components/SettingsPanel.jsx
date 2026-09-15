@@ -10,7 +10,7 @@ const ALL_PLATFORMS = [
 
 export default function SettingsPanel({
   meta, country, setCountry, currency, setCurrency,
-  platforms, setPlatforms, profitRate, setProfitRate, t, children,
+  platforms, setPlatforms, serviceFee, setServiceFee, t, children,
 }) {
   const togglePlatform = (id) => {
     setPlatforms((prev) => (prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]));
@@ -53,16 +53,16 @@ export default function SettingsPanel({
       </div>
 
       <div className="settings-field field-profit">
-        <label className="settings-label" title={t('settings.profitHelp')}>{t('settings.profitRate')}: {profitRate}%</label>
+        <label className="settings-label" title={t('settings.serviceFeeHelp')}>{t('settings.serviceFee')}: {serviceFee}%</label>
         <input
           className="settings-control"
           type="range"
           min="0"
-          max="100"
+          max="30"
           step="1"
-          value={profitRate}
-          style={{ '--fill': `${(profitRate / 100) * 100}%` }}
-          onChange={(e) => setProfitRate(Number(e.target.value))}
+          value={serviceFee}
+          style={{ '--fill': `${(serviceFee / 30) * 100}%` }}
+          onChange={(e) => setServiceFee(Number(e.target.value))}
         />
       </div>
 

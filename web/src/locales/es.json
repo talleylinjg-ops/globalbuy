@@ -18,8 +18,8 @@
     "deliveryCountry": "Destino",
     "currency": "Moneda",
     "platforms": "Plataformas",
-    "profitRate": "Margen de servicio",
-    "profitHelp": "Tu comisión / beneficio añadido",
+    "serviceFee": "Comisión de servicio",
+    "serviceFeeHelp": "Comisión opcional elegida por el comprador, 5% por defecto; el precio ya incluye el margen",
     "weightsTitle": "Pesos de ordenación"
   },
   "result": {
