@@ -30,6 +30,11 @@ export class PtdsgjAdapter extends CarrierAdapter {
 
   async quote(p) {
     if (!this.configured) throw new CarrierError('PTD 未配置 token', 'NOT_CONFIGURED');
+    // calculator 要求长宽高必填且大于 0；询价链路无箱型时用默认箱（20x15x10cm，体积重 0.5kg）
+    const dims = p.dims || {};
+    const len = Number(dims.lengthCm) > 0 ? Number(dims.lengthCm) : 20;
+    const wid = Number(dims.widthCm) > 0 ? Number(dims.widthCm) : 15;
+    const hei = Number(dims.heightCm) > 0 ? Number(dims.heightCm) : 10;
     const body = {
       shipment: {
         pickup_zone: this.pickupZone,
@@ -37,9 +42,9 @@ export class PtdsgjAdapter extends CarrierAdapter {
         postcode: p.postcode || '',
         parcels: [{
           client_weight: p.weightKg,
-          client_length: p.dims?.lengthCm || 0,
-          client_width: p.dims?.widthCm || 0,
-          client_height: p.dims?.heightCm || 0,
+          client_length: len,
+          client_width: wid,
+          client_height: hei,
         }],
       },
     };
