@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { applySearchSeo, applyBreadcrumbSeo, applyHowToSeo } from './utils/seo.js';
 import { useI18n } from './i18n.js';
 import { fetchMeta, searchProducts, parseLink, apiUrl } from './api.js';
 import ProductCard from './components/ProductCard.jsx';
@@ -193,9 +194,26 @@ export default function App() {
 
   // 初始加载演示数据
   useEffect(() => {
+    applyBreadcrumbSeo();
+    applyHowToSeo();
     doSearch('wireless earbuds');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // 搜索完成后动态注入 SEO/GEO 元数据（标题/描述/OG/ItemList 结构化数据）
+  useEffect(() => {
+    if (!results) return;
+    applySearchSeo({
+      keyword: results.inputKeyword,
+      translated: results.translatedKeyword,
+      total: results.total,
+      topProducts: (results.results || []).slice(0, 10).map((p) => ({
+        title: p.titleEn || p.title,
+        price: Number(p.price) || undefined,
+        imageUrl: p.imageUrl,
+      })),
+    });
+  }, [results]);
 
   const currencySymbol = useMemo(() => {
     const s = {
