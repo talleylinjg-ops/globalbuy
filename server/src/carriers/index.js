@@ -8,16 +8,18 @@ import { FedExAdapter } from './fedex.js';
 import { EMSAdapter } from './ems.js';
 import { PtdsgjAdapter } from './ptdsgj.js';
 import { ZjhygjAdapter } from './zjhygj.js';
+import { SFIntlAdapter } from './sfinternational.js';
 
 export const CARRIER_ADAPTERS = {
   yuntrack: { name: '云途物流', adapter: YunTrackAdapter, fields: ['appId', 'appToken'] },
-  '4px': { name: '递四方', adapter: FourPXAdapter, fields: ['appKey', 'appSecret'] },
+  '4px': { name: '递四方', adapter: FourPXAdapter, fields: ['appKey', 'appSecret', 'appToken', 'methodName', 'apiVersion', 'baseUrl'] },
   dhl: { name: 'DHL Express', adapter: DHLAdapter, fields: ['apiKey', 'apiSecret'] },
   ups: { name: 'UPS', adapter: UPSAdapter, fields: ['clientId', 'clientSecret'] },
   fedex: { name: 'FedEx', adapter: FedExAdapter, fields: ['apiKey', 'apiSecret'] },
   ems: { name: 'EMS', adapter: EMSAdapter, fields: ['userId', 'apiKey'] },
   ptdsgj: { name: 'PTD 国际速递', adapter: PtdsgjAdapter, fields: ['token', 'pickupZone'] },
   zjhygj: { name: '华源国际', adapter: ZjhygjAdapter, fields: ['account', 'password', 'branchId'] },
+  sfintl: { name: '顺丰国际', adapter: SFIntlAdapter, fields: ['appKey', 'appSecret', 'aesKey', 'customerCode', 'customerType', 'serviceCode', 'baseUrl'] },
 };
 
 // 内置默认快递商（未配置密钥时走估算模式，保证开箱可用）
@@ -31,6 +33,7 @@ export function defaultCarriers() {
     { code: 'ems', name: 'EMS', mode: 'standard', enabled: true, markupRate: 0 },
     { code: 'ptdsgj', name: 'PTD 国际速递', mode: 'standard', enabled: true, markupRate: 0 },
     { code: 'zjhygj', name: '华源国际专线', mode: 'economy', enabled: true, markupRate: 0 },
+    { code: 'sfintl', name: '顺丰国际', mode: 'standard', enabled: true, markupRate: 0 },
   ];
 }
 

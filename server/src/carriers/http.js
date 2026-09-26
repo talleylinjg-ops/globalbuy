@@ -6,7 +6,7 @@ export async function httpRequest(url, { method = 'GET', headers = {}, body, tim
     const res = await fetch(url, {
       method,
       headers: { 'Content-Type': 'application/json', ...headers },
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      body: body !== undefined ? (typeof body === 'string' ? body : JSON.stringify(body)) : undefined,
       signal: ctrl.signal,
     });
     const text = await res.text();
