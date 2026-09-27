@@ -74,6 +74,22 @@
     "note": "Los precios son estimaciones que incluyen envío internacional, aranceles e IVA. La aduana real puede variar.",
     "disclaimer": "Sistema de demostración: conecta las API reales de afiliados mediante server/.env para producción."
   },
+  "faq": {
+    "title": "Preguntas frecuentes",
+    "subtitle": "Todo lo que necesitas saber sobre comprar en China con CrossBuy",
+    "q1": "¿Qué plataformas busca CrossBuy?",
+    "a1": "CrossBuy compara el mismo producto en Taobao, Tmall, JD.com, Pinduoduo y 1688 en una sola búsqueda, destacando la opción más rápida, la más barata y la mejor valorada.",
+    "q2": "¿Qué incluye el precio final?",
+    "a2": "Precio final = precio del producto + envío internacional + aranceles + IVA + tarifa de servicio + comisión de pago, calculado en tiempo real según las reglas fiscales de tu país y desglosado antes de pagar, sin costes ocultos.",
+    "q3": "¿A qué países envía CrossBuy?",
+    "a3": "Enviamos a Estados Unidos, Reino Unido, Alemania, Francia, Japón, Corea del Sur, Australia, Canadá y más destinos, con varias transportistas y estimaciones de precio y entrega antes del pedido.",
+    "q4": "¿Puedo agrupar varios pedidos en un envío?",
+    "a4": "Sí. Los productos de distintas plataformas se agrupan en un solo paquete; el envío se cobra por peso combinado y los umbrales de exención se aplican al valor total declarado, lo que suele ser más barato.",
+    "q5": "¿Cuánto tarda la entrega?",
+    "a5": "Las líneas económicas tardan unos 5-10 días hábiles y las exprés unos 3-7, según el destino y el transportista. Las estimaciones se muestran antes de pedir.",
+    "q6": "¿Por qué es más barato con CrossBuy?",
+    "a6": "Los precios en China están muy por debajo de los márgenes del retail exterior. CrossBuy te conecta directamente con el precio de origen y hace transparentes el envío y los impuestos, para que decidas con el coste real."
+  },
   "error": {
     "search": "La búsqueda falló. Inténtalo de nuevo."
   },

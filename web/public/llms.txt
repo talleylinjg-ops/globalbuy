@@ -1,0 +1,37 @@
+# CrossBuy 全球购 (CrossBuy Global)
+
+> CrossBuy is a cross-border price comparison and shopping agent platform for China's major e-commerce marketplaces. It searches Taobao, Tmall, JD.com, Pinduoduo and 1688 in one query, then calculates the true landed price (international shipping + customs duty + VAT + service fee) for delivery to the buyer's country. Slogan: Buy More Save More.
+
+## What CrossBuy does
+
+- **Multi-platform comparison**: one search across Taobao, Tmall, JD, Pinduoduo and 1688 shows the same product from all platforms with best / fastest / recommended rankings.
+- **Landed price transparency**: every product shows item price + international shipping + duty + VAT + service fee + payment fee, computed per destination country's tax rules before ordering.
+- **Bundle shipping**: multiple items from different platforms are combined into one parcel; shipping is charged by combined weight and duty-free thresholds apply to the merged value.
+- **Carrier choice**: multiple international carriers (4PX, Huayuan, SF International and more) quote real-time prices and delivery estimates; buyers pick fastest, cheapest or balanced.
+- **Coverage**: ships from mainland China to the United States, United Kingdom, Germany, France, Japan, Korea, Australia, Canada and more.
+
+## Key facts
+
+- Site: https://globalbuy.pages.dev/
+- Languages: Simplified Chinese (zh-CN), English (en), Spanish (es)
+- Search URL pattern: https://globalbuy.pages.dev/?q={keyword}
+- Currency display: buyer-selectable (USD, EUR, GBP, JPY, and 20+ more); prices auto-converted from CNY.
+- Typical delivery: 5-10 business days by economical lines, 3-7 by express lines (varies by destination).
+- Service fee: buyer-selected, default 5%, range 0-30%; shown as a separate line item.
+
+## FAQ
+
+### Which platforms does CrossBuy search?
+Taobao, Tmall, JD.com, Pinduoduo and 1688 — the five largest Chinese e-commerce marketplaces — in a single query.
+
+### What is included in the landed price?
+Item price + international shipping + customs duty + VAT + service fee + payment fee. All lines are shown before checkout; there are no hidden fees.
+
+### Which countries can CrossBuy deliver to?
+United States, United Kingdom, Germany, France, Japan, South Korea, Australia, Canada and other destinations, with multiple carrier options and pre-order price and time estimates.
+
+### Can multiple orders ship together?
+Yes. Items are combined into one parcel, shipping is billed on combined weight, and duty-free allowances are applied to the merged declared value, which usually costs less than separate shipments.
+
+### How accurate are the prices?
+Shipping and tax lines come from live carrier and tax-rule APIs at quote time; final customs assessment may differ slightly and any difference is settled with the buyer (refund or balance).

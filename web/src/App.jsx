@@ -387,6 +387,21 @@ export default function App() {
         )}
       </main>
 
+      {!isAdmin && (
+        <section className="container faq-section" aria-labelledby="faq-title">
+          <h2 id="faq-title">{t('faq.title')}</h2>
+          <p className="faq-subtitle">{t('faq.subtitle')}</p>
+          <div className="faq-list">
+            {[1, 2, 3, 4, 5, 6].map((n) => (
+              <details key={n} className="faq-item" open={n <= 2}>
+                <summary>{t(`faq.q${n}`)}</summary>
+                <p>{t(`faq.a${n}`)}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+      )}
+
       <CombineBar
         items={combineList}
         result={combineResult}

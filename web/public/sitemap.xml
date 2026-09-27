@@ -5,11 +5,17 @@
     <loc>https://globalbuy.pages.dev/</loc>
     <xhtml:link rel="alternate" hreflang="zh-CN" href="https://globalbuy.pages.dev/"/>
     <xhtml:link rel="alternate" hreflang="en" href="https://globalbuy.pages.dev/?lang=en"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://globalbuy.pages.dev/?lang=es"/>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://globalbuy.pages.dev/?lang=en</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://globalbuy.pages.dev/?lang=es</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>

@@ -98,6 +98,22 @@
     "note": "Prices are estimates including international shipping, duties & VAT. Actual customs may vary; any difference will be settled.",
     "disclaimer": "Demo system — connect real platform affiliate APIs via server/.env for production use."
   },
+  "faq": {
+    "title": "FAQ",
+    "subtitle": "Everything you need to know about buying from China with CrossBuy",
+    "q1": "Which platforms does CrossBuy search?",
+    "a1": "CrossBuy compares the same product across Taobao, Tmall, JD.com, Pinduoduo and 1688 in a single search, flagging the fastest, cheapest and best-value options.",
+    "q2": "What is included in the landed price?",
+    "a2": "Landed price = item price + international shipping + customs duty + VAT + service fee + payment fee, computed in real time under your destination country's tax rules and itemized before checkout — no hidden fees.",
+    "q3": "Which countries can CrossBuy deliver to?",
+    "a3": "We ship to the United States, United Kingdom, Germany, France, Japan, South Korea, Australia, Canada and more, with multiple carrier options and pre-order price and delivery estimates.",
+    "q4": "Can multiple orders ship together?",
+    "a4": "Yes. Items from different platforms are combined into one parcel, shipping is billed on combined weight, and duty-free allowances apply to the merged declared value — usually cheaper than separate shipments.",
+    "q5": "How long does delivery take?",
+    "a5": "Economy lines take about 5-10 business days, express lines about 3-7, depending on destination and carrier. Live estimates are shown before you order.",
+    "q6": "Why is CrossBuy cheaper?",
+    "a6": "China's domestic prices sit far below overseas retail markups. CrossBuy plugs you directly into source prices and makes shipping and taxes fully transparent, so you decide on the true landed total."
+  },
   "error": {
     "search": "Search failed. Please try again."
   },
