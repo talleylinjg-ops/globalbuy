@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, lazy, Suspense } from 'react';
 import { applySearchSeo, applyBreadcrumbSeo, applyHowToSeo } from './utils/seo.js';
 import { useI18n } from './i18n.js';
 import { fetchMeta, searchProducts, parseLink, apiUrl } from './api.js';
@@ -9,7 +9,9 @@ import Loading from './components/Loading.jsx';
 import CarrierPicker from './components/CarrierPicker.jsx';
 import CombineBar from './components/CombineBar.jsx';
 import OrderModal from './components/OrderModal.jsx';
-import AdminPanel from './components/AdminPanel.jsx';
+
+// 管理端拆包：仅 #/admin 路由加载，减小主包体积
+const AdminPanel = lazy(() => import('./components/AdminPanel.jsx'));
 
 const DEFAULT_COUNTRY = 'US';
 const DEFAULT_CURRENCY = 'USD';
@@ -288,7 +290,9 @@ export default function App() {
 
       <main className="container">
         {isAdmin ? (
-          <AdminPanel t={t} />
+          <Suspense fallback={<div className="loading">...</div>}>
+            <AdminPanel t={t} />
+          </Suspense>
         ) : (
         <>
         <SearchPanel
