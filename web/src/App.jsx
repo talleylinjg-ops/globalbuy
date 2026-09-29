@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, lazy, Suspense } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef, lazy, Suspense } from 'react';
 import { applySearchSeo, applyBreadcrumbSeo, applyHowToSeo } from './utils/seo.js';
 import { useI18n } from './i18n.js';
 import { fetchMeta, searchProducts, parseLink, apiUrl } from './api.js';
@@ -89,6 +89,8 @@ export default function App() {
   const [combineResult, setCombineResult] = useState(null);
   const [orderItem, setOrderItem] = useState(null);
   const [combineLoading, setCombineLoading] = useState(false);
+  const isDemoModeRef = useRef(false);
+  isDemoModeRef.current = Boolean(results?.demo || meta?.demo);
 
   useEffect(() => {
     const onHash = () => setIsAdmin(getAdminRoute());
@@ -139,6 +141,9 @@ export default function App() {
       });
       const data = await res.json();
       if (res.ok) setCombineResult(data);
+      else if (isDemoModeRef.current) setCombineResult({ demo: true });
+    } catch {
+      if (isDemoModeRef.current) setCombineResult({ demo: true });
     } finally {
       setCombineLoading(false);
     }
@@ -227,6 +232,9 @@ export default function App() {
     return s[currency] ?? currency;
   }, [currency]);
 
+  // 演示模式：后端不可达时由静态快照兜底（meta.demo / results.demo 任一为真即开启）
+  const isDemoMode = Boolean(results?.demo || meta?.demo);
+
   // 客户端二次排序
   const sortedResults = useMemo(() => {
     if (!results) return null;
@@ -305,6 +313,10 @@ export default function App() {
           t={t}
           categories={meta?.hotKeywords || meta?.categories || DEFAULT_HOT_KEYWORDS}
         />
+
+        {isDemoMode && (
+          <div className="demo-banner" role="status">{t('banner.demoMode')}</div>
+        )}
 
         {linkMatched && linkMatched.ok && linkMatched.product && (
           <div className="translate-badge" style={{ marginTop: '10px' }}>

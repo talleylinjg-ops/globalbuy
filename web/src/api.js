@@ -4,13 +4,40 @@ export function apiUrl(path) {
   return `${API_BASE}${path}`;
 }
 
-async function getJSON(url) {
-  const res = await fetch(apiUrl(url));
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error || `HTTP ${res.status}`);
+// ===== 静态快照降级层（学习镜像站架构：后端不可达时前台 100% 可浏览） =====
+// 后端（"原站"）休眠/未部署时，读取构建期抓取的演示快照，访客端始终有完整浏览体验
+async function fetchWithTimeout(url, ms = 8000) {
+  return fetch(url, { signal: AbortSignal.timeout(ms) });
+}
+
+let demoSnapshotCache = {};
+async function loadDemoSnapshot(name) {
+  if (demoSnapshotCache[name]) return demoSnapshotCache[name];
+  const res = await fetch(`${import.meta.env.BASE_URL}demo/${name}.json`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const j = await res.json();
+  demoSnapshotCache[name] = j;
+  return j;
+}
+
+function demoSearchSnapshot(keyword) {
+  const k = (keyword || '').toLowerCase();
+  if (k.includes('case') || k.includes('壳') || k.includes('手机壳')) return loadDemoSnapshot('search-phone-case');
+  return loadDemoSnapshot('search-wireless-earbuds');
+}
+
+async function getJSON(url, { fallback } = {}) {
+  try {
+    const res = await fetchWithTimeout(apiUrl(url));
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `HTTP ${res.status}`);
+    }
+    return res.json();
+  } catch (e) {
+    if (fallback) return fallback(e);
+    throw e;
   }
-  return res.json();
 }
 
 // ===== 后台管理 API =====
@@ -187,7 +214,10 @@ export async function quoteCarriers(params) {
 }
 
 export async function fetchMeta() {
-  return getJSON('/api/meta');
+  const meta = await getJSON('/api/meta', {
+    fallback: async () => ({ ...(await loadDemoSnapshot('meta')), demo: true }),
+  });
+  return meta;
 }
 
 export async function fetchTax(country) {
@@ -204,7 +234,23 @@ export async function searchProducts(params) {
       qs.set(k, String(v));
     }
   }
-  return getJSON(`/api/search?${qs.toString()}`);
+  try {
+    const res = await fetchWithTimeout(apiUrl(`/api/search?${qs.toString()}`));
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `HTTP ${res.status}`);
+    }
+    return res.json();
+  } catch (e) {
+    // 后端不可达：降级到内置演示快照（标注 demo，保留用户关键词）
+    const snap = await demoSearchSnapshot(params.q);
+    return {
+      ...snap,
+      inputKeyword: params.q || snap.inputKeyword,
+      keyword: params.q || snap.keyword,
+      demo: true,
+    };
+  }
 }
 
 export async function parseLink(url) {

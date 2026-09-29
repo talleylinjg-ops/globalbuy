@@ -98,6 +98,9 @@
     "note": "Prices are estimates including international shipping, duties & VAT. Actual customs may vary; any difference will be settled.",
     "disclaimer": "Demo system — connect real platform affiliate APIs via server/.env for production use."
   },
+  "banner": {
+    "demoMode": "Demo mode — showing built-in sample data while live comparison is being connected"
+  },
   "faq": {
     "title": "FAQ",
     "subtitle": "Everything you need to know about buying from China with CrossBuy",

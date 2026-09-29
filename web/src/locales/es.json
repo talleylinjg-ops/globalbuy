@@ -74,6 +74,9 @@
     "note": "Los precios son estimaciones que incluyen envío internacional, aranceles e IVA. La aduana real puede variar.",
     "disclaimer": "Sistema de demostración: conecta las API reales de afiliados mediante server/.env para producción."
   },
+  "banner": {
+    "demoMode": "Modo demostración — mostrando datos de ejemplo integrados mientras se conecta la comparación en vivo"
+  },
   "faq": {
     "title": "Preguntas frecuentes",
     "subtitle": "Todo lo que necesitas saber sobre comprar en China con CrossBuy",

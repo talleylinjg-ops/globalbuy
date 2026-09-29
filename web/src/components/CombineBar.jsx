@@ -32,7 +32,11 @@ export default function CombineBar({ items, result, loading, onCalc, onClear, on
         </div>
       </div>
 
-      {result && expanded && (
+      {result?.demo && (
+        <div className="combine-result demo-note">{t('banner.demoMode')}</div>
+      )}
+
+      {result && !result.demo && expanded && (
         <div className="combine-result">
           <div className="combine-result-head">
             <span>{result.carrier} · {result.daysMin}-{result.daysMax} {t('result.days')} · {result.totalWeightKg}kg</span>
