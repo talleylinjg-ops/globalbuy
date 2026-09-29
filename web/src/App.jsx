@@ -320,7 +320,7 @@ export default function App() {
 
         {linkMatched && linkMatched.ok && linkMatched.product && (
           <div className="translate-badge" style={{ marginTop: '10px' }}>
-            {t('result.linkMatched')} <b>{linkMatched.product.title}</b>
+            {t('result.linkMatched')} <b>{linkMatched.product.titleEn || linkMatched.product.title}</b>
             {linkMatched.product.price != null && ` · ¥${linkMatched.product.price}`}
           </div>
         )}
@@ -395,6 +395,7 @@ export default function App() {
                 onToggleCombine={() => toggleCombine(item)}
                 onOrder={() => setOrderItem(item)}
                 t={t}
+                lang={lang}
               />
             ))}
           </div>
@@ -438,6 +439,7 @@ export default function App() {
           defaultServiceFee={serviceFee}
           onClose={() => setOrderItem(null)}
           t={t}
+          lang={lang}
         />
       )}
 

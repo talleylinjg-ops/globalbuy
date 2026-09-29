@@ -30,13 +30,13 @@ function fmtInt(n) {
   return String(n);
 }
 
-export default function ProductCard({ item, currency, currencySymbol, shippingTiers, inCombine, onToggleCombine, onOrder, t }) {
+export default function ProductCard({ item, currency, currencySymbol, shippingTiers, inCombine, onToggleCombine, onOrder, t, lang }) {
   const [showBreakdown, setShowBreakdown] = useState(false);
   const b = item.landed.breakdown;
   const platformClass = PLATFORM_CLASS[item.platform] || '';
   const platformName = t(`platform.${item.adapter || item.platform.toLowerCase()}`) || item.platform;
 
-  const title = item.titleEn && item.titleEn !== item.title ? item.titleEn : item.title;
+  const title = lang !== 'zh' && item.titleEn && item.titleEn !== item.title ? item.titleEn : item.title;
 
   return (
     <div className={`card ${item.isTopPick ? 'top' : item.isRecommended ? 'recommended' : ''}`}>
@@ -63,7 +63,10 @@ export default function ProductCard({ item, currency, currencySymbol, shippingTi
 
         <div className="card-meta">
           {item.brand && <span className="pill">{item.brand}</span>}
-          <span className="pill">{item.category}</span>
+          {item.category && (() => {
+            const key = `category.${item.category}`;
+            return <span className="pill">{t(key) === key ? item.category : t(key)}</span>;
+          })()}
           {item.inStock && <span className="pill good">{t('result.inStock')}</span>}
           <span className="pill source-badge">{item.sourceType === 'api' ? t('source.api') : t('source.mock')}</span>
         </div>

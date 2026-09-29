@@ -84,6 +84,22 @@
     "pdd": "Pinduoduo",
     "1688": "1688"
   },
+  "country": {
+    "US": "United States", "GB": "United Kingdom", "DE": "Germany", "FR": "France", "NL": "Netherlands",
+    "IT": "Italy", "ES": "Spain", "CA": "Canada", "AU": "Australia", "JP": "Japan",
+    "KR": "South Korea", "SG": "Singapore", "MY": "Malaysia", "TH": "Thailand", "VN": "Vietnam",
+    "PH": "Philippines", "ID": "Indonesia", "IN": "India", "SA": "Saudi Arabia", "AE": "United Arab Emirates",
+    "BR": "Brazil", "MX": "Mexico", "RU": "Russia", "TR": "Turkey", "ZA": "South Africa",
+    "NZ": "New Zealand", "CH": "Switzerland", "SE": "Sweden", "NO": "Norway", "PL": "Poland",
+    "HK": "Hong Kong", "TW": "Taiwan"
+  },
+  "category": {
+    "蓝牙耳机": "Bluetooth Earbuds", "耳机": "Earbuds", "手机壳": "Phone Case", "手机配件": "Phone Accessories",
+    "智能手表": "Smart Watch", "键盘": "Keyboard", "鼠标": "Mouse", "行李箱": "Luggage",
+    "运动鞋": "Sneakers", "保温杯": "Water Bottle", "瑜伽垫": "Yoga Mat", "LED台灯": "LED Lamp",
+    "零食": "Snacks", "猫玩具": "Cat Toys", "无线充电器": "Wireless Charger", "充电宝": "Power Bank",
+    "卫衣": "Hoodie", "T恤": "T-Shirt", "羽绒服": "Down Jacket", "背包": "Backpack", "玩具": "Toys"
+  },
   "source": {
     "mock": "Demo data",
     "api": "Live API",

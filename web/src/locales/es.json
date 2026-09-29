@@ -66,6 +66,22 @@
     "pdd": "Pinduoduo",
     "1688": "1688"
   },
+  "country": {
+    "US": "Estados Unidos", "GB": "Reino Unido", "DE": "Alemania", "FR": "Francia", "NL": "Países Bajos",
+    "IT": "Italia", "ES": "España", "CA": "Canadá", "AU": "Australia", "JP": "Japón",
+    "KR": "Corea del Sur", "SG": "Singapur", "MY": "Malasia", "TH": "Tailandia", "VN": "Vietnam",
+    "PH": "Filipinas", "ID": "Indonesia", "IN": "India", "SA": "Arabia Saudita", "AE": "Emiratos Árabes Unidos",
+    "BR": "Brasil", "MX": "México", "RU": "Rusia", "TR": "Turquía", "ZA": "Sudáfrica",
+    "NZ": "Nueva Zelanda", "CH": "Suiza", "SE": "Suecia", "NO": "Noruega", "PL": "Polonia",
+    "HK": "Hong Kong", "TW": "Taiwán"
+  },
+  "category": {
+    "蓝牙耳机": "Auriculares Bluetooth", "耳机": "Auriculares", "手机壳": "Funda de móvil", "手机配件": "Accesorios de móvil",
+    "智能手表": "Reloj inteligente", "键盘": "Teclado", "鼠标": "Ratón", "行李箱": "Maleta",
+    "运动鞋": "Zapatillas", "保温杯": "Termo", "瑜伽垫": "Esterilla de yoga", "LED台灯": "Lámpara LED",
+    "零食": "Snacks", "猫玩具": "Juguetes para gatos", "无线充电器": "Cargador inalámbrico", "充电宝": "Batería externa",
+    "卫衣": "Sudadera", "T恤": "Camiseta", "羽绒服": "Plumífero", "背包": "Mochila", "玩具": "Juguetes"
+  },
   "source": {
     "mock": "Datos demo",
     "api": "API en vivo"

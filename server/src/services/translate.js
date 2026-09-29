@@ -215,14 +215,96 @@ const ZH_TO_EN = {
   '中号': 'Medium', '小号': 'Small', '加大码': 'XL', '套装': 'Set',
 };
 
+// 中文标题 -> 英文展示
+// 策略：按词典 key 长度降序做子串替换（长词优先，避免"无线蓝牙耳机"整串无法命中）；
+// 英文片段前置空格保证可读性，最后统一收敛空白
+const ZH_TO_EN_ENTRIES = Object.entries({
+  ...ZH_TO_EN,
+  // 高频商品词扩充（mock 标题与真实平台标题通用）
+  '无线蓝牙耳机': 'Wireless Bluetooth Earbuds', '蓝牙耳机': 'Bluetooth Earbuds',
+  '无线充电器': 'Wireless Charger', '手机壳': 'Phone Case', '机械键盘': 'Mechanical Keyboard',
+  '智能手表': 'Smart Watch', '跑步鞋': 'Running Shoes', '登机箱': 'Carry-on Luggage',
+  '健身垫': 'Fitness Mat', '逗猫': 'Cat Teaser', '猫咪': 'Cat', '零食': 'Snacks',
+  '超长续航': 'Ultra-long Battery Life', '续航': 'Battery Life', '快充': 'Fast Charging',
+  '防汗': 'Sweatproof', '防摔': 'Drop-proof', '防滑': 'Non-slip', '透气': 'Breathable',
+  '大容量': 'Large Capacity', '大屏': 'Large Screen', '高清': 'HD', '背光': 'Backlit',
+  '官方自营': 'Official Store', '官方正品': 'Official Authentic', '官方旗舰': 'Official Flagship',
+  '官方认证': 'Officially Certified', '官方配件': 'Official Accessory',
+  '男女款': 'Unisex', '男女同款': 'Unisex', '男款': 'Men', '女款': 'Women', '男女鞋': 'Unisex',
+  '入耳式': 'In-ear', '半入耳式': 'Semi In-ear', '磁吸': 'Magnetic', '低延迟': 'Low Latency',
+  '心率监测': 'Heart Rate Monitor', '血氧': 'Blood Oxygen', '睡眠监测': 'Sleep Tracking',
+  '蓝牙通话': 'Bluetooth Calling', '运动模式': 'Sports Mode', '防水防汗': 'Waterproof & Sweatproof',
+  '护眼': 'Eye-care', '加厚': 'Thickened', '办公': 'Office', '游戏': 'Gaming',
+  '电竞': 'Esports', '热插拔': 'Hot-swappable', '苹果': 'Apple', '华为': 'Huawei',
+  '小米': 'Xiaomi', '安卓': 'Android', '通用': 'Universal', '适配': 'Compatible with',
+  '万向轮': 'Spinner Wheels', '不锈钢': 'Stainless Steel', '铝合金': 'Aluminum Alloy',
+  '硅胶': 'Silicone', '便携': 'Portable', '折叠': 'Foldable', '迷你': 'Mini',
+  '批发': 'Wholesale', '跨境专供': 'Cross-border Supply', '工厂': 'Factory',
+  // 第二批：mock 与真实标题高频残留词
+  '真无线': 'True Wireless', '主动降噪': 'Active Noise Cancelling',
+  '全包边': 'Full Coverage', '包邮': 'Free Shipping', '双肩包': 'Backpack',
+  '一年质保': '1-Year Warranty', '两年质保': '2-Year Warranty', '质保': 'Warranty',
+  '一年保修': '1-Year Warranty', '保修': 'Warranty', '通话': 'Calls', '运动': 'Sports',
+  '适用': 'Compatible', '支持定制': 'Customization Available', '定制': 'Customizable',
+  '贴牌': 'OEM', '代发': 'Dropshipping', '一件代发': 'Dropshipping Available',
+  '厂家直销': 'Factory Direct', '量大从优': 'Bulk Discounts', '简约': 'Minimalist',
+  '透明': 'Clear', '正品保障': 'Authenticity Guaranteed', '多色可选': 'Multiple Colors',
+  '全系列': 'All Series', '软壳': 'Soft Case', '桌面充电板': 'Desktop Charging Pad',
+  '充电板': 'Charging Pad', '桌面': 'Desktop', '三线圈': '3-Coil', '超薄': 'Ultra Slim',
+  '环保': 'Eco-friendly', '双面': 'Double-sided', '纹理': 'Texture', '附赠': 'Bonus',
+  '收纳袋': 'Storage Bag', '初学者': 'Beginner', '材质': 'Material',
+  '训练垫': 'Training Mat', '品质保障': 'Quality Assured', '家用': 'Home Use',
+  '高颜值': 'Stylish', '商务': 'Business', '防漏': 'Leak-proof',
+  '保温保冷': 'Keeps Hot & Cold', '放心购': 'Trusted Purchase', '超值': 'Great Value',
+  '学生': 'Student', '秋冬必备': 'Fall & Winter Essential', '电商': 'E-commerce',
+  '茶轴': 'Brown Switch', '青轴': 'Blue Switch', '轴体': 'Switch', '有线': 'Wired',
+  '电脑键盘': 'Computer Keyboard', '电竞游戏': 'Esports Gaming',
+  '多种表盘': 'Multiple Watch Faces', '计步': 'Step Counter', '来电提醒': 'Call Alerts',
+  '平价爆款': 'Budget Bestseller', '轻便': 'Lightweight', '轻量化': 'Lightweight',
+  '缓震回弹': 'Responsive Cushioning', '缓震支撑': 'Cushioned Support', '缓震': 'Cushioned',
+  '时尚百搭': 'Stylish & Versatile', '百搭': 'Versatile', '专业': 'Pro',
+  '休闲': 'Casual', '软底': 'Soft Sole', '增高': 'Height Increasing',
+  '清仓特价': 'Clearance Offer', '清仓': 'Clearance', '特价': 'Special Offer',
+  '网面': 'Mesh', '拉链': 'Zipper', '拉杆': 'Trolley', '磨砂': 'Matte',
+  '抗刮': 'Scratch-resistant', '硬壳': 'Hard Shell', '旅行': 'Travel',
+  '外贸': 'Foreign Trade', '箱体': 'Shell', '加密': 'Reinforced',
+  '触控调光': 'Touch Dimming', '调光': 'Dimming', '无极调色': 'Stepless Color Temperature',
+  '无频闪': 'Flicker-free', '全光谱': 'Full Spectrum', '感光': 'Light Sensor',
+  '宿舍神器': 'Dorm Essential', '床头灯': 'Bedside Lamp', '学习灯': 'Study Lamp',
+  '阅读写字': 'Reading & Writing', '充电式': 'Rechargeable', '三档': '3-Level',
+  '逗猫棒': 'Cat Teaser Wand', '转盘球': 'Turntable Ball', '自嗨': 'Self-playing',
+  '解闷': 'Boredom Relief', '益智互动': 'Interactive Puzzle', '仿真': 'Realistic',
+  '薄荷': 'Catnip', '咬咬乐': 'Chew Toy', '磨牙': 'Teething', '安抚': 'Calming',
+  '去毛球': 'Hairball Remover', '便宜': 'Budget', '自动': 'Automatic',
+  '玩耍': 'Play', '用品': 'Supplies', '电动': 'Electric',
+  '冻干': 'Freeze-dried', '火龙果': 'Dragon Fruit', '果干': 'Dried Fruit',
+  '水果': 'Fruit', '山楂': 'Hawthorn', '糖葫芦': 'Tanghulu', '冰糖': 'Rock Sugar',
+  '坚果': 'Nuts', '无糖': 'Sugar-free', '无添加': 'No Additives',
+  '孕妇': 'Pregnancy-safe', '酸甜开胃': 'Sweet & Sour Appetizing', '开胃': 'Appetizing',
+  '散装': 'Bulk', '年货': 'Festival Goods', '礼盒': 'Gift Box', '混合': 'Mixed',
+  '真果肉': 'Real Fruit', '多种': 'Multi', '健康': 'Healthy', '自营': 'Self-operated',
+  '休闲食品': 'Casual Snacks', '脆片': 'Crisps',
+  // 第三批：残留收尾
+  '半入耳': 'Semi In-ear', '长续航': 'Long Battery Life', '高性价比': 'Great Value',
+  '跨境出口': 'Cross-border Export', '支持跨境': 'Cross-border Ready', '跨境': 'Cross-border',
+  '支持': 'Supports', '双芯片': 'Dual Chip', '安全': 'Safe', '可用': 'Compatible',
+  '87键': '87-Key', '104键': '104-Key', '61键': '61-Key', '可选': 'Optional',
+  '20寸': '20-inch', '24寸': '24-inch', '28寸': '28-inch', '寸': '-inch',
+  'TSA锁': 'TSA Lock', '锁': 'Lock', '国AA级': 'National AA Grade',
+  '心率': 'Heart Rate', '支付宝': 'Alipay', '自嗨球': 'Self-rolling Ball', '球': 'Ball',
+  '仿真鱼': 'Realistic Fish', '鱼': 'Fish', '火龙果干': 'Freeze-dried Dragon Fruit',
+  '水果干': 'Dried Fruit', '冰糖葫芦': 'Tanghulu',   '孕妇可吃': 'Pregnancy-safe', '可贴牌': 'OEM Available',
+}).sort((a, b) => b[0].length - a[0].length);
+
 export function translateTitleToEnglish(title) {
   if (!title) return title;
   // 如果标题中没有中文字符，直接返回（可能本身就是英文）
   if (!/[\u4e00-\u9fa5]/.test(title)) return title;
-  return title.replace(/[\u4e00-\u9fa5A-Za-z0-9]+/g, (word) => {
-    if (/^[A-Za-z0-9]+$/.test(word)) return word;
-    return ZH_TO_EN[word] ?? word;
-  });
+  let out = title;
+  for (const [zh, en] of ZH_TO_EN_ENTRIES) {
+    if (out.includes(zh)) out = out.split(zh).join(` ${en} `);
+  }
+  return out.replace(/\s+/g, ' ').trim();
 }
 
 // 检测输入是否主要为英文（用于决定是否需要翻译成中文）

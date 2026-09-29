@@ -21,9 +21,11 @@ export default function SettingsPanel({
       <div className="settings-field field-country">
         <label className="settings-label">{t('settings.deliveryCountry')}</label>
         <select className="settings-control" value={country} onChange={(e) => setCountry(e.target.value)}>
-          {(meta?.countries || []).map((c) => (
-            <option key={c.code} value={c.code}>{c.name} ({c.code})</option>
-          ))}
+          {(meta?.countries || []).map((c) => {
+            const key = `country.${c.code}`;
+            const name = t(key) === key ? c.name : t(key);
+            return <option key={c.code} value={c.code}>{name} ({c.code})</option>;
+          })}
         </select>
       </div>
 
