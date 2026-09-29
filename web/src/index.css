@@ -1187,6 +1187,20 @@ body {
 }
 .footer .note { margin: 0 0 6px; font-weight: 500; color: var(--text); }
 
+/* ===== 错误边界兜底面板 ===== */
+.error-boundary {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 20px;
+  text-align: center;
+}
+.error-boundary h1 { font-size: 1.3rem; }
+.error-boundary p { color: var(--muted); font-size: 0.9rem; max-width: 480px; word-break: break-all; }
+
 /* ===== 演示模式横幅 ===== */
 .demo-banner {
   margin: 0 0 14px;

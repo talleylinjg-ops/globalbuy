@@ -20,10 +20,21 @@ async function loadDemoSnapshot(name) {
   return j;
 }
 
+// 快照内商品图片随快照打包在 /demo/images/，降级时改写路径避免 404
+function rewriteDemoImages(data) {
+  const base = import.meta.env.BASE_URL;
+  (data?.results || []).forEach((r) => {
+    if (r.imageUrl && !r.imageUrl.startsWith(`${base}demo/`)) r.imageUrl = `${base}demo${r.imageUrl}`;
+  });
+  return data;
+}
+
 function demoSearchSnapshot(keyword) {
   const k = (keyword || '').toLowerCase();
-  if (k.includes('case') || k.includes('壳') || k.includes('手机壳')) return loadDemoSnapshot('search-phone-case');
-  return loadDemoSnapshot('search-wireless-earbuds');
+  const name = k.includes('case') || k.includes('壳') || k.includes('手机壳')
+    ? 'search-phone-case'
+    : 'search-wireless-earbuds';
+  return loadDemoSnapshot(name).then(rewriteDemoImages);
 }
 
 async function getJSON(url, { fallback } = {}) {
