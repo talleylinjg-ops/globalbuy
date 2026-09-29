@@ -9,12 +9,16 @@ mkdir -p "$OUT/images"
 curl -sf --max-time 15 "$API/api/meta" -o "$OUT/meta.json"
 curl -sf --max-time 30 "$API/api/search?q=wireless%20earbuds&country=US&currency=USD" -o "$OUT/search-wireless-earbuds.json"
 curl -sf --max-time 30 "$API/api/search?q=phone%20case&country=US&currency=USD" -o "$OUT/search-phone-case.json"
+curl -sf --max-time 30 "$API/api/search?q=smart%20watch&country=US&currency=USD" -o "$OUT/search-smart-watch.json"
+curl -sf --max-time 30 "$API/api/search?q=luggage&country=US&currency=USD" -o "$OUT/search-luggage.json"
+curl -sf --max-time 30 "$API/api/search?q=keyboard&country=US&currency=USD" -o "$OUT/search-keyboard.json"
+curl -sf --max-time 30 "$API/api/search?q=sneakers&country=US&currency=USD" -o "$OUT/search-sneakers.json"
 
 # 拷贝快照引用的商品图片，保证离线/降级时图片完整
 IMGS=$(node -e "
 const fs = require('fs');
 const urls = new Set();
-for (const f of ['search-wireless-earbuds.json', 'search-phone-case.json']) {
+for (const f of fs.readdirSync('$OUT').filter(n => n.startsWith('search-') && n.endsWith('.json'))) {
   const j = JSON.parse(fs.readFileSync('$OUT/' + f, 'utf8'));
   (j.results || []).forEach(r => { if (r.imageUrl) urls.add(r.imageUrl); });
 }

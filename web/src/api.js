@@ -31,9 +31,14 @@ function rewriteDemoImages(data) {
 
 function demoSearchSnapshot(keyword) {
   const k = (keyword || '').toLowerCase();
-  const name = k.includes('case') || k.includes('壳') || k.includes('手机壳')
-    ? 'search-phone-case'
-    : 'search-wireless-earbuds';
+  const rules = [
+    [/(case|壳)/, 'search-phone-case'],
+    [/(watch|手表)/, 'search-smart-watch'],
+    [/(luggage|suitcase|行李|箱)/, 'search-luggage'],
+    [/(keyboard|键盘)/, 'search-keyboard'],
+    [/(shoe|sneaker|鞋)/, 'search-sneakers'],
+  ];
+  const name = rules.find(([re]) => re.test(k))?.[1] || 'search-wireless-earbuds';
   return loadDemoSnapshot(name).then(rewriteDemoImages);
 }
 
