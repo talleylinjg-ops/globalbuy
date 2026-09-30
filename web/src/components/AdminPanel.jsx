@@ -19,14 +19,14 @@ const FIELD_LABELS = {
   ups: { clientId: 'Client ID', clientSecret: 'Client Secret' },
   fedex: { apiKey: 'API Key', apiSecret: 'API Secret' },
   ems: { userId: 'User ID', apiKey: 'API Key' },
-  ptdsgj: { token: 'API Token', pickupZone: '收货区域' },
-  zjhygj: { account: '账号', password: '密码', branchId: '租户 ID（branchId）' },
+  ptdsgj: { token: 'API Token', pickupZone: 'admin.fieldPickupZone' },
+  zjhygj: { account: 'admin.fieldAccount', password: 'admin.fieldPassword', branchId: 'admin.fieldBranchId' },
 };
 
 const MODE_OPTIONS = [
-  { id: 'economy', label: '经济' },
-  { id: 'standard', label: '标准' },
-  { id: 'express', label: '特快' },
+  { id: 'economy', label: 'admin.tierEconomy' },
+  { id: 'standard', label: 'admin.tierStandard' },
+  { id: 'express', label: 'admin.tierExpress' },
 ];
 
 const ORDER_STATUSES = ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'];
@@ -467,14 +467,14 @@ export default function AdminPanel({ t }) {
           <div className="admin-section-head">
             <h3>{t('admin.addresses')}</h3>
             <button className="btn btn-primary btn-sm" onClick={() => setAddressForm({ ...emptyAddress, _editing: null })}>
-              {t('admin.addAddress') || '新增地址'}
+              {t('admin.addAddress')}
             </button>
           </div>
 
           <table className="admin-table">
             <thead>
               <tr>
-                <th>{t('admin.name')}</th><th>{t('admin.customerInfo')}</th><th>地址</th>
+                <th>{t('admin.name')}</th><th>{t('admin.customerInfo')}</th><th>{t('admin.address')}</th>
                 <th>{t('admin.phone')}</th><th>{t('admin.actions')}</th>
               </tr>
             </thead>
@@ -514,7 +514,7 @@ export default function AdminPanel({ t }) {
       {tab === 'carriers' && !busy && (
         <div>
           <div className="admin-section-head">
-            <h3>{t('admin.carriers') || '国际快递商户对接'}</h3>
+            <h3>{t('admin.carriers')}</h3>
             <span className="admin-hint">
               {t('admin.productionHint') || 'Production mode: all shipping quotes come from real API channels'}
             </span>
@@ -533,7 +533,7 @@ export default function AdminPanel({ t }) {
                   </div>
                   <div className="carrier-card-meta">
                     <span className="pill">{c.code}</span>
-                    <span className="pill">{MODE_OPTIONS.find((m) => m.id === c.mode)?.label || c.mode}</span>
+                    <span className="pill">{t(MODE_OPTIONS.find((m) => m.id === c.mode)?.label || 'admin.tierStandard')}</span>
                     {c.hasRealConfig
                       ? <span className="pill good">{t('admin.connected') || 'Connected · Production'}</span>
                       : <span className="pill">{t('admin.estimateMode') || 'Not connected'}</span>}
@@ -541,12 +541,12 @@ export default function AdminPanel({ t }) {
                   <div className="carrier-fields">
                     {fields.map((f) => (
                       <div key={f} className="field-row">
-                        <span>{FIELD_LABELS[c.code]?.[f] || f}</span>
-                        <code>{c[f] || '未填写'}</code>
+                        <span>{t(FIELD_LABELS[c.code]?.[f] || f)}</span>
+                        <code>{c[f] || t('admin.noField')}</code>
                       </div>
                     ))}
                     <div className="field-row">
-                      <span>加价率</span>
+                      <span>{t('admin.markupRate')}</span>
                       <code>{((c.markupRate || 0) * 100).toFixed(0)}%</code>
                     </div>
                   </div>
@@ -554,7 +554,7 @@ export default function AdminPanel({ t }) {
                   <div className="carrier-actions">
                     <button className="btn btn-ghost btn-sm" onClick={() => setEditing(c)}>{t('admin.edit')}</button>
                     <button className="btn btn-ghost btn-sm" onClick={() => testCarrier(c.id)}>
-                      {t('admin.testConnection') || '测试连接'}
+                      {t('admin.testConnection')}
                     </button>
                     <button className="btn btn-ghost btn-sm danger" onClick={() => removeCarrier(c.id)}>{t('admin.delete')}</button>
                   </div>
@@ -570,13 +570,13 @@ export default function AdminPanel({ t }) {
 
           {/* 编辑 / 新增表单 */}
           <div className="card admin-form">
-            <h4>{editing ? `${t('admin.edit')} ${editing.name}` : (t('admin.addCarrier') || '添加快递商')}</h4>
+            <h4>{editing ? `${t('admin.edit')} ${editing.name}` : t('admin.addCarrier')}</h4>
             <CarrierForm meta={meta} editing={editing} onSave={saveCarrier} onCancel={() => setEditing(null)} t={t} />
           </div>
 
           {/* 报价测试工具 */}
           <div className="card admin-form">
-            <h4>{t('admin.quoteTester') || '快递报价测试'}</h4>
+            <h4>{t('admin.quoteTester')}</h4>
             <div className="quote-tester">
               <label className="settings-label">{t('settings.deliveryCountry')}</label>
               <input
@@ -585,7 +585,7 @@ export default function AdminPanel({ t }) {
                 onChange={(e) => setQuoteForm({ ...quoteForm, country: e.target.value })}
                 maxLength={2}
               />
-              <label className="settings-label">重量 (kg)</label>
+              <label className="settings-label">{t('admin.weightKg')}</label>
               <input
                 className="settings-control"
                 type="number"
@@ -594,7 +594,7 @@ export default function AdminPanel({ t }) {
                 onChange={(e) => setQuoteForm({ ...quoteForm, weightKg: e.target.value })}
               />
               <button className="btn btn-primary" onClick={runQuote} disabled={quoteLoading}>
-                {quoteLoading ? '…' : '询价'}
+                {quoteLoading ? '…' : t('admin.inquiry')}
               </button>
             </div>
             {quoteResult && (
@@ -605,7 +605,7 @@ export default function AdminPanel({ t }) {
                   <table className="admin-table">
                     <thead>
                       <tr>
-                        <th>快递</th><th>渠道</th><th>运费 (USD)</th><th>时效</th><th>推荐</th>
+                        <th>{t('admin.carrierTh')}</th><th>{t('admin.channel')}</th><th>{t('admin.freightUsd')}</th><th>{t('admin.leadTime')}</th><th>{t('admin.recommend')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -614,7 +614,7 @@ export default function AdminPanel({ t }) {
                           <td><b>{q.carrierName}</b></td>
                           <td>{q.productName}</td>
                           <td>{q.priceUsd.toFixed(2)}</td>
-                          <td>{q.daysMin}-{q.daysMax} 天</td>
+                          <td>{q.daysMin}-{q.daysMax} {t('admin.dayUnit')}</td>
                           <td>{q.recommended ? '★ ' + (t('result.recommended') || 'Best') : ''}</td>
                         </tr>
                       ))}
@@ -635,7 +635,7 @@ export default function AdminPanel({ t }) {
           </div>
 
           <div className="card admin-form">
-            <h4>{t('admin.systemSettings') || '系统参数'}</h4>
+            <h4>{t('admin.systemSettings')}</h4>
             <label className="settings-label">{t('admin.minServiceFee')}</label>
             <input
               className="settings-control"
@@ -658,7 +658,7 @@ export default function AdminPanel({ t }) {
           )}
 
           <div className="card admin-form">
-            <h4>{t('admin.adminProfile') || '会员资料'}</h4>
+            <h4>{t('admin.adminProfile')}</h4>
             <form onSubmit={saveProfile}>
               <div className="form-grid">
                 <div>
@@ -687,11 +687,11 @@ export default function AdminPanel({ t }) {
           </div>
 
           <div className="card admin-form">
-            <h4>{t('admin.changePassword') || '修改密码'}</h4>
+            <h4>{t('admin.changePassword')}</h4>
             <form onSubmit={changePassword}>
               <div className="form-grid">
                 <div>
-                  <label className="settings-label">{t('admin.currentPassword') || '当前密码'}</label>
+                  <label className="settings-label">{t('admin.currentPassword')}</label>
                   <input
                     className="settings-control"
                     type="password"
@@ -701,7 +701,7 @@ export default function AdminPanel({ t }) {
                   />
                 </div>
                 <div>
-                  <label className="settings-label">{t('admin.newPassword') || '新密码'}</label>
+                  <label className="settings-label">{t('admin.newPassword')}</label>
                   <input
                     className="settings-control"
                     type="password"
@@ -712,7 +712,7 @@ export default function AdminPanel({ t }) {
                   />
                 </div>
                 <div>
-                  <label className="settings-label">{t('admin.confirmPassword') || '确认新密码'}</label>
+                  <label className="settings-label">{t('admin.confirmPassword')}</label>
                   <input
                     className="settings-control"
                     type="password"
@@ -725,7 +725,7 @@ export default function AdminPanel({ t }) {
               </div>
               {pwError && <div className="error-text">{pwError}</div>}
               <button type="submit" className="btn btn-primary" style={{ marginTop: 14 }}>
-                {t('admin.updatePassword') || '更新密码'}
+                {t('admin.updatePassword')}
               </button>
             </form>
           </div>
@@ -922,7 +922,7 @@ function CustomerForm({ initial, editing, onSave, onCancel, t }) {
   };
   return (
     <div className="card admin-form">
-      <h4>{editing ? `${t('admin.edit')} ${form.name}` : (t('admin.addCustomer') || '新增客户')}</h4>
+      <h4>{editing ? `${t('admin.edit')} ${form.name}` : t('admin.addCustomer')}</h4>
       <form onSubmit={submit}>
         <div className="form-grid">
           <div>
@@ -954,7 +954,7 @@ function CustomerForm({ initial, editing, onSave, onCancel, t }) {
             </select>
           </div>
           <div className="form-grid-full">
-            <label className="settings-label">备注</label>
+            <label className="settings-label">{t('admin.notes')}</label>
             <textarea className="settings-control" rows={2} value={form.notes} onChange={(e) => set('notes', e.target.value)} />
           </div>
         </div>
@@ -978,22 +978,22 @@ function AddressForm({ customers, initial, editing, onSave, onCancel, t }) {
   };
   return (
     <div className="card admin-form">
-      <h4>{editing ? `${t('admin.edit')} ${form.recipient}` : (t('admin.addAddress') || '新增地址')}</h4>
+      <h4>{editing ? `${t('admin.edit')} ${form.recipient}` : t('admin.addAddress')}</h4>
       <form onSubmit={submit}>
         <div className="form-grid">
           <div>
-            <label className="settings-label">所属客户 *</label>
+            <label className="settings-label">{t('admin.belongingCustomer')} *</label>
             <select className="settings-control" value={form.customerId} onChange={(e) => set('customerId', e.target.value)} required>
-              <option value="">选择客户</option>
+              <option value="">{t('admin.selectCustomer')}</option>
               {customers.map((c) => <option key={c.id} value={c.id}>{c.name} ({c.email || c.id})</option>)}
             </select>
           </div>
           <div>
-            <label className="settings-label">地址标签</label>
+            <label className="settings-label">{t('admin.addressLabel')}</label>
             <input className="settings-control" value={form.label} onChange={(e) => set('label', e.target.value)} placeholder="Home / Office" />
           </div>
           <div>
-            <label className="settings-label">收件人 *</label>
+            <label className="settings-label">{t('admin.recipient')} *</label>
             <input className="settings-control" value={form.recipient} onChange={(e) => set('recipient', e.target.value)} required />
           </div>
           <div>
@@ -1001,23 +1001,23 @@ function AddressForm({ customers, initial, editing, onSave, onCancel, t }) {
             <input className="settings-control" value={form.phone} onChange={(e) => set('phone', e.target.value)} />
           </div>
           <div className="form-grid-full">
-            <label className="settings-label">地址行 1 *</label>
+            <label className="settings-label">{t('admin.addressLine1')} *</label>
             <input className="settings-control" value={form.line1} onChange={(e) => set('line1', e.target.value)} required />
           </div>
           <div className="form-grid-full">
-            <label className="settings-label">地址行 2</label>
+            <label className="settings-label">{t('admin.addressLine2')}</label>
             <input className="settings-control" value={form.line2} onChange={(e) => set('line2', e.target.value)} />
           </div>
           <div>
-            <label className="settings-label">城市</label>
+            <label className="settings-label">{t('admin.city')}</label>
             <input className="settings-control" value={form.city} onChange={(e) => set('city', e.target.value)} />
           </div>
           <div>
-            <label className="settings-label">州 / 省</label>
+            <label className="settings-label">{t('admin.stateProvince')}</label>
             <input className="settings-control" value={form.state} onChange={(e) => set('state', e.target.value)} />
           </div>
           <div>
-            <label className="settings-label">邮编</label>
+            <label className="settings-label">{t('admin.postalCode')}</label>
             <input className="settings-control" value={form.postal} onChange={(e) => set('postal', e.target.value)} />
           </div>
           <div>
@@ -1027,7 +1027,7 @@ function AddressForm({ customers, initial, editing, onSave, onCancel, t }) {
           <div className="form-grid-full">
             <label className="settings-label" style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
               <input type="checkbox" checked={!!form.isDefault} onChange={(e) => set('isDefault', e.target.checked)} />
-              设为默认地址
+              {t('admin.setAsDefault')}
             </label>
           </div>
         </div>
@@ -1070,64 +1070,64 @@ function OrderForm({ customers, addresses, initial, editing, onSave, onCancel, t
 
   return (
     <div className="card admin-form">
-      <h4>{editing ? `${t('admin.edit')} ${form.orderNo || ''}`.trim() : (t('admin.addOrder') || '新增订单')}</h4>
+      <h4>{editing ? `${t('admin.edit')} ${form.orderNo || ''}`.trim() : t('admin.addOrder')}</h4>
       <form onSubmit={submit}>
         <div className="form-grid">
           <div>
-            <label className="settings-label">客户 *</label>
+            <label className="settings-label">{t('admin.customer')} *</label>
             <select className="settings-control" value={form.customerId} onChange={(e) => { set('customerId', e.target.value); set('addressId', ''); }} required>
-              <option value="">选择客户</option>
+              <option value="">{t('admin.selectCustomer')}</option>
               {customers.map((c) => <option key={c.id} value={c.id}>{c.name} ({c.email || c.id})</option>)}
             </select>
           </div>
           <div>
-            <label className="settings-label">送货地址 *</label>
+            <label className="settings-label">{t('admin.shippingAddress')} *</label>
             <select className="settings-control" value={form.addressId} onChange={(e) => set('addressId', e.target.value)} required>
-              <option value="">选择地址</option>
+              <option value="">{t('admin.selectAddress')}</option>
               {addressesForCustomer.map((a) => (
                 <option key={a.id} value={a.id}>{a.label || 'Home'} · {a.recipient}, {[a.city, a.country].filter(Boolean).join(', ')}</option>
               ))}
             </select>
           </div>
           <div>
-            <label className="settings-label">状态</label>
+            <label className="settings-label">{t('admin.status')}</label>
             <select className="settings-control" value={form.status} onChange={(e) => set('status', e.target.value)}>
               {ORDER_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
           <div>
-            <label className="settings-label">币种</label>
+            <label className="settings-label">{t('admin.currency')}</label>
             <select className="settings-control" value={form.currency} onChange={(e) => set('currency', e.target.value)}>
               {CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
           <div>
-            <label className="settings-label">快递</label>
-            <input className="settings-control" value={form.carrier} onChange={(e) => set('carrier', e.target.value)} placeholder="云途专线" />
+            <label className="settings-label">{t('admin.carrierLabel')}</label>
+            <input className="settings-control" value={form.carrier} onChange={(e) => set('carrier', e.target.value)} placeholder="YunTu Line" />
           </div>
           <div>
-            <label className="settings-label">运单号</label>
+            <label className="settings-label">{t('admin.tracking')}</label>
             <input className="settings-control" value={form.trackingNo} onChange={(e) => set('trackingNo', e.target.value)} />
           </div>
           <div>
-            <label className="settings-label">打赏比例 (%)</label>
+            <label className="settings-label">{t('admin.tipRate')}</label>
             <input className="settings-control" type="number" step="1" value={form.tipRate} onChange={(e) => set('tipRate', e.target.value)} />
           </div>
           <div className="form-grid-full">
-            <label className="settings-label">备注</label>
+            <label className="settings-label">{t('admin.notes')}</label>
             <textarea className="settings-control" rows={2} value={form.notes} onChange={(e) => set('notes', e.target.value)} />
           </div>
         </div>
 
         <div className="order-items-head">
-          <span>订单商品</span>
-          <button type="button" className="btn btn-ghost btn-sm" onClick={addItem}>+ 添加商品</button>
+          <span>{t('admin.orderItems')}</span>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={addItem}>{t('admin.addItem')}</button>
         </div>
         {(form.items || []).map((it, i) => (
           <div className="order-item-row" key={i}>
-            <input className="settings-control" placeholder="商品名称" value={it.title} onChange={(e) => setItem(i, 'title', e.target.value)} />
-            <input className="settings-control" type="number" step="0.01" placeholder="单价" value={it.price} onChange={(e) => setItem(i, 'price', e.target.value)} style={{ maxWidth: 110 }} />
-            <input className="settings-control" type="number" step="1" placeholder="数量" value={it.qty} onChange={(e) => setItem(i, 'qty', e.target.value)} style={{ maxWidth: 80 }} />
+            <input className="settings-control" placeholder={t('admin.itemTitlePh')} value={it.title} onChange={(e) => setItem(i, 'title', e.target.value)} />
+            <input className="settings-control" type="number" step="0.01" placeholder={t('admin.unitPricePh')} value={it.price} onChange={(e) => setItem(i, 'price', e.target.value)} style={{ maxWidth: 110 }} />
+            <input className="settings-control" type="number" step="1" placeholder={t('admin.qtyPh')} value={it.qty} onChange={(e) => setItem(i, 'qty', e.target.value)} style={{ maxWidth: 80 }} />
             <button type="button" className="btn btn-ghost btn-sm danger" onClick={() => removeItem(i)}>✕</button>
           </div>
         ))}
@@ -1671,7 +1671,7 @@ function CarrierForm({ meta, editing, onSave, onCancel, t }) {
               setFields({});
             }}
           >
-            <option value="">选择快递公司</option>
+            <option value="">{t('admin.selectCarrierCo')}</option>
             {codeOptions.map((c) => (
               <option key={c} value={c}>{meta.adapters[c].name}</option>
             ))}
@@ -1679,23 +1679,23 @@ function CarrierForm({ meta, editing, onSave, onCancel, t }) {
         </div>
         <div>
           <label className="settings-label">{t('admin.name')}</label>
-          <input className="settings-control" value={name} onChange={(e) => setName(e.target.value)} placeholder="自定义名称" />
+          <input className="settings-control" value={name} onChange={(e) => setName(e.target.value)} placeholder={t('admin.customName')} />
         </div>
         <div>
-          <label className="settings-label">时效档位</label>
+          <label className="settings-label">{t('admin.speedTier')}</label>
           <select className="settings-control" value={mode} onChange={(e) => setMode(e.target.value)}>
-            {MODE_OPTIONS.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}
+            {MODE_OPTIONS.map((m) => <option key={m.id} value={m.id}>{t(m.label)}</option>)}
           </select>
         </div>
         <div>
-          <label className="settings-label">加价率 (%)</label>
+          <label className="settings-label">{t('admin.markupRate')}</label>
           <input className="settings-control" type="number" step="1" value={markupRate} onChange={(e) => setMarkupRate(Number(e.target.value))} />
         </div>
         <div>
-          <label className="settings-label">启用</label>
+          <label className="settings-label">{t('admin.enabled')}</label>
           <select className="settings-control" value={enabled ? '1' : '0'} onChange={(e) => setEnabled(e.target.value === '1')}>
-            <option value="1">是</option>
-            <option value="0">否</option>
+            <option value="1">{t('admin.yes')}</option>
+            <option value="0">{t('admin.no')}</option>
           </select>
         </div>
       </div>
@@ -1709,7 +1709,7 @@ function CarrierForm({ meta, editing, onSave, onCancel, t }) {
                 className="settings-control"
                 type="password"
                 value={fields[f] || ''}
-                placeholder={editing && editing[f] ? '已配置（留空保持不变）' : '输入 API ' + f}
+                placeholder={editing && editing[f] ? t('admin.configured') : t('admin.enterApi') + ' ' + f.toUpperCase()}
                 onChange={(e) => setFields({ ...fields, [f]: e.target.value })}
               />
             </div>

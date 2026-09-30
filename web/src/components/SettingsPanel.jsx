@@ -48,7 +48,7 @@ export default function SettingsPanel({
               className={`btn-chip ${platforms.includes(p.id) ? 'active' : ''}`}
               onClick={() => togglePlatform(p.id)}
             >
-              {p.label}
+              {t(`platform.${p.id}`)}
             </button>
           ))}
         </div>

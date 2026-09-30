@@ -38,11 +38,15 @@ export default function SearchPanel({ query, setQuery, onSearch, onParseLink, lo
       {!linkMode && (
         <div className="suggestions">
           <span>{t('search.suggestions')}</span>
-          {categories.map((c) => (
-            <button key={c} type="button" className="btn-chip" onClick={() => onSearch(c)}>
-              {c}
-            </button>
-          ))}
+          {categories.map((c) => {
+            const key = `keyword.${c}`;
+            const label = t(key) === key ? c : t(key);
+            return (
+              <button key={c} type="button" className="btn-chip" onClick={() => onSearch(c)}>
+                {label}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
