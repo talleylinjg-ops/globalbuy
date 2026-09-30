@@ -311,7 +311,11 @@ export default function App() {
           loading={loading}
           parsing={parsing}
           t={t}
-          categories={meta?.hotKeywords || meta?.categories || DEFAULT_HOT_KEYWORDS}
+          categories={(() => {
+            const kws = meta?.hotKeywords || meta?.categories || DEFAULT_HOT_KEYWORDS;
+            // 英/西语标签更长，限制在一行可容纳的数量；中文全量展示
+            return lang === 'zh' ? kws : kws.slice(0, 6);
+          })()}
         />
 
         {isDemoMode && (

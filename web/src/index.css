@@ -196,9 +196,12 @@ body {
   background: var(--accent-soft);
 }
 
-.suggestions { margin-top: 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; color: var(--text-dim); font-size: 0.85rem; }
+.suggestions { margin-top: 14px; display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; justify-content: space-between; overflow: hidden; color: var(--text-dim); font-size: 0.85rem; }
 .suggestions > span { flex-shrink: 0; font-weight: 600; margin-right: 2px; }
-.suggestions .btn-chip { flex: 0 1 auto; padding: 6px 14px; }
+.suggestions .btn-chip { flex: 0 1 auto; padding: 6px 10px; white-space: nowrap; }
+@media (max-width: 720px) {
+  .suggestions { flex-wrap: wrap; justify-content: flex-start; }
+}
 .translate-badge {
   margin-top: 10px;
   color: var(--accent-2);
