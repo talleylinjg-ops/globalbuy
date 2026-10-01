@@ -406,5 +406,10 @@
     "close": "关闭",
     "failed": "下单失败",
     "toCountry": "收货国家"
+  },
+  "carrierName": {
+    "sfintl": "顺丰国际",
+    "4px": "4PX快递",
+    "huayuan": "华源国际"
   }
 }

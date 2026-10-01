@@ -40,7 +40,11 @@ export default function CarrierPicker({ quotes, current, onSelect, t }) {
               <div className="carrier-option-left">
                 {q.recommended && <span className="carrier-best">{t('result.recommended') || '推荐'}</span>}
                 <b>{q.productName}</b>
-                <span className="carrier-days">{q.carrierName} · {q.daysMin}-{q.daysMax} {t('result.days')}</span>
+                <span className="carrier-days">{(() => {
+                  const k = `carrierName.${q.carrier}`;
+                  const v = t(k);
+                  return v === k ? q.carrierName : v;
+                })()} · {q.daysMin}-{q.daysMax} {t('result.days')}</span>
               </div>
               <div className="carrier-option-right">
                 <span className="carrier-price">{fmt(q.priceUsd)}</span>

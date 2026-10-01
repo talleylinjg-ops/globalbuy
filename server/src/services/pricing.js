@@ -108,6 +108,7 @@ export function computeLandedCost(product, opts = {}) {
       quoteUsd: carrierQuote ? carrierQuote.priceUsd : null,
     },
     taxNote: tax.note || '',
+    taxNoteEn: tax.noteEn || '',
     vatRate: tax.vatRate,
     dutyRate,
     deMinimis: tax.deMinimis,

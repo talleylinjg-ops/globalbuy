@@ -95,7 +95,11 @@ export default function ProductCard({ item, currency, currencySymbol, shippingTi
                         <em key={label} className={`tier-tag ${label}`}>{t(`result.${label}`)}</em>
                       ))}
                     </span>
-                    <span className="tier-name">{tr.quote.carrierName || tr.quote.carrier}{tr.quote.productName ? ` · ${tr.quote.productName}` : ''}</span>
+                    <span className="tier-name">{(() => {
+                      const k = `carrierName.${tr.quote.carrier}`;
+                      const v = t(k);
+                      return v === k ? (tr.quote.carrierName || tr.quote.carrier) : v;
+                    })()}{tr.quote.productName ? ` · ${tr.quote.productName}` : ''}</span>
                     <span className="tier-days">{tr.quote.daysMin}-{tr.quote.daysMax}{t('result.days')}</span>
                     <span className="tier-price">{tierTotal != null ? fmt(tierTotal, currencySymbol, currency) : fmt(tr.quote.priceUsd, '$', 'USD')}</span>
                   </div>
@@ -176,7 +180,7 @@ export default function ProductCard({ item, currency, currencySymbol, shippingTi
                 <span>{t('result.landedTotal')}</span>
                 <span className="val">{fmt(b.total, currencySymbol, currency)}</span>
               </div>
-              {item.landed.taxNote && <div className="tax-note">{t('result.taxNote')}: {item.landed.taxNote}</div>}
+              {item.landed.taxNote && <div className="tax-note">{t('result.taxNote')}: {lang !== 'zh' && item.landed.taxNoteEn ? item.landed.taxNoteEn : item.landed.taxNote}</div>}
             </div>
           )}
 

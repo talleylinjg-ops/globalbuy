@@ -419,5 +419,10 @@
     "close": "Close",
     "failed": "Order failed",
     "toCountry": "Country"
+  },
+  "carrierName": {
+    "sfintl": "SF International",
+    "4px": "4PX Express",
+    "huayuan": "Huayuan Logistics"
   }
 }

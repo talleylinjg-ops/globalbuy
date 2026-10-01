@@ -431,6 +431,7 @@ export default function App() {
         onClear={() => { setCombineList([]); setCombineResult(null); }}
         onRemove={removeCombine}
         t={t}
+        lang={lang}
       />
 
       {orderItem && (

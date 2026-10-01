@@ -159,5 +159,6 @@ export async function computeCombinedQuote(opts) {
     combinedTotal: round(cnyToCurrency(totalCny, currency)),
     savings: round(cnyToCurrency(separateTotalCny - totalCny, currency)),
     taxNote: tax.note || '',
+    taxNoteEn: tax.noteEn || '',
   };
 }

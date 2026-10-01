@@ -11,7 +11,8 @@ function extractSpecs(title) {
   for (const re of patterns) {
     let m;
     while ((m = re.exec(title)) !== null) {
-      specs.push(m[0].toLowerCase());
+      // 规格统一输出拉丁单位（寸 -> in），避免非中文界面出现中文规格
+      specs.push(m[0].toLowerCase().replace(/寸$/, 'in'));
     }
   }
   return specs;

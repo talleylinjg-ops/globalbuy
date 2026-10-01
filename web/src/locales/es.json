@@ -412,5 +412,10 @@
     "fieldPassword": "Contraseña",
     "fieldBranchId": "ID de inquilino (branchId)",
     "selectCarrierCo": "Seleccionar transportista"
+  },
+  "carrierName": {
+    "sfintl": "SF Internacional",
+    "4px": "4PX Express",
+    "huayuan": "Logística Huayuan"
   }
 }

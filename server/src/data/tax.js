@@ -12,7 +12,7 @@ export const TAX_RULES = {
     vatThreshold: 0,      // 美国无联邦增值税
     vatRate: 0,
     importDutyRate: 0.025,
-    note: '2025-08-29 起 $800 小额包裹豁免取消，大多数进口包裹需缴纳关税；仅低于 $100 的个人文件及礼品可能免税',
+    note: '2025-08-29 起 $800 小额包裹豁免取消，大多数进口包裹需缴纳关税；仅低于 $100 的个人文件及礼品可能免税', noteEn: 'Since Aug 29, 2025, the $800 de minimis exemption has been removed; most imports are subject to duty; only personal documents & gifts under $100 may be duty-free',
   },
   GB: {
     name: '英国',
@@ -21,7 +21,7 @@ export const TAX_RULES = {
     vatThreshold: 0,      // 但 VAT 自 2021 年起对小包全面征收
     vatRate: 0.20,
     importDutyRate: 0.03,
-    note: '申报价值 ≤£135 免关税，需缴纳 20% VAT；皮革鞋类等除外',
+    note: '申报价值 ≤£135 免关税，需缴纳 20% VAT；皮革鞋类等除外', noteEn: 'Declared value ≤£135 is duty-free but subject to 20% VAT; leather & footwear excluded',
   },
   DE: {
     name: '德国',
@@ -30,7 +30,7 @@ export const TAX_RULES = {
     vatThreshold: 0,
     vatRate: 0.19,
     importDutyRate: 0.03,
-    note: '低于 €150 免关税，需缴纳 19% VAT；计划 2028 年 3 月起取消 €150 豁免',
+    note: '低于 €150 免关税，需缴纳 19% VAT；计划 2028 年 3 月起取消 €150 豁免', noteEn: 'Under €150 is duty-free but subject to 19% VAT; the €150 exemption is planned to end in March 2028',
   },
   FR: {
     name: '法国',
@@ -39,7 +39,7 @@ export const TAX_RULES = {
     vatThreshold: 0,
     vatRate: 0.20,
     importDutyRate: 0.03,
-    note: '需缴纳 20% VAT；计划 2028 年 3 月起取消 €150 关税豁免',
+    note: '需缴纳 20% VAT；计划 2028 年 3 月起取消 €150 关税豁免', noteEn: 'Subject to 20% VAT; the €150 duty exemption is planned to end in March 2028',
   },
   NL: {
     name: '荷兰',
@@ -48,7 +48,7 @@ export const TAX_RULES = {
     vatThreshold: 0,
     vatRate: 0.21,
     importDutyRate: 0.03,
-    note: '需缴纳 21% VAT；计划 2028 年 3 月起取消 €150 关税豁免',
+    note: '需缴纳 21% VAT；计划 2028 年 3 月起取消 €150 关税豁免', noteEn: 'Subject to 21% VAT; the €150 duty exemption is planned to end in March 2028',
   },
   IT: {
     name: '意大利',
@@ -57,7 +57,7 @@ export const TAX_RULES = {
     vatThreshold: 0,
     vatRate: 0.22,
     importDutyRate: 0.03,
-    note: '需缴纳 22% VAT；计划 2028 年 3 月起取消 €150 关税豁免',
+    note: '需缴纳 22% VAT；计划 2028 年 3 月起取消 €150 关税豁免', noteEn: 'Subject to 22% VAT; the €150 duty exemption is planned to end in March 2028',
   },
   ES: {
     name: '西班牙',
@@ -66,7 +66,7 @@ export const TAX_RULES = {
     vatThreshold: 0,
     vatRate: 0.21,
     importDutyRate: 0.03,
-    note: '需缴纳 21% VAT；计划 2028 年 3 月起取消 €150 关税豁免',
+    note: '需缴纳 21% VAT；计划 2028 年 3 月起取消 €150 关税豁免', noteEn: 'Subject to 21% VAT; the €150 duty exemption is planned to end in March 2028',
   },
   CA: {
     name: '加拿大',
@@ -75,7 +75,7 @@ export const TAX_RULES = {
     vatThreshold: 40,     // 低于 40 加元免 GST
     vatRate: 0.05,
     importDutyRate: 0.03,
-    note: '20 加元以下免税，以上按品类征收 GST + 关税',
+    note: '20 加元以下免税，以上按品类征收 GST + 关税', noteEn: 'Duty-free under CAD 20; above that, GST + category duty apply',
   },
   AU: {
     name: '澳大利亚',
@@ -92,7 +92,7 @@ export const TAX_RULES = {
     vatThreshold: 10000,
     vatRate: 0.10,
     importDutyRate: 0.03,
-    note: '申报价值 ≤10,000 日元免税；皮革制品、鞋类等特定商品除外',
+    note: '申报价值 ≤10,000 日元免税；皮革制品、鞋类等特定商品除外', noteEn: 'Declared value ≤¥10,000 is duty-free; leather goods & footwear excluded',
   },
   KR: {
     name: '韩国',
@@ -181,7 +181,7 @@ export const TAX_RULES = {
     vatThreshold: 50,
     vatRate: 0.17,
     importDutyRate: 0.15,
-    note: '50 美元以下免税，以上征收较高关税 + 州税',
+    note: '50 美元以下免税，以上征收较高关税 + 州税', noteEn: 'Duty-free under USD 50; above that, higher duties + state taxes apply',
   },
   MX: {
     name: '墨西哥',
@@ -198,7 +198,7 @@ export const TAX_RULES = {
     vatThreshold: 200,
     vatRate: 0.20,
     importDutyRate: 0.10,
-    note: '计划 2027 年起逐步取消 200 欧元以下包裹免税',
+    note: '计划 2027 年起逐步取消 200 欧元以下包裹免税', noteEn: 'The duty exemption for parcels under €200 is planned to phase out from 2027',
   },
   TR: {
     name: '土耳其',
@@ -263,7 +263,7 @@ export const TAX_RULES = {
     vatThreshold: Infinity,
     vatRate: 0,
     importDutyRate: 0.0,
-    note: '香港一般无进口增值税，仅部分品类有关税',
+    note: '香港一般无进口增值税，仅部分品类有关税', noteEn: 'Hong Kong generally has no import VAT; only a few categories carry duty',
   },
   TW: {
     name: '中国台湾',

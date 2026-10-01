@@ -178,11 +178,11 @@ export class SFIntlAdapter extends CarrierAdapter {
       // 其他币种：经 CNY 中转（feeInfoList 无汇率时按 CNY 近似处理场景有限，暂不支持）
       throw new CarrierError(`顺丰国际返回币种 ${currency} 暂不支持换算`, 'NO_QUOTE', data);
     }
-    const feeNames = (d.feeInfoList || []).map((f) => f.serviceName).filter(Boolean).join(' + ');
+    // 产品名只保留产品码（如 INT0014），费用明细为服务端中文描述，拼入名称会在非中文界面造成混排
     return [this.normalize({
       carrier: this.cfg.code,
       carrierName: this.cfg.name,
-      productName: `${d.interProductCode || ''}${feeNames ? '（' + feeNames + '）' : ''}`.trim() || '顺丰国际',
+      productName: d.interProductCode || this.cfg.code || 'SF International',
       priceUsd: Number((priceUsd * (1 + (this.cfg.markupRate || 0))).toFixed(2)),
       currency: 'USD',
       daysMin: this.cfg.daysMin ?? 5,

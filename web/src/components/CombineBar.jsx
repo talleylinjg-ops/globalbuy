@@ -9,7 +9,7 @@ function fmt(n, symbol, currency) {
 }
 
 // 底部合并包裹浮条：多商品统一运费/关税/增值税计价
-export default function CombineBar({ items, result, loading, onCalc, onClear, onRemove, t }) {
+export default function CombineBar({ items, result, loading, onCalc, onClear, onRemove, t, lang }) {
   const [expanded, setExpanded] = useState(false);
   if (items.length === 0) return null;
 
@@ -71,11 +71,11 @@ export default function CombineBar({ items, result, loading, onCalc, onClear, on
           <div className="combine-compare">
             {t('combine.separate')}: {fmt(result.separateTotal, symbol, currency)}
           </div>
-          {result.taxNote && <div className="combine-note">{t('result.taxNote')}: {result.taxNote}</div>}
+          {result.taxNote && <div className="combine-note">{t('result.taxNote')}: {lang !== 'zh' && result.taxNoteEn ? result.taxNoteEn : result.taxNote}</div>}
           <div className="combine-items">
             {result.perItem.map((it) => (
               <div className="combine-item" key={it.itemId}>
-                <span className="ci-title">{it.title?.slice(0, 22)}</span>
+                <span className="ci-title">{(lang !== 'zh' && it.titleEn ? it.titleEn : it.title)?.slice(0, 22)}</span>
                 <span className="ci-share">{t('combine.perItem')} {fmt(it.shippingShare, symbol, currency)}</span>
                 <button className="btn btn-ghost btn-sm" onClick={() => onRemove(it.itemId)}>{t('common.remove')}</button>
               </div>
