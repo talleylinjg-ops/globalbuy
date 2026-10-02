@@ -87,3 +87,13 @@ Entries discovered by the Agent during task execution should follow this format:
   - 沙盒已验证产品码：INT0014（0.5kg CN->US 报 ¥52 CNY，含住宅附加费）、INT0007（¥55，计费重取整 1kg）；INT0263/INT0255 沙盒无数据返回空 feeInfoList
   - 沙盒凭据（appKey be287d...、customerCode ICRME000SRN93）已配置进 db；生产凭据（appKey 39a47...）待「API 授权」审批通过（IUOP预估费用/快递柜查询/宅配延伸服务 2026-09-23 申请待审批），通过后仅改 baseUrl+appKey+appSecret+aesKey+customerCode
   - 适配器 sfinternational.js + sfcrypto.js；fields：appKey/appSecret/aesKey/customerCode/customerType/serviceCode(=msgType)/baseUrl
+
+[前端静态快照降级层（前台浏览零依赖后端）]
+- Date: 2026-09-28
+- Context: 借鉴 liangdu-asia 镜像站架构（HTML快照/静态镜像/仅动态回源），为 CrossBuy 实现「后端不可达时线上站 100% 可浏览」
+- Category: Operations & Deployment
+- Instructions:
+  - 构建期抓取后端响应生成快照：bash web/scripts/gen-demo-snapshots.sh [后端地址]，输出 web/public/demo/{meta,search-wireless-earbuds,search-phone-case}.json；后端有数据变化时重新执行即可刷新
+  - 降级逻辑在 web/src/api.js：GET 类请求 8s 超时失败自动读本地快照并标记 demo:true；搜索词按关键词匹配快照（含 case/壳 → phone-case，其余 → earbuds）；POST /api/combine 失败降级为 {demo:true}（CombineBar 显示演示提示）
+  - 演示模式 UI：App.jsx isDemoMode = results.demo || meta.demo，顶部显示 banner.demoMode 横幅（三语）
+  - 新增公开演示数据接口时，记得同步更新 gen-demo-snapshots.sh 并重跑，否则线上降级数据过期
