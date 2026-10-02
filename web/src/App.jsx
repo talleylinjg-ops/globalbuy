@@ -413,7 +413,7 @@ export default function App() {
           <h2 id="faq-title">{t('faq.title')}</h2>
           <p className="faq-subtitle">{t('faq.subtitle')}</p>
           <div className="faq-list">
-            {[1, 2, 3, 4, 5, 6].map((n) => (
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
               <details key={n} className="faq-item" open={n <= 2}>
                 <summary>{t(`faq.q${n}`)}</summary>
                 <p>{t(`faq.a${n}`)}</p>

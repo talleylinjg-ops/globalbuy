@@ -187,7 +187,15 @@
     "q5": "How long does delivery take?",
     "a5": "Economy lines take about 5-10 business days, express lines about 3-7, depending on destination and carrier. Live estimates are shown before you order.",
     "q6": "Why is CrossBuy cheaper?",
-    "a6": "China's domestic prices sit far below overseas retail markups. CrossBuy plugs you directly into source prices and makes shipping and taxes fully transparent, so you decide on the true landed total."
+    "a6": "China's domestic prices sit far below overseas retail markups. CrossBuy plugs you directly into source prices and makes shipping and taxes fully transparent, so you decide on the true landed total.",
+    "q7": "Which payment methods are supported?",
+    "a7": "PayPal, Visa, Mastercard and other major international payment methods are supported, with settlement in USD, EUR, GBP, JPY and 20+ currencies. Exchange rates and payment fees are shown transparently before checkout.",
+    "q8": "How do I track my parcel?",
+    "a8": "Once your order is picked up, an international tracking number is provided. You can follow both the domestic and cross-border legs in real time on the CrossBuy order page and the carrier's website until delivery.",
+    "q9": "Can I return or exchange items?",
+    "a9": "Quality checks are performed before dispatch. If a quality issue is found after delivery, you can request a return or exchange within the allowed window, and our support team helps negotiate with the marketplace seller.",
+    "q10": "Can I choose the service fee myself?",
+    "a10": "Yes. The service fee is buyer-selected (0%-30%, default 5%) and shown as a separate line item before checkout; a higher rate means higher service priority."
   },
   "error": {
     "search": "Search failed. Please try again."

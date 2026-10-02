@@ -163,7 +163,15 @@
     "q5": "¿Cuánto tarda la entrega?",
     "a5": "Las líneas económicas tardan unos 5-10 días hábiles y las exprés unos 3-7, según el destino y el transportista. Las estimaciones se muestran antes de pedir.",
     "q6": "¿Por qué es más barato con CrossBuy?",
-    "a6": "Los precios en China están muy por debajo de los márgenes del retail exterior. CrossBuy te conecta directamente con el precio de origen y hace transparentes el envío y los impuestos, para que decidas con el coste real."
+    "a6": "Los precios en China están muy por debajo de los márgenes del retail exterior. CrossBuy te conecta directamente con el precio de origen y hace transparentes el envío y los impuestos, para que decidas con el coste real.",
+    "q7": "¿Qué métodos de pago se admiten?",
+    "a7": "Se admiten PayPal, Visa, Mastercard y otros métodos de pago internacionales, con liquidación en USD, EUR, GBP, JPY y más de 20 monedas. El tipo de cambio y la comisión de pago se muestran de forma transparente antes de pagar.",
+    "q8": "¿Cómo rastreo mi paquete?",
+    "a8": "Cuando el pedido se recoge, se proporciona un número de seguimiento internacional. Puedes seguir el tramo nacional e internacional en tiempo real en la página de pedidos de CrossBuy y en el sitio del transportista hasta la entrega.",
+    "q9": "¿Puedo devolver o cambiar artículos?",
+    "a9": "Se realiza un control de calidad antes del envío. Si encuentras un problema de calidad tras la entrega, puedes solicitar una devolución o cambio dentro del plazo permitido, y nuestro equipo de atención ayuda a negociar con el vendedor.",
+    "q10": "¿Puedo elegir la tarifa de servicio?",
+    "a10": "Sí. La tarifa de servicio la elige el comprador (0%-30%, por defecto 5%) y se muestra como una línea independiente antes de pagar; una tarifa mayor implica mayor prioridad de servicio."
   },
   "error": {
     "search": "La búsqueda falló. Inténtalo de nuevo."

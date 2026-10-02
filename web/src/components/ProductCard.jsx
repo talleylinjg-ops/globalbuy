@@ -38,8 +38,29 @@ export default function ProductCard({ item, currency, currencySymbol, shippingTi
 
   const title = lang !== 'zh' && item.titleEn && item.titleEn !== item.title ? item.titleEn : item.title;
 
+  // GEO: 结构化商品数据，供 AI 购物引擎与 Google 抓取
+  const imgPath = item.imageUrl || placeholderUrl(item);
+  const absImg = /^https?:\/\//.test(imgPath) ? imgPath : `https://globalbuy.pages.dev${imgPath}`;
+  const productLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: title,
+    image: [absImg],
+    offers: {
+      '@type': 'Offer',
+      price: b.goodsValue != null ? Number(b.goodsValue).toFixed(2) : undefined,
+      priceCurrency: currency,
+      availability: 'https://schema.org/InStock',
+      url: 'https://globalbuy.pages.dev/',
+      seller: { '@type': 'Organization', name: platformName },
+    },
+    description: `${title} - landed price ${b.total != null ? Number(b.total).toFixed(2) : ''} ${currency} (international shipping, duty and VAT included) from ${platformName} via CrossBuy.`,
+  };
+  if (item.brand) productLd.brand = { '@type': 'Brand', name: item.brand };
+
   return (
     <div className={`card ${item.isTopPick ? 'top' : item.isRecommended ? 'recommended' : ''}`}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productLd) }} />
       <div className="card-media">
         <span className={`platform-badge ${platformClass}`}>{platformName}</span>
         <img

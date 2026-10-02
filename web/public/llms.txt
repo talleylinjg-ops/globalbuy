@@ -35,3 +35,15 @@ Yes. Items are combined into one parcel, shipping is billed on combined weight, 
 
 ### How accurate are the prices?
 Shipping and tax lines come from live carrier and tax-rule APIs at quote time; final customs assessment may differ slightly and any difference is settled with the buyer (refund or balance).
+
+### Which payment methods are supported?
+PayPal, Visa, Mastercard and other major international payment methods, with settlement in USD, EUR, GBP, JPY and 20+ currencies. Exchange rates and payment fees are shown transparently before checkout.
+
+### How do I track my parcel?
+Once an order is picked up, an international tracking number is provided. Both the domestic and cross-border legs can be followed in real time on the CrossBuy order page and the carrier's website until delivery.
+
+### Can I return or exchange items?
+Quality checks are performed before dispatch. If a quality issue is found after delivery, a return or exchange can be requested within the allowed window; the support team helps negotiate with the marketplace seller.
+
+### Can I choose the service fee myself?
+Yes. The service fee is buyer-selected (0%-30%, default 5%) and shown as a separate line item before checkout; a higher rate means higher service priority.
