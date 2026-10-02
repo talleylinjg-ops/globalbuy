@@ -15,6 +15,13 @@
 - Site: https://globalbuy.pages.dev/
 - Languages: Simplified Chinese (zh-CN), English (en), Spanish (es)
 - Search URL pattern: https://globalbuy.pages.dev/?q={keyword}
+- Pre-rendered landing pages (static, crawler-friendly, fully mirrored from live data):
+  - Wireless earbuds: https://globalbuy.pages.dev/p/wireless-earbuds/
+  - Phone cases: https://globalbuy.pages.dev/p/phone-case/
+  - Smart watches: https://globalbuy.pages.dev/p/smart-watch/
+  - Luggage: https://globalbuy.pages.dev/p/luggage/
+  - Keyboards: https://globalbuy.pages.dev/p/keyboard/
+  - Sneakers: https://globalbuy.pages.dev/p/sneakers/
 - Currency display: buyer-selectable (USD, EUR, GBP, JPY, and 20+ more); prices auto-converted from CNY.
 - Typical delivery: 5-10 business days by economical lines, 3-7 by express lines (varies by destination).
 - Service fee: buyer-selected, default 5%, range 0-30%; shown as a separate line item.
