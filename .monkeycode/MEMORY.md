@@ -97,3 +97,17 @@ Entries discovered by the Agent during task execution should follow this format:
   - 降级逻辑在 web/src/api.js：GET 类请求 8s 超时失败自动读本地快照并标记 demo:true；搜索词按关键词匹配快照（含 case/壳 → phone-case，其余 → earbuds）；POST /api/combine 失败降级为 {demo:true}（CombineBar 显示演示提示）
   - 演示模式 UI：App.jsx isDemoMode = results.demo || meta.demo，顶部显示 banner.demoMode 横幅（三语）
   - 新增公开演示数据接口时，记得同步更新 gen-demo-snapshots.sh 并重跑，否则线上降级数据过期
+
+[预渲染 SEO 落地页构建链]
+- Date: 2026-10-04
+- Context: 静态落地页 /p/<slug>/ 与原站 en 结果页整页复刻（用户要求「静态站点与原站完全一致」）
+- Category: Build Methods
+- Instructions:
+  - 构建链：npm run build = vite build && node scripts/prerender-seo-pages.mjs（脚本在 vite 之后运行，从 dist/index.html 提取 CSS 哈希文件名，并把 public/p 拷入 dist/p）
+  - 数据源 web/public/demo/search-*.json（快照）；关键词取 inputKeyword（英文），勿用 translatedKeyword（中文）
+  - 快照图片路径必须加 /demo 前缀（api.js rewriteDemoImages 同规则），否则落地页图片 404；改页面模板后只需重跑 npm run build
+  - 页面结构复刻原站：header(lang-switcher/logo/tagline)/SearchPanel/demo-banner/SettingsPanel(静态只读)/CarrierPicker(details 折叠)/results-head/sort-bar/商品卡(ship-tiers 三档+score-bar+breakdown 折叠)/FAQ/footer；词条同步自 src/locales/en.json（脚本内 T 对象）
+  - pickShippingTiers 抽在 web/src/utils/shipping.js，App 与预渲染脚本共用，改算法只改一处
+  - 渠道中文名→英文映射在 web/src/utils/carrier.js（4PX 递四方/顺丰国际/华源 别名匹配 + t('carrierName.*')）
+  - 目的国全球清单在 server/src/data/tax.js（CONTINENT_GROUPS/GLOBAL_COUNTRIES/GLOBAL_CURRENCIES：重点 32 国置顶+亚洲/欧洲/北美/南美/大洋洲/非洲分组，207 国 145 币）；meta 接口输出全量；未配税则国家 getTaxRule 兜底美国税则
+  - SettingsPanel 国家名本地化：i18n country.* 词条优先，其余走 Intl.DisplayNames；lang 由 App 传 prop（useI18n 是组件独立 state，多实例不同步）
