@@ -64,7 +64,7 @@ function productCard(item, kw, tiers, idx) {
   const b = item.landed.breakdown;
   const title = item.titleEn && item.titleEn !== item.title ? item.titleEn : item.title;
   const platform = PLATFORM_EN[item.platform] || item.platform;
-  const imgPath = item.imageUrl || '';
+    const imgPath = item.imageUrl ? (item.imageUrl.startsWith('/demo/') ? item.imageUrl : `/demo${item.imageUrl}`) : '';
   const badge = item.isTopPick ? `<span class="badge">${T.topPick}</span>` : item.isRecommended ? `<span class="badge rec">${T.recommended}</span>` : '';
 
   const breakdownRows = [
@@ -136,7 +136,8 @@ function productCard(item, kw, tiers, idx) {
 // 从 dist/index.html 提取主站 CSS（build 后 hash 文件名）
 const distHtml = readFileSync(join(DIST, 'index.html'), 'utf8');
 const cssMatch = distHtml.match(/<link rel="stylesheet"[^>]*>/g) || [];
-const cssLinks = cssMatch.map((l) => l.replace(/href="\//, `href="${SITE}/`)).join('\n    ');
+// 与落地页同域部署，CSS 用根相对路径（本地/生产均可用）
+const cssLinks = cssMatch.map((l) => l.replace(/href="\//, 'href="/')).join('\n    ');
 
 const files = readdirSync(join(PUBLIC, 'demo')).filter((f) => /^search-.*\.json$/.test(f)).sort();
 
@@ -213,7 +214,7 @@ for (const file of files) {
     const b = item.landed.breakdown;
     const titleEn = item.titleEn && item.titleEn !== item.title ? item.titleEn : item.title;
     const platform = PLATFORM_EN[item.platform] || item.platform;
-    const imgPath = item.imageUrl || '';
+  const imgPath = item.imageUrl ? (item.imageUrl.startsWith('/demo/') ? item.imageUrl : `/demo${item.imageUrl}`) : '';
     return {
       '@type': 'ListItem',
       position: idx + 1,
