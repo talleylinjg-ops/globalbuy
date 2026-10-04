@@ -1279,3 +1279,7 @@ body {
 .seo-related a:hover{text-decoration:underline}
 .seo-footer{margin:40px 0 24px;padding-top:16px;border-top:1px solid var(--border,#e5e7eb);color:var(--text-secondary,#6b7280);font-size:13px}
 .seo-footer a{color:#4f46e5;text-decoration:none}
+
+/* 落地页 breakdown 折叠复用按钮样式（隐藏 details 默认标记） */
+.card-actions summary.btn { list-style: none; display: inline-flex; align-items: center; }
+.card-actions summary.btn::-webkit-details-marker { display: none; }
