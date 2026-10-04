@@ -3,13 +3,15 @@
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync, cpSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { pickShippingTiers } from '../src/utils/shipping.js';
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const DIST = join(ROOT, 'dist');
 const PUBLIC = join(ROOT, 'public');
 const SITE = 'https://globalbuy.pages.dev';
 
-const CARRIER_EN = { '顺丰国际': 'SF International', '华源': 'Huayuan', '4PX': '4PX', 'sfintl': 'SF International', 'huayuan': 'Huayuan' };
+const CARRIER_EN = { '顺丰国际': 'SF International', '华源': 'Huayuan', '4PX 递四方': '4PX', '4PX': '4PX', 'sfintl': 'SF International', 'huayuan': 'Huayuan', '4px': '4PX' };
+const SHIP_LABEL_EN = { shipFastest: 'Fastest', shipCheapest: 'Cheapest', shipMiddle: 'Balanced' };
 const PLATFORM_EN = { '淘宝': 'Taobao', '天猫': 'Tmall', '京东': 'JD.com', '拼多多': 'Pinduoduo', '1688': '1688' };
 
 const en = JSON.parse(readFileSync(join(ROOT, 'src/locales/en.json'), 'utf8'));
@@ -24,13 +26,24 @@ function slugOf(file) {
   return file.replace(/^search-/, '').replace(/\.json$/, '');
 }
 
-function productCard(item, kw) {
+function productCard(item, kw, tiers, idx) {
   const b = item.landed.breakdown;
   const title = item.titleEn && item.titleEn !== item.title ? item.titleEn : item.title;
   const platform = PLATFORM_EN[item.platform] || item.platform;
   const carrier = CARRIER_EN[item.landed.shipping.carrier] || item.landed.shipping.carrier;
   const imgPath = item.imageUrl || '';
   const badge = item.isTopPick ? '<span class="badge">Top Pick</span>' : item.isRecommended ? '<span class="badge rec">Recommended</span>' : '';
+
+  // 三档快递到手价换算（与原站 ProductCard 一致：税费/服务费与运费无关，直接重算）
+  const refUsd = item.landed.shipping.quoteUsd;
+  const rate = refUsd ? b.intlShipping / refUsd : null;
+  const tierRows = (tiers || []).map(({ labels, quote }) => {
+    const tierPrice = rate != null ? quote.priceUsd * rate : null;
+    const tierTotal = tierPrice != null ? b.total - b.intlShipping + tierPrice : null;
+    const tagHtml = labels.map((label) => `<em class="tier-tag ${label}">${SHIP_LABEL_EN[label] || label}</em>`).join('');
+    const name = CARRIER_EN[quote.carrierName] || CARRIER_EN[quote.carrier] || quote.carrierName || quote.carrier;
+    return `<div class="ship-tier"><span class="tier-tags">${tagHtml}</span><span class="tier-name">${esc(name)}${quote.productName ? ` · ${esc(quote.productName)}` : ''}</span><span class="tier-days">${quote.daysMin}-${quote.daysMax} days</span><span class="tier-price">${money(tierTotal)}</span></div>`;
+  }).join('\n          ');
 
   const breakdownRows = [
     ['Item price', b.goodsValue],
@@ -45,7 +58,7 @@ function productCard(item, kw) {
   return `<div class="card ${item.isTopPick ? 'top' : item.isRecommended ? 'recommended' : ''}">
       <div class="card-media">
         <span class="platform-badge">${platform}</span>
-        ${imgPath ? `<img src="${imgPath}" alt="${esc(title)}" loading="lazy" />` : ''}
+        ${imgPath ? `<img src="${imgPath}" alt="${esc(title)}" loading="${idx === 0 ? 'eager" fetchpriority="high' : 'lazy'}" />` : ''}
         ${badge}
       </div>
       <div class="card-body">
@@ -59,7 +72,7 @@ function productCard(item, kw) {
           <span class="price-unit">USD</span>
         </div>
         <div class="price-note">Shown price is the item price. Landed price below includes all fees.</div>
-        <div class="cost-strip"><span>Landed total</span><span class="val">${money(b.total)}</span></div>
+        ${tierRows ? `<div class="ship-tiers">\n          ${tierRows}\n        </div>` : `<div class="cost-strip"><span>Landed total</span><span class="val">${money(b.total)}</span></div>`}
         <div class="breakdown">
           ${breakdownRows.map(([label, v]) => `<div class="breakdown-row"><span>${esc(label)}</span><span class="val">${money(v)}</span></div>`).join('\n          ')}
           <div class="breakdown-row total"><span>Landed total</span><span class="val">${money(b.total)}</span></div>
@@ -169,7 +182,7 @@ for (const file of files) {
     ],
   };
 
-  const cards = items.map((it) => productCard(it, kw)).join('\n    ');
+  const cards = items.map((it, idx) => productCard(it, kw, pickShippingTiers(d.carrierQuotes), idx)).join('\n    ');
   const otherPages = allPages.length > 1
     ? `<nav class="seo-related"><h2>Popular searches</h2><ul>${allPages.filter((p) => p.slug !== slug).map((p) => `<li><a href="/p/${p.slug}/">${esc(p.kw)}</a></li>`).join('')}</ul></nav>`
     : '';

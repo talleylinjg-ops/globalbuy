@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, useRef, lazy, Suspense } from 'react';
 import { applySearchSeo, applyBreadcrumbSeo, applyHowToSeo } from './utils/seo.js';
 import { useI18n } from './i18n.js';
+import { pickShippingTiers } from './utils/shipping.js';
 import { fetchMeta, searchProducts, parseLink, apiUrl } from './api.js';
 import ProductCard from './components/ProductCard.jsx';
 import SearchPanel from './components/SearchPanel.jsx';
@@ -28,43 +29,6 @@ function getAdminRoute() {
 }
 
 // 从全部快递报价中挑三档：最快 / 最便宜 / 居中；三档尽量为三个不同报价
-function pickShippingTiers(quotes) {
-  if (!Array.isArray(quotes) || quotes.length === 0) return [];
-  const byPrice = [...quotes].sort((a, b) => a.priceUsd - b.priceUsd);
-  const byDays = [...quotes].sort(
-    (a, b) => (a.daysMin + a.daysMax) / 2 - (b.daysMin + b.daysMax) / 2
-  );
-  const cheapest = byPrice[0];
-  const fastest = byDays[0];
-  // 按价格数字去重：三个档位的价格数值必须互不相同，视觉上才是三个价格
-  const usedPrices = new Set([cheapest, fastest].map((q) => q.priceUsd));
-
-  // 居中：从价格中位出发向两侧找与最便宜/最快价格不同的报价
-  let middle = null;
-  const start = Math.floor(byPrice.length / 2);
-  for (let d = 0; d < byPrice.length && !middle; d++) {
-    for (const i of [start + d, start - d]) {
-      if (i >= 0 && i < byPrice.length) {
-        const q = byPrice[i];
-        if (!usedPrices.has(q.priceUsd)) {
-          middle = q;
-          break;
-        }
-      }
-    }
-  }
-
-  const tiers = [];
-  const push = (label, quote) => {
-    const existing = tiers.find((tr) => tr.quote === quote);
-    if (existing) existing.labels.push(label);
-    else tiers.push({ labels: [label], quote });
-  };
-  push('shipFastest', fastest);
-  push('shipCheapest', cheapest);
-  if (middle) push('shipMiddle', middle);
-  return tiers;
-}
 
 export default function App() {
   const { t, lang, setLang, languages } = useI18n();  const [isAdmin, setIsAdmin] = useState(getAdminRoute());
