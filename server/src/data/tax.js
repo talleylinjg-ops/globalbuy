@@ -357,3 +357,36 @@ export function getTaxRule(country) {
 export function getCategoryDutyRate(category) {
   return CATEGORY_DUTY_RATE[category] ?? CATEGORY_DUTY_RATE['默认'];
 }
+
+// ===== 全球国家注册表：重点市场置顶，其余按洲际排列 =====
+// 格式 "ISO2:货币"，重点市场即已配置税则的 32 国（TAX_RULES）
+const RAW_GROUPS = [
+  ['asia', 'JP:JPY KR:KRW SG:SGD MY:MYR TH:THB VN:VND PH:PHP ID:IDR IN:INR PK:PKR BD:BDT LK:LKR NP:NPR MM:MMK KH:KHR LA:LAK MN:MNT KZ:KZT UZ:UZS KG:KGS TJ:TJS TM:TMT AZ:AZN AM:AMD GE:GEL MV:MVR BN:BND MO:MOP IL:ILS JO:JOD LB:LBP OM:OMR QA:QAR KW:KWD BH:BHD IQ:IQD IR:IRR SY:SYP YE:YER AF:AFN TR:TRY'],
+  ['europe', 'BE:EUR LU:EUR PT:EUR AT:EUR IE:EUR FI:EUR GR:EUR SI:EUR SK:EUR LT:EUR LV:EUR EE:EUR CY:EUR MT:EUR HR:EUR ME:EUR CZ:CZK HU:HUF RO:RON BG:BGN DK:DKK IS:ISK UA:UAH BY:BYN MD:MDL RS:RSD BA:BAM MK:MKD AL:ALL XK:EUR'],
+  ['north-america', 'GT:GTQ BZ:BZD SV:USD HN:HNL NI:NIO CR:CRC PA:PAB CU:CUP JM:JMD HT:HTG DO:DOP TT:TTD BB:BBD BS:BSD AG:XCD DM:XCD GD:XCD LC:XCD VC:XCD KN:XCD BM:BMD KY:KYD PR:USD VI:USD GL:DKK'],
+  ['south-america', 'AR:ARS CL:CLP CO:COP PE:PEN UY:UYU PY:PYG BO:BOB EC:USD VE:VES GY:GYD SR:SRD'],
+  ['oceania', 'FJ:FJD PG:PGK SB:SBD VU:VUV WS:WST TO:TOP TV:AUD KI:AUD NR:AUD PW:USD MH:USD FM:USD MP:USD NC:XPF PF:XPF'],
+  ['africa', 'EG:EGP NG:NGN KE:KES GH:GHS MA:MAD DZ:DZD TN:TND LY:LYD ET:ETB TZ:TZS UG:UGX RW:RWF ZM:ZMW ZW:USD BW:BWP NA:NAD MZ:MZN AO:AOA CD:CDF CG:XAF CM:XAF CI:XOF SN:XOF ML:XOF BF:XOF NE:XOF TG:XOF BJ:XOF GN:GNF SL:SLE LR:LRD GM:GMD GW:XOF CV:CVE MR:MRU TD:XAF CF:XAF GQ:XAF GA:XAF ST:STN MG:MGA MU:MUR SC:SCR KM:KMF DJ:DJF SO:SOS SS:SSP SD:SDG MW:MWK LS:LSL SZ:SZL BI:BIF ER:ERN'],
+];
+
+export const CONTINENT_GROUPS = [
+  { key: 'priority', codes: Object.keys(TAX_RULES) },
+  ...RAW_GROUPS.map(([continent, str]) => ({
+    key: continent,
+    codes: str.split(' ').map((pair) => pair.split(':')[0]),
+  })),
+];
+
+// ISO2 → { continent, currency } 全量查询表（重点市场复用 TAX_RULES 的币种）
+export const GLOBAL_COUNTRIES = Object.fromEntries(
+  CONTINENT_GROUPS.flatMap((g) => g.codes.map((code) => [code, {
+    continent: g.key,
+    currency: g.key === 'priority' ? TAX_RULES[code].currency : Object.fromEntries(RAW_GROUPS.find(([k]) => k === g.key)[1].split(' ').map((p) => p.split(':')))[code],
+  }]))
+);
+
+// 全球去重货币清单（重点市场货币在前）
+export const GLOBAL_CURRENCIES = [...new Set([
+  ...Object.keys(TAX_RULES).map((c) => TAX_RULES[c].currency),
+  ...Object.values(GLOBAL_COUNTRIES).map((c) => c.currency),
+])];

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { carrierDisplayName } from '../utils/carrier.js';
 
 const PLATFORM_CLASS = {
   '淘宝': 'platform-tb',
@@ -178,7 +179,7 @@ export default function ProductCard({ item, currency, currencySymbol, shippingTi
                 <span className="val">{fmt(b.goodsValue, currencySymbol, currency)}</span>
               </div>
               <div className="breakdown-row">
-                <span>{t('result.shipping')} · {item.landed.shipping.carrier} ({item.landed.shipping.weightGrams}g)</span>
+                <span>{t('result.shipping')} · {carrierDisplayName(item.landed.shipping.carrier, t)} ({item.landed.shipping.weightGrams}g)</span>
                 <span className="val">{fmt(b.intlShipping, currencySymbol, currency)}</span>
               </div>
               <div className="breakdown-row">

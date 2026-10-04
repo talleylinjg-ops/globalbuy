@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { searchAndCompare } from '../services/searchService.js';
 import { getRates } from '../services/currency.js';
 import { isMostlyAscii, translateKeywordToChinese } from '../services/translate.js';
-import { getTaxRule, TAX_RULES } from '../data/tax.js';
+import { getTaxRule, TAX_RULES, CONTINENT_GROUPS, GLOBAL_COUNTRIES, GLOBAL_CURRENCIES } from '../data/tax.js';
 import { getShippingRates } from '../data/shipping.js';
 import { platformList } from '../platforms/index.js';
 import { listMockCategories, HOT_KEYWORDS } from '../data/mockProducts.js';
@@ -208,11 +208,14 @@ router.post('/orders', async (req, res, next) => {
 router.get('/meta', (req, res) => {
   res.json({
     platforms: platformList(),
-    countries: Object.keys(TAX_RULES).map((code) => ({
+    countries: CONTINENT_GROUPS.flatMap((g) => g.codes.map((code) => ({
       code,
-      name: TAX_RULES[code].name,
-      currency: TAX_RULES[code].currency,
-    })),
+      continent: g.key,
+      priority: g.key === 'priority',
+      currency: GLOBAL_COUNTRIES[code].currency,
+      name: TAX_RULES[code]?.name,
+    }))),
+    currencies: GLOBAL_CURRENCIES,
     rates: getRates(),
     weights: { price: 0.4, reputation: 0.25, sales: 0.15, speed: 0.1, commission: 0.1 },
     categories: listMockCategories(),

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { apiUrl } from '../api.js';
+import { carrierDisplayName } from '../utils/carrier.js';
 
 // 游客下单弹窗：商品 + 数量 + 快递渠道 + 收货信息 -> POST /api/orders
 export default function OrderModal({ item, country, currency, carrier, quotes, defaultServiceFee, onClose, onPlaced, t, lang }) {
@@ -61,7 +62,7 @@ export default function OrderModal({ item, country, currency, carrier, quotes, d
             <h3>{t('order.success')}</h3>
             <p>{t('order.orderNo')}: <b>{result.orderNo}</b></p>
             <p>{t('order.estimatedTotal')}: <b>{result.currency} {result.total.toLocaleString()}</b></p>
-            <p className="order-success-carrier">{result.carrier} · {result.daysMin}-{result.daysMax} {t('result.days')}</p>
+            <p className="order-success-carrier">{carrierDisplayName(result.carrier, t)} · {result.daysMin}-{result.daysMax} {t('result.days')}</p>
             <button className="btn btn-primary" onClick={onClose}>{t('order.close')}</button>
           </div>
         ) : (

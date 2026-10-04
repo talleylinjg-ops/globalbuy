@@ -1,4 +1,4 @@
-import { useI18n } from '../i18n.js';
+// lang 由 App 传入（useI18n 为组件独立 state，避免多实例不同步）
 
 const ALL_PLATFORMS = [
   { id: 'taobao', label: '淘宝' },
@@ -8,32 +8,77 @@ const ALL_PLATFORMS = [
   { id: '1688', label: '1688' },
 ];
 
+const CONTINENT_LABEL_KEY = {
+  priority: 'geo.priority',
+  asia: 'geo.asia',
+  europe: 'geo.europe',
+  'north-america': 'geo.northAmerica',
+  'south-america': 'geo.southAmerica',
+  oceania: 'geo.oceania',
+  africa: 'geo.africa',
+};
+
+let displayNamesCache = {};
+function regionName(code, lang) {
+  const cacheKey = lang || 'en';
+  if (!displayNamesCache[cacheKey]) {
+    try {
+      displayNamesCache[cacheKey] = new Intl.DisplayNames([cacheKey === 'zh' ? 'zh-CN' : cacheKey], { type: 'region' });
+    } catch {
+      displayNamesCache[cacheKey] = null;
+    }
+  }
+  try {
+    return displayNamesCache[cacheKey]?.of(code) || code;
+  } catch {
+    return code;
+  }
+}
+
+function countryLabel(c, t, lang) {
+  const key = `country.${c.code}`;
+  if (t(key) !== key) return t(key);
+  return regionName(c.code, lang);
+}
+
 export default function SettingsPanel({
   meta, country, setCountry, currency, setCurrency,
-  platforms, setPlatforms, serviceFee, setServiceFee, t, children,
+  platforms, setPlatforms, serviceFee, setServiceFee, t, lang, children,
 }) {
   const togglePlatform = (id) => {
     setPlatforms((prev) => (prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]));
   };
+
+  const countries = meta?.countries || [];
+  const groupOrder = ['priority', 'asia', 'europe', 'north-america', 'south-america', 'oceania', 'africa'];
+  const grouped = groupOrder
+    .map((g) => ({ g, list: countries.filter((c) => (c.continent || 'priority') === g) }))
+    .filter(({ list }) => list.length > 0);
+
+  const currencies = meta?.currencies?.length
+    ? meta.currencies
+    : [...new Set(countries.map((c) => c.currency).filter(Boolean))];
 
   return (
     <div className="settings-panel">
       <div className="settings-field field-country">
         <label className="settings-label">{t('settings.deliveryCountry')}</label>
         <select className="settings-control" value={country} onChange={(e) => setCountry(e.target.value)}>
-          {(meta?.countries || []).map((c) => {
-            const key = `country.${c.code}`;
-            const name = t(key) === key ? c.name : t(key);
-            return <option key={c.code} value={c.code}>{name} ({c.code})</option>;
-          })}
+          {grouped.map(({ g, list }) => (
+            <optgroup key={g} label={t(CONTINENT_LABEL_KEY[g] || 'geo.priority')}>
+              {list.map((c) => (
+                <option key={c.code} value={c.code}>{countryLabel(c, t, lang)} ({c.code})</option>
+              ))}
+            </optgroup>
+          ))}
         </select>
       </div>
 
       <div className="settings-field field-currency">
         <label className="settings-label">{t('settings.currency')}</label>
         <select className="settings-control" value={currency} onChange={(e) => setCurrency(e.target.value)}>
-          {(meta?.countries || []).map((c) => (
-            <option key={c.currency} value={c.currency}>{c.currency}</option>
+          {currencies.map((code) => (
+            <option key={code} value={code}>{code}</option>
           ))}
         </select>
       </div>

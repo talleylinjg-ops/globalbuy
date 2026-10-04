@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { carrierDisplayName } from '../utils/carrier.js';
 
 function fmt(n, symbol, currency) {
   if (n === undefined || n === null || Number.isNaN(n)) return '—';
@@ -39,7 +40,7 @@ export default function CombineBar({ items, result, loading, onCalc, onClear, on
       {result && !result.demo && expanded && (
         <div className="combine-result">
           <div className="combine-result-head">
-            <span>{result.carrier} · {result.daysMin}-{result.daysMax} {t('result.days')} · {result.totalWeightKg}kg</span>
+            <span>{carrierDisplayName(result.carrier, t)} · {result.daysMin}-{result.daysMax} {t('result.days')} · {result.totalWeightKg}kg</span>
             <button className="btn btn-ghost btn-sm" onClick={() => setExpanded(false)}>{t('common.close')}</button>
           </div>
           <div className="combine-grid">

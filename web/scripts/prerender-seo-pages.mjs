@@ -99,14 +99,14 @@ const cap = (s) => String(s).replace(/\b\w/g, (c) => c.toUpperCase());
 // 先扫全部关键词，供每个页面互链（内链网）
 const allPages = files.map((file) => {
   const meta = JSON.parse(readFileSync(join(PUBLIC, 'demo', file), 'utf8'));
-  return { slug: slugOf(file), kw: meta.translatedKeyword || slugOf(file).replace(/-/g, ' ') };
+  return { slug: slugOf(file), kw: meta.inputKeyword || slugOf(file).replace(/-/g, ' ') };
 });
 
 for (const file of files) {
   const slug = slugOf(file);
   const d = JSON.parse(readFileSync(join(PUBLIC, 'demo', file), 'utf8'));
   const items = (d.results || []).slice(0, 9);
-  const kw = d.translatedKeyword || slug.replace(/-/g, ' ');
+  const kw = d.inputKeyword || slug.replace(/-/g, ' ');
   const title = `${cap(kw)} from China — Landed Price, Duty &amp; Shipping Calculator | CrossBuy`;
   const prices = items.map((i) => i.landed.breakdown.total).filter((v) => v != null);
   const minP = prices.length ? Math.min(...prices) : null;

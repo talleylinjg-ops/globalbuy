@@ -139,7 +139,8 @@
     "T恤": "T-Shirt",
     "羽绒服": "Down Jacket",
     "背包": "Backpack",
-    "玩具": "Toys"
+    "玩具": "Toys",
+    "宠物玩具": "Pet Toys"
   },
   "keyword": {
     "蓝牙耳机": "Bluetooth Earbuds",
@@ -432,5 +433,14 @@
     "sfintl": "SF International",
     "4px": "4PX Express",
     "huayuan": "Huayuan Logistics"
+  },
+  "geo": {
+    "priority": "Key Markets",
+    "asia": "Asia",
+    "europe": "Europe",
+    "northAmerica": "North America",
+    "southAmerica": "South America",
+    "oceania": "Oceania",
+    "africa": "Africa"
   }
 }

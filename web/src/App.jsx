@@ -340,6 +340,7 @@ export default function App() {
           serviceFee={serviceFee}
           setServiceFee={setServiceFee}
           t={t}
+          lang={lang}
         >
           {lastSearch && results && results.carrierQuotes && results.carrierQuotes.length > 0 && (
             <CarrierPicker
