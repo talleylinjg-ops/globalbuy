@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { carrierDisplayName } from '../utils/carrier.js';
+import { carrierDisplayName, productNameDisplay } from '../utils/carrier.js';
 
 const PLATFORM_CLASS = {
   '淘宝': 'platform-tb',
@@ -121,7 +121,7 @@ export default function ProductCard({ item, currency, currencySymbol, shippingTi
                       const k = `carrierName.${tr.quote.carrier}`;
                       const v = t(k);
                       return v === k ? (tr.quote.carrierName || tr.quote.carrier) : v;
-                    })()}{tr.quote.productName ? ` · ${tr.quote.productName}` : ''}</span>
+                    })()}{tr.quote.productName ? ` · ${productNameDisplay(tr.quote.productName)}` : ''}</span>
                     <span className="tier-days">{tr.quote.daysMin}-{tr.quote.daysMax}{t('result.days')}</span>
                     <span className="tier-price">{tierTotal != null ? fmt(tierTotal, currencySymbol, currency) : fmt(tr.quote.priceUsd, '$', 'USD')}</span>
                   </div>

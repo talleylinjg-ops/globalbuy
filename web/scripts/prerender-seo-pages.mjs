@@ -11,9 +11,35 @@ const PUBLIC = join(ROOT, 'public');
 const SITE = 'https://globalbuy.pages.dev';
 
 const CARRIER_EN = { '顺丰国际': 'SF International', '华源': 'Huayuan', '4PX 递四方': '4PX', '4PX': '4PX', 'sfintl': 'SF International', 'huayuan': 'Huayuan', '4px': '4PX' };
+// 渠道名模式匹配（兼容全名/别名：华源国际专线、顺丰国际、4PX 递四方等）
+function carrierEn(name) {
+  const s = String(name || '');
+  if (!s) return '';
+  if (/4PX|递四方/i.test(s)) return '4PX';
+  if (/顺丰/.test(s)) return 'SF International';
+  if (/华源/.test(s)) return 'Huayuan';
+  return CARRIER_EN[s] || s;
+}
 const SHIP_LABEL_EN = { shipFastest: 'Fastest', shipCheapest: 'Cheapest', shipMiddle: 'Middle' };
 const PLATFORM_EN = { '淘宝': 'Taobao', '天猫': 'Tmall', '京东': 'JD.com', '拼多多': 'Pinduoduo', '1688': '1688' };
 const PLATFORM_ID = { '淘宝': 'taobao', '天猫': 'tmall', '京东': 'jd', '拼多多': 'pdd', '1688': '1688' };
+const CATEGORY_EN = { '蓝牙耳机': 'Bluetooth Earbuds', '无线充电器': 'Wireless Chargers', '瑜伽垫': 'Yoga Mats', '保温杯': 'Thermal Bottles', '手机壳': 'Phone Cases', '键盘': 'Keyboards', '智能手表': 'Smart Watches', '运动鞋': 'Sneakers', '行李箱': 'Luggage', 'LED台灯': 'LED Lamps', '宠物玩具': 'Pet Toys', '零食': 'Snacks' };
+const PRODUCT_NAME_EN = {
+  'FED-5DAY-空派DDP小货': 'FED-5DAY Air DDP Small Parcel',
+  'FEDEX美国空快-包裹（包税）': 'FEDEX US Air Express (Tax Included)',
+  'HKUPS蓝单南美6000（UPL22）': 'HKUPS Blue Line South America 6000 (UPL22)',
+  'USXB-V06美国FEDEX专线小包（不接手表）': 'USXB-V06 US FEDEX Line Small Parcel (No Watches)',
+};
+function productNameEn(name) {
+  const s = String(name || '');
+  if (!s) return '';
+  if (PRODUCT_NAME_EN[s]) return PRODUCT_NAME_EN[s];
+  if (/[\u4e00-\u9fff]/.test(s)) {
+    const ascii = s.replace(/[^\x20-\x7e]/g, ' ').replace(/\s+/g, ' ').trim();
+    return ascii || s;
+  }
+  return s;
+}
 
 // 原站 en 词条（与 src/locales/en.json 同步维护）
 const T = {
@@ -69,7 +95,7 @@ function productCard(item, kw, tiers, idx) {
 
   const breakdownRows = [
     [`${T.price} (${item.shopName || platform})`, b.goodsValue],
-    [`${T.shipping} · ${CARRIER_EN[item.landed.shipping.carrier] || item.landed.shipping.carrier} (${item.landed.shipping.weightGrams}g)`, b.intlShipping],
+    [`${T.shipping} · ${carrierEn(item.landed.shipping.carrier)} (${item.landed.shipping.weightGrams}g)`, b.intlShipping],
     [`${T.duty} (${(item.landed.dutyRate * 100).toFixed(0)}%)`, b.duty],
     [`${T.vat} (${(item.landed.vatRate * 100).toFixed(0)}%)`, b.vat],
     [T.serviceFee, b.serviceFee],
@@ -83,8 +109,8 @@ function productCard(item, kw, tiers, idx) {
     const tierPrice = rate != null ? quote.priceUsd * rate : null;
     const tierTotal = tierPrice != null ? b.total - b.intlShipping + tierPrice : null;
     const tagHtml = labels.map((l) => `<em class="tier-tag ${l}">${SHIP_LABEL_EN[l] || l}</em>`).join('');
-    const name = CARRIER_EN[quote.carrierName] || CARRIER_EN[quote.carrier] || quote.carrierName || quote.carrier;
-    return `<div class="ship-tier"><span class="tier-tags">${tagHtml}</span><span class="tier-name">${esc(name)}${quote.productName ? ` · ${esc(quote.productName)}` : ''}</span><span class="tier-days">${quote.daysMin}-${quote.daysMax} ${T.days}</span><span class="tier-price">${money(tierTotal)}</span></div>`;
+    const name = carrierEn(quote.carrierName || quote.carrier);
+    return `<div class="ship-tier"><span class="tier-tags">${tagHtml}</span><span class="tier-name">${esc(name)}${quote.productName ? ` · ${esc(productNameEn(quote.productName))}` : ''}</span><span class="tier-days">${quote.daysMin}-${quote.daysMax} ${T.days}</span><span class="tier-price">${money(tierTotal)}</span></div>`;
   }).join('\n          ');
 
   const score = item.scores?.total ?? 0;
@@ -98,7 +124,7 @@ function productCard(item, kw, tiers, idx) {
       <div class="card-body">
         <h3 class="card-title">${esc(title)}</h3>
         <div class="card-meta">
-          ${item.category ? `<span class="pill">${esc(item.category)}</span>` : ''}
+          ${item.category ? `<span class="pill">${esc(CATEGORY_EN[item.category] || item.category)}</span>` : ''}
           ${item.inStock ? `<span class="pill good">${T.inStock}</span>` : ''}
           <span class="pill source-badge">${T.sourceMock}</span>
         </div>
@@ -188,8 +214,8 @@ for (const file of files) {
   // 渠道选择器：选中行 + 可展开完整报价列表（details 折叠与原站收起状态一致）
   const quotes = d.carrierQuotes || [];
   const carrierRows = quotes.map((q, i) => {
-    const name = CARRIER_EN[q.carrierName] || CARRIER_EN[q.carrier] || q.carrierName || q.carrier;
-    return `<div class="carrier-option ${i === 0 ? 'active' : ''}"><div class="carrier-option-left">${q.recommended ? `<span class="carrier-best">${T.recommended}</span>` : ''}<b>${esc(q.productName)}</b><span class="carrier-days">${esc(name)} · ${q.daysMin}-${q.daysMax} ${T.days}</span></div><div class="carrier-option-right"><span class="carrier-price">${money(q.priceUsd)}</span></div></div>`;
+    const name = carrierEn(q.carrierName || q.carrier);
+    return `<div class="carrier-option ${i === 0 ? 'active' : ''}"><div class="carrier-option-left">${q.recommended ? `<span class="carrier-best">${T.recommended}</span>` : ''}<b>${esc(productNameEn(q.productName))}</b><span class="carrier-days">${esc(name)} · ${q.daysMin}-${q.daysMax} ${T.days}</span></div><div class="carrier-option-right"><span class="carrier-price">${money(q.priceUsd)}</span></div></div>`;
   }).join('\n          ');
 
   const sortBar = [['recommended', T.sortRecommended], ['price', T.sortPriceAsc], ['priceDesc', T.sortPriceDesc], ['rating', T.sortRating], ['sales', T.sortSales], ['speed', T.sortSpeed]].map(([id, label]) =>

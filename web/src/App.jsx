@@ -322,8 +322,8 @@ export default function App() {
         {lastSearch && results && (
           <div className="results-head">
             <div className="results-count">
-              {results.translatedKeyword && results.translatedKeyword !== results.inputKeyword && (
-                <span className="translate-badge">{t('search.keywordTranslated')}: <b>{results.translatedKeyword}</b></span>
+              {!results.demo && results.translatedKeyword && results.translatedKeyword !== results.inputKeyword && (
+                <span className="translate-badge">{t('search.keywordTranslated')}: <b>{lang !== 'zh' && results.translatedKeywordEn ? results.translatedKeywordEn : results.translatedKeyword}</b></span>
               )}
               <span>{t('result.totalLabel', { total: results.total, platforms: results.sourceInfo.filter((s) => s.count > 0).length })}</span>
             </div>

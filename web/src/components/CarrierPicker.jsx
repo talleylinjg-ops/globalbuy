@@ -1,5 +1,6 @@
 // 快递渠道选择器：行末按钮 + 下拉浮层列表，点击切换后由父组件重新询价
 import { useState } from 'react';
+import { productNameDisplay } from '../utils/carrier.js';
 
 function fmt(n) {
   if (n === undefined || n === null || Number.isNaN(n)) return '—';
@@ -21,7 +22,7 @@ export default function CarrierPicker({ quotes, current, onSelect, t }) {
         className="carrier-selected"
         onClick={() => setOpen(!open)}
       >
-        {selected && <b>{selected.productName}</b>}
+        {selected && <b>{productNameDisplay(selected.productName)}</b>}
         <span className="carrier-arrow">{open ? '▲' : '▼'}</span>
       </button>
 
@@ -39,7 +40,7 @@ export default function CarrierPicker({ quotes, current, onSelect, t }) {
             >
               <div className="carrier-option-left">
                 {q.recommended && <span className="carrier-best">{t('result.recommended') || '推荐'}</span>}
-                <b>{q.productName}</b>
+                <b>{productNameDisplay(q.productName)}</b>
                 <span className="carrier-days">{(() => {
                   const k = `carrierName.${q.carrier}`;
                   const v = t(k);

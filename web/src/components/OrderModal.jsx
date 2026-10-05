@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { apiUrl } from '../api.js';
-import { carrierDisplayName } from '../utils/carrier.js';
+import { carrierDisplayName, productNameDisplay } from '../utils/carrier.js';
 
 // 游客下单弹窗：商品 + 数量 + 快递渠道 + 收货信息 -> POST /api/orders
 export default function OrderModal({ item, country, currency, carrier, quotes, defaultServiceFee, onClose, onPlaced, t, lang }) {
@@ -99,7 +99,7 @@ export default function OrderModal({ item, country, currency, carrier, quotes, d
                 >
                   {quotes.map((q) => (
                     <option key={q.productName} value={q.productName}>
-                      {q.productName} · ${q.priceUsd} · {q.daysMin}-{q.daysMax}d
+                      {productNameDisplay(q.productName)} · ${q.priceUsd} · {q.daysMin}-{q.daysMax}d
                     </option>
                   ))}
                 </select>
