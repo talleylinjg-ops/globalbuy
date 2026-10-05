@@ -22,6 +22,7 @@
   - Luggage: https://globalbuy.pages.dev/p/luggage/
   - Keyboards: https://globalbuy.pages.dev/p/keyboard/
   - Sneakers: https://globalbuy.pages.dev/p/sneakers/
+- Full reference for LLMs: https://globalbuy.pages.dev/llms-full.txt
 - Currency display: buyer-selectable (USD, EUR, GBP, JPY, and 20+ more); prices auto-converted from CNY.
 - Typical delivery: 5-10 business days by economical lines, 3-7 by express lines (varies by destination).
 - Service fee: buyer-selected, default 5%, range 0-30%; shown as a separate line item.

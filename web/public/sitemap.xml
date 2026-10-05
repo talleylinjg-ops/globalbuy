@@ -7,46 +7,55 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://globalbuy.pages.dev/?lang=en"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://globalbuy.pages.dev/?lang=es"/>
     <changefreq>daily</changefreq>
+    <lastmod>2026-10-04</lastmod>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://globalbuy.pages.dev/?lang=en</loc>
     <changefreq>weekly</changefreq>
+    <lastmod>2026-10-04</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://globalbuy.pages.dev/?lang=es</loc>
     <changefreq>weekly</changefreq>
+    <lastmod>2026-10-04</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://globalbuy.pages.dev/p/wireless-earbuds/</loc>
     <changefreq>daily</changefreq>
+    <lastmod>2026-10-04</lastmod>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://globalbuy.pages.dev/p/phone-case/</loc>
     <changefreq>daily</changefreq>
+    <lastmod>2026-10-04</lastmod>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://globalbuy.pages.dev/p/smart-watch/</loc>
     <changefreq>daily</changefreq>
+    <lastmod>2026-10-04</lastmod>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://globalbuy.pages.dev/p/luggage/</loc>
     <changefreq>daily</changefreq>
+    <lastmod>2026-10-04</lastmod>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://globalbuy.pages.dev/p/keyboard/</loc>
     <changefreq>daily</changefreq>
+    <lastmod>2026-10-04</lastmod>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://globalbuy.pages.dev/p/sneakers/</loc>
     <changefreq>daily</changefreq>
+    <lastmod>2026-10-04</lastmod>
     <priority>0.9</priority>
   </url>
 </urlset>

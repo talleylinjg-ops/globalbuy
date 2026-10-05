@@ -382,8 +382,57 @@ for (const file of files) {
 
 console.log(`done: ${allPages.length} SEO pages`);
 
-// build 链中本脚本在 vite build 之后运行，public/p 需再拷入 dist 才会随部署发布
+// 生成 LLMs-full.txt（完整版 LLM 上下文：功能 + FAQ 全文 + 各关键词商品数据）
+const faqFull = Object.keys(en.faq)
+  .filter((k) => /^q\d+$/.test(k))
+  .map((k) => `### ${en.faq[k]}\n${en.faq[k.replace('q', 'a')]}`)
+  .join('\n\n');
+
+const catalogSections = allPages.map(({ slug, kw }) => {
+  const data = JSON.parse(readFileSync(join(PUBLIC, 'demo', `search-${slug}.json`), 'utf8'));
+  const rows = (data.results || []).map((item, idx) => {
+    const b = item.landed.breakdown;
+    const titleEn = item.titleEn && item.titleEn !== item.title ? item.titleEn : item.title;
+    const platform = PLATFORM_EN[item.platform] || item.platform;
+    return `${idx + 1}. ${titleEn} — item ${money(b.goodsValue)} USD, landed ${money(b.total)} USD (${item.landed.shipping.daysMin}-${item.landed.shipping.daysMax} days), from ${platform}`;
+  }).join('\n');
+  return `## ${cap(kw)} (${SITE}/p/${slug}/)\n\n${rows}`;
+}).join('\n\n');
+
+const llmsFull = `# CrossBuy Global — full reference (LLMs-full)
+
+This is the complete reference for CrossBuy (https://globalbuy.pages.dev/), a cross-border price comparison and shopping agent platform for China's major e-commerce marketplaces (Taobao, Tmall, JD.com, Pinduoduo, 1688). Slogan: Buy More Save More.
+
+## How it works
+
+1. Buyer searches once; CrossBuy queries all five marketplaces and merges the same product into one card with best / fastest / recommended rankings.
+2. Every product shows the full landed price: item price + international shipping + customs duty + VAT + service fee + payment fee, computed per destination country.
+3. Buyer picks an international carrier (4PX, Huayuan, SF International and more) with real-time prices and delivery estimates.
+4. Multiple items can be combined into one parcel; shipping is billed on combined weight and duty-free thresholds apply to the merged value.
+
+## Key facts
+
+- Destinations: 200+ countries and regions. Key markets first (US, GB, DE, FR, IT, ES, CA, AU, JP, KR, SG and more), then grouped by continent.
+- Currencies: 140+ display currencies with live FX rates; item prices are quoted in CNY and converted for display.
+- Service fee: buyer-selected 0%-30% (default 5%), shown as a separate line.
+- Languages: Simplified Chinese (zh-CN), English (en), Spanish (es).
+- Pre-rendered keyword landing pages: ${allPages.map((p) => `${SITE}/p/${p.slug}/`).join(', ')}
+
+## FAQ (full text)
+
+${faqFull}
+
+## Product catalog snapshot (per keyword)
+
+${catalogSections}
+`;
+
+writeFileSync(join(PUBLIC, 'llms-full.txt'), llmsFull);
+console.log('generated llms-full.txt');
+
+// build 链中本脚本在 vite build 之后运行，需把生成物拷入 dist 才会随部署发布
 if (existsSync(DIST)) {
   cpSync(join(PUBLIC, 'p'), join(DIST, 'p'), { recursive: true });
-  console.log('copied public/p -> dist/p');
+  cpSync(join(PUBLIC, 'llms-full.txt'), join(DIST, 'llms-full.txt'));
+  console.log('copied public/p + llms-full.txt -> dist');
 }

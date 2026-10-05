@@ -57,7 +57,9 @@
     "deMinimis": "Umbral de franquicia",
     "orderCta": "Pedir a través del agente",
     "linkMatched": "Enlace reconocido:",
-    "totalLabel": "{total} ofertas encontradas de {platforms} plataformas"
+    "totalLabel": "{total} ofertas encontradas de {platforms} plataformas",
+    "goodsValue": "Valor de la mercancía",
+    "purchaseNote": "Precio de compra en China · Sin envío, impuestos ni aranceles"
   },
   "platform": {
     "1688": "1688",

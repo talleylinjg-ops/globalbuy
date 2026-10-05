@@ -1,0 +1,98 @@
+# CrossBuy Global — full reference (LLMs-full)
+
+This is the complete reference for CrossBuy (https://globalbuy.pages.dev/), a cross-border price comparison and shopping agent platform for China's major e-commerce marketplaces (Taobao, Tmall, JD.com, Pinduoduo, 1688). Slogan: Buy More Save More.
+
+## How it works
+
+1. Buyer searches once; CrossBuy queries all five marketplaces and merges the same product into one card with best / fastest / recommended rankings.
+2. Every product shows the full landed price: item price + international shipping + customs duty + VAT + service fee + payment fee, computed per destination country.
+3. Buyer picks an international carrier (4PX, Huayuan, SF International and more) with real-time prices and delivery estimates.
+4. Multiple items can be combined into one parcel; shipping is billed on combined weight and duty-free thresholds apply to the merged value.
+
+## Key facts
+
+- Destinations: 200+ countries and regions. Key markets first (US, GB, DE, FR, IT, ES, CA, AU, JP, KR, SG and more), then grouped by continent.
+- Currencies: 140+ display currencies with live FX rates; item prices are quoted in CNY and converted for display.
+- Service fee: buyer-selected 0%-30% (default 5%), shown as a separate line.
+- Languages: Simplified Chinese (zh-CN), English (en), Spanish (es).
+- Pre-rendered keyword landing pages: https://globalbuy.pages.dev/p/keyboard/, https://globalbuy.pages.dev/p/luggage/, https://globalbuy.pages.dev/p/phone-case/, https://globalbuy.pages.dev/p/smart-watch/, https://globalbuy.pages.dev/p/sneakers/, https://globalbuy.pages.dev/p/wireless-earbuds/
+
+## FAQ (full text)
+
+### Which platforms does CrossBuy search?
+CrossBuy compares the same product across Taobao, Tmall, JD.com, Pinduoduo and 1688 in a single search, flagging the fastest, cheapest and best-value options.
+
+### What is included in the landed price?
+Landed price = item price + international shipping + customs duty + VAT + service fee + payment fee, computed in real time under your destination country's tax rules and itemized before checkout — no hidden fees.
+
+### Which countries can CrossBuy deliver to?
+We ship to the United States, United Kingdom, Germany, France, Japan, South Korea, Australia, Canada and more, with multiple carrier options and pre-order price and delivery estimates.
+
+### Can multiple orders ship together?
+Yes. Items from different platforms are combined into one parcel, shipping is billed on combined weight, and duty-free allowances apply to the merged declared value — usually cheaper than separate shipments.
+
+### How long does delivery take?
+Economy lines take about 5-10 business days, express lines about 3-7, depending on destination and carrier. Live estimates are shown before you order.
+
+### Why is CrossBuy cheaper?
+China's domestic prices sit far below overseas retail markups. CrossBuy plugs you directly into source prices and makes shipping and taxes fully transparent, so you decide on the true landed total.
+
+### Which payment methods are supported?
+PayPal, Visa, Mastercard and other major international payment methods are supported, with settlement in USD, EUR, GBP, JPY and 20+ currencies. Exchange rates and payment fees are shown transparently before checkout.
+
+### How do I track my parcel?
+Once your order is picked up, an international tracking number is provided. You can follow both the domestic and cross-border legs in real time on the CrossBuy order page and the carrier's website until delivery.
+
+### Can I return or exchange items?
+Quality checks are performed before dispatch. If a quality issue is found after delivery, you can request a return or exchange within the allowed window, and our support team helps negotiate with the marketplace seller.
+
+### Can I choose the service fee myself?
+Yes. The service fee is buyer-selected (0%-30%, default 5%) and shown as a separate line item before checkout; a higher rate means higher service priority.
+
+## Product catalog snapshot (per keyword)
+
+## Keyboard (https://globalbuy.pages.dev/p/keyboard/)
+
+1. Mechanical Keyboard 87-Key Blue Switch Backlit Esports Gaming Office Great Value Free Shipping — item $7.43 USD, landed $31.61 USD (3-10 days), from Pinduoduo
+2. Mechanical Keyboard Factory 87-Key Hot-swappable Switch Optional Wholesale OEM Cross-border Supply — item $5.80 USD, landed $29.43 USD (3-10 days), from 1688
+3. Mechanical Keyboard 87-Key Brown Switch Blue Switch Backlit Wired Office Gaming Computer Keyboard — item $13.24 USD, landed $40.97 USD (3-10 days), from Taobao
+4. Mechanical Keyboard 87-Key Hot-swappable RGB Backlit Gaming Office Official Store 2-Year Warranty — item $22.17 USD, landed $56.44 USD (3-10 days), from JD.com
+
+## Luggage (https://globalbuy.pages.dev/p/luggage/)
+
+1. Luggage 20-inch Carry-on Luggage Hard Shell Spinner Wheels Large Capacity Student Travel Special Offer — item $11.76 USD, landed $74.57 USD (3-10 days), from Pinduoduo
+2. Luggage Factory Aluminum Alloy Shell 20/ 24-inch Spinner Wheels OEM Customizable Foreign Trade Wholesale — item $10.12 USD, landed $73.97 USD (3-10 days), from 1688
+3. Luggage 20-inch Carry-on Luggage Lightweight Spinner Wheels Reinforced Zipper Matte Scratch-resistant — item $38.54 USD, landed $122.29 USD (3-10 days), from Taobao
+4. Luggage 24-inch Spinner Wheels Aluminum Alloy Trolley TSA Lock Hard Shell Luggage Official Store — item $68.30 USD, landed $207.82 USD (3-10 days), from JD.com
+
+## Phone Case (https://globalbuy.pages.dev/p/phone-case/)
+
+1. Phone Case Factory Silicone Phone Case Apple All Series Wholesale Cross-border Supply Customizable LOGO — item $0.52 USD, landed $9.57 USD (3-10 days), from 1688
+2. Apple Phone Case iPhone All Series Silicone Soft Case Drop-proof Minimalist Multiple Colors — item $1.32 USD, landed $10.87 USD (3-10 days), from Pinduoduo
+3. Apple Phone Case iPhone 15 14 13 Silicone Drop-proof Minimalist Matte Full Coverage — item $2.96 USD, landed $13.50 USD (3-10 days), from Taobao
+4. Apple Phone Case iPhone 15 Pro Magnetic Clear Drop-proof Official Accessory Authenticity Guaranteed — item $4.32 USD, landed $15.68 USD (3-10 days), from JD.com
+
+## Smart Watch (https://globalbuy.pages.dev/p/smart-watch/)
+
+1. Smart Watch Men Large Screen Step Counter Sleep Tracking Call Alerts Budget Bestseller — item $7.43 USD, landed $20.69 USD (3-10 days), from Pinduoduo
+2. Smart Watch Bluetooth Calling Heart Rate Monitor Sports Waterproof Multiple Watch Faces Long Battery Life — item $23.66 USD, landed $46.83 USD (3-10 days), from Taobao
+3. Smart Watch HD Large Screen AMOLED Blood Oxygen Heart Rate Alipay NFC Sports Mode — item $35.57 USD, landed $65.99 USD (3-10 days), from JD.com
+
+## Sneakers (https://globalbuy.pages.dev/p/sneakers/)
+
+1. Sneakers Casual Running Shoes Breathable Mesh Soft Sole Height Increasing Unisex Clearance Offer — item $5.94 USD, landed $28.65 USD (3-10 days), from Pinduoduo
+2. Sneakers Factory Running Shoes Mesh Breathable Unisex OEM OEM Cross-border Wholesale — item $5.21 USD, landed $26.76 USD (3-10 days), from 1688
+3. Sneakers Running Shoes Lightweight Breathable Responsive Cushioning Unisex Stylish & Versatile — item $29.61 USD, landed $67.81 USD (3-10 days), from Taobao
+4. Running Shoes Cushioned Support Pro Sneakers Lightweight Mesh Breathable Official Store — item $53.42 USD, landed $107.19 USD (3-10 days), from JD.com
+
+## Wireless Earbuds (https://globalbuy.pages.dev/p/wireless-earbuds/)
+
+1. Bluetooth Earbuds Wireless Semi In-ear Noise Cancelling Sports Running Mini Portable 1-Year Warranty — item $4.45 USD, landed $15.90 USD (3-10 days), from Pinduoduo
+2. Wireless Bluetooth Earbuds True Wireless Earbuds Noise Cancelling Ultra-long Battery Life Apple Android Universal Great Value — item $5.94 USD, landed $18.29 USD (3-10 days), from Pinduoduo
+3. Bluetooth Earbuds Factory Wireless Sports Earbuds OEM ODM Cross-border Supply OEM Available Dual Chip — item $3.27 USD, landed $14.00 USD (3-10 days), from 1688
+4. Factory Direct Wireless Bluetooth Earbuds True Wireless Noise Cancelling Wholesale Dropshipping Cross-border Ready Bulk Discounts — item $4.24 USD, landed $15.56 USD (3-10 days), from 1688
+5. Bluetooth Earbuds Wireless Sports Earbuds Semi In-ear Earbuds Noise Cancelling Ultra-long Battery Life Xiaomi Android Apple Universal — item $8.91 USD, landed $23.09 USD (3-10 days), from Taobao
+6. Bluetooth Earbuds Wireless Sports Running Earbuds Noise Cancelling In-ear Waterproof & Sweatproof Magnetic Long Battery Life — item $11.76 USD, landed $27.66 USD (3-10 days), from JD.com
+7. Wireless Bluetooth Earbuds True Wireless In-ear Noise Cancelling Sports Running Earbuds Ultra-long Battery Life Huawei Apple Universal — item $13.24 USD, landed $30.06 USD (3-10 days), from Taobao
+8. Wireless Bluetooth Earbuds True Wireless Semi In-ear Noise Cancelling Calls Ultra-long Battery Life Official Authentic 1-Year Warranty — item $22.17 USD, landed $44.43 USD (3-10 days), from JD.com
+9. 【 Official Flagship 】 Wireless Bluetooth Earbuds Active Noise Cancelling True Wireless In-ear Earbuds Low Latency Apple Compatible — item $29.61 USD, landed $56.41 USD (3-10 days), from Tmall

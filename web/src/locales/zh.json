@@ -28,7 +28,7 @@
     "recommended": "推荐",
     "price": "价格",
     "landedTotal": "到手总价",
-    "purchaseNote": "中国采购价 · 不含运费、税费、关税",
+    "purchaseNote": "中国采购价 · 未含运费与税费",
     "shipFastest": "最快",
     "shipCheapest": "最便宜",
     "shipMiddle": "居间",
@@ -60,7 +60,7 @@
     "orderCta": "通过代购下单",
     "linkMatched": "链接识别成功：",
     "totalLabel": "共 {total} 条报价，来自 {platforms} 个平台",
-    "goodsValue": "商品货值"
+    "goodsValue": "商品价值"
   },
   "platform": {
     "1688": "1688",
@@ -429,5 +429,8 @@
     "southAmerica": "南美洲",
     "oceania": "大洋洲",
     "africa": "非洲"
+  },
+  "carrier": {
+    "title": "国际快递渠道"
   }
 }
