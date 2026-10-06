@@ -111,3 +111,14 @@ Entries discovered by the Agent during task execution should follow this format:
   - 渠道中文名→英文映射在 web/src/utils/carrier.js（4PX 递四方/顺丰国际/华源 别名匹配 + t('carrierName.*')）
   - 目的国全球清单在 server/src/data/tax.js（CONTINENT_GROUPS/GLOBAL_COUNTRIES/GLOBAL_CURRENCIES：重点 32 国置顶+亚洲/欧洲/北美/南美/大洋洲/非洲分组，207 国 145 币）；meta 接口输出全量；未配税则国家 getTaxRule 兜底美国税则
   - SettingsPanel 国家名本地化：i18n country.* 词条优先，其余走 Intl.DisplayNames；lang 由 App 传 prop（useI18n 是组件独立 state，多实例不同步）
+
+[搜索接口 3 秒假象排查法与后端提速要点]
+- Date: 2026-10-06
+- Context: 优化「访客尽快拿到价格和快递选项」时排查 warm 搜索固定 3s
+- Category: Troubleshooting & Debugging
+- Instructions:
+  - 后端 node --watch 的热重载有假象：touch 后日志可能仍打旧进程输出，确认方式是看进程 PID 是否变化或直接 kill+重启（后台终端 npm run dev:server）
+  - curl 计时定位慢源分段：`-w 'connect:%{time_connect} start:%{time_starttransfer} total:%{time_total}'`；localhost connect 慢 3s 属 curl/DNS 层假象，换 127.0.0.1 复测
+  - er-api.com 汇率接口 node fetch 直连 ~300ms 可达；curl 直测 5s 是 curl 层差异，勿据 curl 结论判定外呼慢
+  - 后端搜索提速已落地：searchService 询价与平台搜索并行；carrierService per-channel 3s 硬超时；currency.js fx 失败 10 分钟冷却（否则外呼失败 updatedAt 不更新导致每次搜索重试）；warm 搜索应 <20ms，首搜冷启动含 fx+4PX 询价约 1-3s
+  - 前端 api.js 降级层提速：GET 超时 2.5s 快速失败 → 全局 backendDown 标记（后续 0ms 走快照）→ 60s 一次 probeBackend 探活恢复；模块加载即预热 meta+默认快照
