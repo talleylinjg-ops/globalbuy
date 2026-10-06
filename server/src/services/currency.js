@@ -165,11 +165,18 @@ async function fetchLiveRates() {
   }
 }
 
+// 失败冷却：外部汇率 API 不可达时，冷却期内跳过重试，避免每次搜索都等待网络超时
+let lastFxAttemptAt = 0;
+const FX_RETRY_COOLDOWN_MS = 10 * 60 * 1000;
+
 export async function refreshRatesIfNeeded() {
+  const now = Date.now();
+  if (now - lastFxAttemptAt < FX_RETRY_COOLDOWN_MS) return;
   const staleMinutes = cache.updatedAt
-    ? (Date.now() - new Date(cache.updatedAt).getTime()) / 60000
+    ? (now - new Date(cache.updatedAt).getTime()) / 60000
     : Infinity;
   if (staleMinutes > config.fxCacheMinutes) {
+    lastFxAttemptAt = now;
     await fetchLiveRates();
   }
 }

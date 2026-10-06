@@ -19,7 +19,21 @@ export async function searchAndCompare(rawKeyword, opts = {}) {
     dims: { lengthCm: 12, widthCm: 10, heightCm: 4 },
     valueUsd: 20,
   };
-  const carrierResult = await getCarrierQuotes(carrierOpts);
+
+  const adapters = createAdapters();
+  const selected = opts.platforms && opts.platforms.length
+    ? Object.keys(adapters).filter((k) => opts.platforms.includes(k))
+    : Object.keys(adapters);
+
+  // 询价与平台搜索并行（互不依赖，合流后再计算总成本），缩短整体响应
+  const [carrierSettled, platformResults] = await Promise.all([
+    getCarrierQuotes(carrierOpts)
+      .then((r) => r)
+      .catch(() => ({ quotes: [], recommended: null, recommendedKey: null, hasRealData: false })),
+    Promise.allSettled(selected.map((key) => adapters[key].search(rawKeyword, opts))),
+  ]);
+  const carrierResult = carrierSettled;
+
   // carrier 参数支持渠道名（productName，多渠道场景）或快递商 code
   const preferred = opts.carrier
     ? carrierResult.quotes.find((q) => q.productName === opts.carrier) ||
@@ -31,15 +45,7 @@ export async function searchAndCompare(rawKeyword, opts = {}) {
     || carrierResult.quotes[0]
     || null;
 
-  const adapters = createAdapters();
-  const selected = opts.platforms && opts.platforms.length
-    ? Object.keys(adapters).filter((k) => opts.platforms.includes(k))
-    : Object.keys(adapters);
-
-  // 并行搜索各平台
-  const results = await Promise.allSettled(
-    selected.map((key) => adapters[key].search(rawKeyword, opts))
-  );
+  const results = platformResults;
 
   const rawItems = [];
   const sourceInfo = [];

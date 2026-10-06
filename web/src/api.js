@@ -6,8 +6,33 @@ export function apiUrl(path) {
 
 // ===== 静态快照降级层（学习镜像站架构：后端不可达时前台 100% 可浏览） =====
 // 后端（"原站"）休眠/未部署时，读取构建期抓取的演示快照，访客端始终有完整浏览体验
-async function fetchWithTimeout(url, ms = 8000) {
+// 速度策略：GET 快查 2.5s 超时；任一请求失败即全局降级（后续 0ms 走快照），后台每 60s 探活自动恢复
+const GET_TIMEOUT = 2500;
+const SLOW_TIMEOUT = 8000;
+
+let backendDown = false;
+let lastProbeAt = 0;
+
+async function fetchWithTimeout(url, ms = GET_TIMEOUT) {
   return fetch(url, { signal: AbortSignal.timeout(ms) });
+}
+
+async function probeBackend() {
+  if (!backendDown || Date.now() - lastProbeAt < 60000) return;
+  lastProbeAt = Date.now();
+  try {
+    const res = await fetchWithTimeout(apiUrl('/api/meta'), 1500);
+    if (res.ok) backendDown = false;
+  } catch {
+    // 仍不可达，保持降级
+  }
+}
+
+// 模块加载即预热：meta + 默认搜索快照并行预取（demo 模式首屏零等待）
+const DEFAULT_SNAPSHOT = 'search-wireless-earbuds';
+if (typeof window !== 'undefined') {
+  loadDemoSnapshot('meta').catch(() => {});
+  loadDemoSnapshot(DEFAULT_SNAPSHOT).catch(() => {});
 }
 
 let demoSnapshotCache = {};
@@ -43,14 +68,22 @@ function demoSearchSnapshot(keyword) {
 }
 
 async function getJSON(url, { fallback } = {}) {
+  if (backendDown) {
+    probeBackend();
+    if (fallback) return fallback(new Error('backend down'));
+    throw new Error('backend down');
+  }
   try {
     const res = await fetchWithTimeout(apiUrl(url));
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.error || `HTTP ${res.status}`);
     }
+    backendDown = false;
     return res.json();
   } catch (e) {
+    backendDown = true;
+    lastProbeAt = Date.now();
     if (fallback) return fallback(e);
     throw e;
   }
@@ -250,15 +283,23 @@ export async function searchProducts(params) {
       qs.set(k, String(v));
     }
   }
+  if (backendDown) {
+    probeBackend();
+    const snap = await demoSearchSnapshot(params.q);
+    return { ...snap, inputKeyword: params.q || snap.inputKeyword, keyword: params.q || snap.keyword, demo: true };
+  }
   try {
     const res = await fetchWithTimeout(apiUrl(`/api/search?${qs.toString()}`));
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.error || `HTTP ${res.status}`);
     }
+    backendDown = false;
     return res.json();
   } catch (e) {
-    // 后端不可达：降级到内置演示快照（标注 demo，保留用户关键词）
+    // 后端不可达：全局降级 + 内置演示快照（标注 demo，保留用户关键词）
+    backendDown = true;
+    lastProbeAt = Date.now();
     const snap = await demoSearchSnapshot(params.q);
     return {
       ...snap,

@@ -73,6 +73,17 @@ export default function App() {
       .catch(() => {});
   }, []);
 
+  // 首访自动预搜索默认热搜：访客打开即看到价格与快递选项，无需先输入
+  const autoSearchedRef = useRef(false);
+  useEffect(() => {
+    if (!meta || autoSearchedRef.current || isAdmin || lastSearch || loading) return;
+    autoSearchedRef.current = true;
+    // 落地页/外链带 ?q= 进入时优先用户关键词，否则默认热搜
+    const urlQ = new URLSearchParams(window.location.search).get('q');
+    doSearch(urlQ || meta.hotKeywords?.[0] || DEFAULT_HOT_KEYWORDS[0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [meta, isAdmin]);
+
   // 合并包裹：切换选中、调用统一计价接口
   const toggleCombine = useCallback((item) => {
     setCombineList((prev) => {

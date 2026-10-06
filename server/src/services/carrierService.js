@@ -44,7 +44,11 @@ async function fetchQuotes(p) {
       const adapter = createCarrierAdapter(cfg);
       try {
         // 单快递商可能返回多渠道报价（如华源多条专线），统一 flatten
-        const result = await adapter.quote(p);
+        // per-job 硬超时 3s：慢渠道不拖整体搜索响应（缓存 30min 兜底复用）
+        const result = await Promise.race([
+          Promise.resolve(adapter.quote(p)),
+          new Promise((_, reject) => setTimeout(() => reject(new Error(`quote timeout (${cfg.code})`)), 3000)),
+        ]);
         return (Array.isArray(result) ? result : [result]).map((q) => ({
           ...q,
           status: 'ok',
