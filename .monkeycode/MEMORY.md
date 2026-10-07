@@ -122,3 +122,14 @@ Entries discovered by the Agent during task execution should follow this format:
   - er-api.com 汇率接口 node fetch 直连 ~300ms 可达；curl 直测 5s 是 curl 层差异，勿据 curl 结论判定外呼慢
   - 后端搜索提速已落地：searchService 询价与平台搜索并行；carrierService per-channel 3s 硬超时；currency.js fx 失败 10 分钟冷却（否则外呼失败 updatedAt 不更新导致每次搜索重试）；warm 搜索应 <20ms，首搜冷启动含 fx+4PX 询价约 1-3s
   - 前端 api.js 降级层提速：GET 超时 2.5s 快速失败 → 全局 backendDown 标记（后续 0ms 走快照）→ 60s 一次 probeBackend 探活恢复；模块加载即预热 meta+默认快照
+
+[渠道真实凭据缺失现状与快照降级链]
+- Date: 2026-10-07
+- Context: 重抓快照时发现渠道报价全空，逐层排查定位凭据缺失
+- Category: Environment Configuration
+- Instructions:
+  - 渠道凭据存储优先级：admin_db.json 的 carriers 配置 > .env 静态配置（CARRIER_* 变量）> 内置默认；排查用 python 检查 .env 值长度（勿打印真实值）与 admin_db.json 的 keys
+  - 当前现状（2026-10-07）：.env 全部 CARRIER_* 为空、admin_db.json carriers 无凭据键（仅顺丰 sfintl 有生产凭据）；yuntrack/4px/dhl/ups/fedex/ems 全部未配置
+  - 无真实报价时搜索链路 fallback 到 data/shipping.js 静态费率表（carrier 字段=「云途专线」，estimate 模式产品名带「经济专线/标准快递/特快专递」后缀）——快照与演示数据因此带这两个中文名，英文界面靠 carrier.js/预渲染脚本映射为 YunExpress Line/Economy Line
+  - 渠道 API 失败时 fetchQuotes 返回空不写缓存（每 30min 内会重试真实 API）；顺丰凭据在但服务未授权（1004），quote 超时 3s 由 per-channel 硬超时兜住
+  - 若渠道 API 凭据重新可用：直接重跑 web/scripts/gen-demo-snapshots.sh 即可让快照带上真实多渠道报价
