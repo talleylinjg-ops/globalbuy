@@ -15,7 +15,7 @@ This is the complete reference for CrossBuy (https://globalbuy.pages.dev/), a cr
 - Currencies: 140+ display currencies with live FX rates; item prices are quoted in CNY and converted for display.
 - Service fee: buyer-selected 0%-30% (default 5%), shown as a separate line.
 - Languages: Simplified Chinese (zh-CN), English (en), Spanish (es).
-- Pre-rendered keyword landing pages: https://globalbuy.pages.dev/p/keyboard/, https://globalbuy.pages.dev/p/luggage/, https://globalbuy.pages.dev/p/phone-case/, https://globalbuy.pages.dev/p/smart-watch/, https://globalbuy.pages.dev/p/sneakers/, https://globalbuy.pages.dev/p/wireless-earbuds/
+- Pre-rendered keyword landing pages: https://globalbuy.pages.dev/p/cat-toys/, https://globalbuy.pages.dev/p/keyboard/, https://globalbuy.pages.dev/p/led-lamp/, https://globalbuy.pages.dev/p/luggage/, https://globalbuy.pages.dev/p/phone-case/, https://globalbuy.pages.dev/p/smart-watch/, https://globalbuy.pages.dev/p/snacks/, https://globalbuy.pages.dev/p/sneakers/, https://globalbuy.pages.dev/p/thermos/, https://globalbuy.pages.dev/p/wireless-charger/, https://globalbuy.pages.dev/p/wireless-earbuds/, https://globalbuy.pages.dev/p/yoga-mat/
 
 ## FAQ (full text)
 
@@ -51,48 +51,88 @@ Yes. The service fee is buyer-selected (0%-30%, default 5%) and shown as a separ
 
 ## Product catalog snapshot (per keyword)
 
+## Cat Toys (https://globalbuy.pages.dev/p/cat-toys/)
+
+1. Cat Catnip Toy Realistic Fish Cat Chew Toy Teething Calming Hairball Remover Budget — item $1.47 USD, landed $9.16 USD (8-15 days), from Pinduoduo
+2. Cat Toy Turntable Ball Cat Teaser Wand Self-playing Boredom Relief Interactive Puzzle Official Store — item $4.45 USD, landed $16.16 USD (8-15 days), from JD.com
+3. Cat Automatic Cat Teaser Toy Electric Self-rolling Ball Cat Play Boredom Relief Pet Supplies — item $7.43 USD, landed $21.96 USD (8-15 days), from Taobao
+
 ## Keyboard (https://globalbuy.pages.dev/p/keyboard/)
 
-1. Mechanical Keyboard 87-Key Blue Switch Backlit Esports Gaming Office Great Value Free Shipping — item $7.43 USD, landed $31.61 USD (3-10 days), from Pinduoduo
-2. Mechanical Keyboard Factory 87-Key Hot-swappable Switch Optional Wholesale OEM Cross-border Supply — item $5.80 USD, landed $29.43 USD (3-10 days), from 1688
-3. Mechanical Keyboard 87-Key Brown Switch Blue Switch Backlit Wired Office Gaming Computer Keyboard — item $13.24 USD, landed $40.97 USD (3-10 days), from Taobao
-4. Mechanical Keyboard 87-Key Hot-swappable RGB Backlit Gaming Office Official Store 2-Year Warranty — item $22.17 USD, landed $56.44 USD (3-10 days), from JD.com
+1. Mechanical Keyboard 87-Key Blue Switch Backlit Esports Gaming Office Great Value Free Shipping — item $7.43 USD, landed $29.19 USD (8-15 days), from Pinduoduo
+2. Mechanical Keyboard Factory 87-Key Hot-swappable Switch Optional Wholesale OEM Cross-border Supply — item $5.81 USD, landed $26.84 USD (8-15 days), from 1688
+3. Mechanical Keyboard 87-Key Brown Switch Blue Switch Backlit Wired Office Gaming Computer Keyboard — item $13.26 USD, landed $38.57 USD (8-15 days), from Taobao
+4. Mechanical Keyboard 87-Key Hot-swappable RGB Backlit Gaming Office Official Store 2-Year Warranty — item $22.20 USD, landed $53.63 USD (8-15 days), from JD.com
+
+## LED Desk Lamp (https://globalbuy.pages.dev/p/led-lamp/)
+
+1. LED Lamp Dorm Essential Rechargeable Foldable 3-Level Dimming Student Bedside Lamp — item $2.96 USD, landed $15.43 USD (8-15 days), from Pinduoduo
+2. LED Lamp Eye-care Study Lamp Touch Dimming Stepless Color Temperature Reading & Writing Desktop Light — item $13.26 USD, landed $36.55 USD (8-15 days), from Taobao
+3. LED Lamp National AA Grade Eye-care Flicker-free Full Spectrum Smart Light Sensor Official Store — item $26.67 USD, landed $60.15 USD (8-15 days), from JD.com
 
 ## Luggage (https://globalbuy.pages.dev/p/luggage/)
 
-1. Luggage 20-inch Carry-on Luggage Hard Shell Spinner Wheels Large Capacity Student Travel Special Offer — item $11.76 USD, landed $74.57 USD (3-10 days), from Pinduoduo
-2. Luggage Factory Aluminum Alloy Shell 20/ 24-inch Spinner Wheels OEM Customizable Foreign Trade Wholesale — item $10.12 USD, landed $73.97 USD (3-10 days), from 1688
-3. Luggage 20-inch Carry-on Luggage Lightweight Spinner Wheels Reinforced Zipper Matte Scratch-resistant — item $38.54 USD, landed $122.29 USD (3-10 days), from Taobao
-4. Luggage 24-inch Spinner Wheels Aluminum Alloy Trolley TSA Lock Hard Shell Luggage Official Store — item $68.30 USD, landed $207.82 USD (3-10 days), from JD.com
+1. Luggage 20-inch Carry-on Luggage Hard Shell Spinner Wheels Large Capacity Student Travel Special Offer — item $11.77 USD, landed $58.68 USD (8-15 days), from Pinduoduo
+2. Luggage Factory Aluminum Alloy Shell 20/ 24-inch Spinner Wheels OEM Customizable Foreign Trade Wholesale — item $10.13 USD, landed $57.24 USD (8-15 days), from 1688
+3. Luggage 20-inch Carry-on Luggage Lightweight Spinner Wheels Reinforced Zipper Matte Scratch-resistant — item $38.59 USD, landed $105.61 USD (8-15 days), from Taobao
+4. Luggage 24-inch Spinner Wheels Aluminum Alloy Trolley TSA Lock Hard Shell Luggage Official Store — item $68.39 USD, landed $177.72 USD (8-15 days), from JD.com
 
 ## Phone Case (https://globalbuy.pages.dev/p/phone-case/)
 
-1. Phone Case Factory Silicone Phone Case Apple All Series Wholesale Cross-border Supply Customizable LOGO — item $0.52 USD, landed $9.57 USD (3-10 days), from 1688
-2. Apple Phone Case iPhone All Series Silicone Soft Case Drop-proof Minimalist Multiple Colors — item $1.32 USD, landed $10.87 USD (3-10 days), from Pinduoduo
-3. Apple Phone Case iPhone 15 14 13 Silicone Drop-proof Minimalist Matte Full Coverage — item $2.96 USD, landed $13.50 USD (3-10 days), from Taobao
-4. Apple Phone Case iPhone 15 Pro Magnetic Clear Drop-proof Official Accessory Authenticity Guaranteed — item $4.32 USD, landed $15.68 USD (3-10 days), from JD.com
+1. Phone Case Factory Silicone Phone Case Apple All Series Wholesale Cross-border Supply Customizable LOGO — item $0.52 USD, landed $7.28 USD (8-15 days), from 1688
+2. Apple Phone Case iPhone All Series Silicone Soft Case Drop-proof Minimalist Multiple Colors — item $1.33 USD, landed $8.57 USD (8-15 days), from Pinduoduo
+3. Apple Phone Case iPhone 15 14 13 Silicone Drop-proof Minimalist Matte Full Coverage — item $2.96 USD, landed $11.21 USD (8-15 days), from Taobao
+4. Apple Phone Case iPhone 15 Pro Magnetic Clear Drop-proof Official Accessory Authenticity Guaranteed — item $4.32 USD, landed $13.39 USD (8-15 days), from JD.com
 
 ## Smart Watch (https://globalbuy.pages.dev/p/smart-watch/)
 
-1. Smart Watch Men Large Screen Step Counter Sleep Tracking Call Alerts Budget Bestseller — item $7.43 USD, landed $20.69 USD (3-10 days), from Pinduoduo
-2. Smart Watch Bluetooth Calling Heart Rate Monitor Sports Waterproof Multiple Watch Faces Long Battery Life — item $23.66 USD, landed $46.83 USD (3-10 days), from Taobao
-3. Smart Watch HD Large Screen AMOLED Blood Oxygen Heart Rate Alipay NFC Sports Mode — item $35.57 USD, landed $65.99 USD (3-10 days), from JD.com
+1. Smart Watch Men Large Screen Step Counter Sleep Tracking Call Alerts Budget Bestseller — item $7.43 USD, landed $19.80 USD (8-15 days), from Pinduoduo
+2. Smart Watch Bluetooth Calling Heart Rate Monitor Sports Waterproof Multiple Watch Faces Long Battery Life — item $23.69 USD, landed $46.24 USD (8-15 days), from Taobao
+3. Smart Watch HD Large Screen AMOLED Blood Oxygen Heart Rate Alipay NFC Sports Mode — item $35.61 USD, landed $65.70 USD (8-15 days), from JD.com
+
+## Snacks (https://globalbuy.pages.dev/p/snacks/)
+
+1. Tanghulu Hawthorn Dried Fruit Tanghulu Snacks Sweet & Sour Appetizing Bulk Great Value — item $2.37 USD, landed $14.61 USD (8-15 days), from Pinduoduo
+2. Freeze-dried Freeze-dried Dragon Fruit No Additives Fruit Crisps Snacks Casual Snacks Pregnancy-safe — item $4.45 USD, landed $16.88 USD (8-15 days), from Taobao
+3. Nuts Snacks Gift Box OEM Mixed Dried Fruit Wholesale OEM Cross-border Export Festival Goods — item $3.28 USD, landed $21.55 USD (8-15 days), from 1688
+4. Freeze-dried Mixed Dried Fruit 100% Real Fruit Sugar-free Multi Fruit Healthy Snacks Self-operated — item $6.70 USD, landed $23.45 USD (8-15 days), from JD.com
 
 ## Sneakers (https://globalbuy.pages.dev/p/sneakers/)
 
-1. Sneakers Casual Running Shoes Breathable Mesh Soft Sole Height Increasing Unisex Clearance Offer — item $5.94 USD, landed $28.65 USD (3-10 days), from Pinduoduo
-2. Sneakers Factory Running Shoes Mesh Breathable Unisex OEM OEM Cross-border Wholesale — item $5.21 USD, landed $26.76 USD (3-10 days), from 1688
-3. Sneakers Running Shoes Lightweight Breathable Responsive Cushioning Unisex Stylish & Versatile — item $29.61 USD, landed $67.81 USD (3-10 days), from Taobao
-4. Running Shoes Cushioned Support Pro Sneakers Lightweight Mesh Breathable Official Store — item $53.42 USD, landed $107.19 USD (3-10 days), from JD.com
+1. Sneakers Casual Running Shoes Breathable Mesh Soft Sole Height Increasing Unisex Clearance Offer — item $5.94 USD, landed $26.65 USD (8-15 days), from Pinduoduo
+2. Sneakers Factory Running Shoes Mesh Breathable Unisex OEM OEM Cross-border Wholesale — item $5.21 USD, landed $25.01 USD (8-15 days), from 1688
+3. Sneakers Running Shoes Lightweight Breathable Responsive Cushioning Unisex Stylish & Versatile — item $29.65 USD, landed $66.28 USD (8-15 days), from Taobao
+4. Running Shoes Cushioned Support Pro Sneakers Lightweight Mesh Breathable Official Store — item $53.49 USD, landed $106.13 USD (8-15 days), from JD.com
+
+## Thermos (https://globalbuy.pages.dev/p/thermos/)
+
+1. Water Bottle 316 Stainless Steel Large Capacity Portable Great Value Student Office Fall & Winter Essential — item $3.56 USD, landed $16.32 USD (8-15 days), from Pinduoduo
+2. Water Bottle Factory 316 Stainless Steel Large Capacity OEM Customizable Cross-border Wholesale Dropshipping Available — item $2.76 USD, landed $15.01 USD (8-15 days), from 1688
+3. Water Bottle 316 Stainless Steel Large Capacity Portable Unisex Business Office Leak-proof — item $7.30 USD, landed $22.41 USD (8-15 days), from Taobao
+4. Water Bottle 316 Stainless Steel Large Capacity Keeps Hot & Cold Portable Official Store Trusted Purchase — item $11.77 USD, landed $29.97 USD (8-15 days), from JD.com
+
+## Wireless Charger (https://globalbuy.pages.dev/p/wireless-charger/)
+
+1. Wireless Charger 15W Fast Charging Apple Huawei Xiaomi Universal 3-Coil Ultra Slim Portable — item $3.86 USD, landed $12.97 USD (8-15 days), from Pinduoduo
+2. Wireless Charger Factory Direct 15W Fast Charging 3-Coil Cross-border Wholesale Supports OEM — item $2.50 USD, landed $10.86 USD (8-15 days), from 1688
+3. Wireless Charger 15W Fast Charging Apple Huawei Xiaomi Universal Desktop Charging Pad Minimalist — item $6.70 USD, landed $17.55 USD (8-15 days), from Taobao
+4. Wireless Charger Magnetic 15W Fast Charging Compatible with Apple Huawei Xiaomi Officially Certified Safe — item $10.28 USD, landed $23.44 USD (8-15 days), from JD.com
 
 ## Wireless Earbuds (https://globalbuy.pages.dev/p/wireless-earbuds/)
 
-1. Bluetooth Earbuds Wireless Semi In-ear Noise Cancelling Sports Running Mini Portable 1-Year Warranty — item $4.45 USD, landed $15.90 USD (3-10 days), from Pinduoduo
-2. Wireless Bluetooth Earbuds True Wireless Earbuds Noise Cancelling Ultra-long Battery Life Apple Android Universal Great Value — item $5.94 USD, landed $18.29 USD (3-10 days), from Pinduoduo
-3. Bluetooth Earbuds Factory Wireless Sports Earbuds OEM ODM Cross-border Supply OEM Available Dual Chip — item $3.27 USD, landed $14.00 USD (3-10 days), from 1688
-4. Factory Direct Wireless Bluetooth Earbuds True Wireless Noise Cancelling Wholesale Dropshipping Cross-border Ready Bulk Discounts — item $4.24 USD, landed $15.56 USD (3-10 days), from 1688
-5. Bluetooth Earbuds Wireless Sports Earbuds Semi In-ear Earbuds Noise Cancelling Ultra-long Battery Life Xiaomi Android Apple Universal — item $8.91 USD, landed $23.09 USD (3-10 days), from Taobao
-6. Bluetooth Earbuds Wireless Sports Running Earbuds Noise Cancelling In-ear Waterproof & Sweatproof Magnetic Long Battery Life — item $11.76 USD, landed $27.66 USD (3-10 days), from JD.com
-7. Wireless Bluetooth Earbuds True Wireless In-ear Noise Cancelling Sports Running Earbuds Ultra-long Battery Life Huawei Apple Universal — item $13.24 USD, landed $30.06 USD (3-10 days), from Taobao
-8. Wireless Bluetooth Earbuds True Wireless Semi In-ear Noise Cancelling Calls Ultra-long Battery Life Official Authentic 1-Year Warranty — item $22.17 USD, landed $44.43 USD (3-10 days), from JD.com
-9. 【 Official Flagship 】 Wireless Bluetooth Earbuds Active Noise Cancelling True Wireless In-ear Earbuds Low Latency Apple Compatible — item $29.61 USD, landed $56.41 USD (3-10 days), from Tmall
+1. Bluetooth Earbuds Wireless Semi In-ear Noise Cancelling Sports Running Mini Portable 1-Year Warranty — item $4.45 USD, landed $14.47 USD (8-15 days), from Pinduoduo
+2. Wireless Bluetooth Earbuds True Wireless Earbuds Noise Cancelling Ultra-long Battery Life Apple Android Universal Great Value — item $5.94 USD, landed $16.93 USD (8-15 days), from Pinduoduo
+3. Bluetooth Earbuds Factory Wireless Sports Earbuds OEM ODM Cross-border Supply OEM Available Dual Chip — item $3.28 USD, landed $12.64 USD (8-15 days), from 1688
+4. Factory Direct Wireless Bluetooth Earbuds True Wireless Noise Cancelling Wholesale Dropshipping Cross-border Ready Bulk Discounts — item $4.25 USD, landed $14.26 USD (8-15 days), from 1688
+5. Bluetooth Earbuds Wireless Sports Earbuds Semi In-ear Earbuds Noise Cancelling Ultra-long Battery Life Xiaomi Android Apple Universal — item $8.92 USD, landed $21.80 USD (8-15 days), from Taobao
+6. Bluetooth Earbuds Wireless Sports Running Earbuds Noise Cancelling In-ear Waterproof & Sweatproof Magnetic Long Battery Life — item $11.77 USD, landed $26.45 USD (8-15 days), from JD.com
+7. Wireless Bluetooth Earbuds True Wireless In-ear Noise Cancelling Sports Running Earbuds Ultra-long Battery Life Huawei Apple Universal — item $13.26 USD, landed $28.91 USD (8-15 days), from Taobao
+8. Wireless Bluetooth Earbuds True Wireless Semi In-ear Noise Cancelling Calls Ultra-long Battery Life Official Authentic 1-Year Warranty — item $22.20 USD, landed $43.30 USD (8-15 days), from JD.com
+9. 【 Official Flagship 】 Wireless Bluetooth Earbuds Active Noise Cancelling True Wireless In-ear Earbuds Low Latency Apple Compatible — item $29.65 USD, landed $55.43 USD (8-15 days), from Tmall
+
+## Yoga Mat (https://globalbuy.pages.dev/p/yoga-mat/)
+
+1. Yoga Mat Thickened Non-slip Home Use Fitness Mat TPE Eco-friendly Foldable Portable Stylish — item $2.96 USD, landed $25.40 USD (8-15 days), from Pinduoduo
+2. Yoga Mat Factory TPE Thickened Non-slip Fitness Mat Wholesale Cross-border Supply Customization Available — item $1.91 USD, landed $24.35 USD (8-15 days), from 1688
+3. Yoga Mat Thickened Non-slip Fitness Mat Beginner TPE Eco-friendly Double-sided Texture Bonus Storage Bag — item $5.94 USD, landed $30.93 USD (8-15 days), from Taobao
+4. Yoga Mat Thickened Non-slip TPE Eco-friendly Material Fitness Training Mat Double-sided Compatible Quality Assured — item $8.79 USD, landed $36.91 USD (8-15 days), from JD.com

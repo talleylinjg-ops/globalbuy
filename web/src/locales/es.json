@@ -124,7 +124,10 @@
     "羽绒服": "Plumífero",
     "背包": "Mochila",
     "玩具": "Juguetes",
-    "宠物玩具": "Juguetes para mascotas"
+    "宠物玩具": "Juguetes para mascotas",
+    "灯具": "Iluminación",
+    "健身器材": "Equipamiento fitness",
+    "充电器": "Cargadores"
   },
   "keyword": {
     "蓝牙耳机": "Auriculares Bluetooth",

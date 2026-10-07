@@ -18,12 +18,17 @@ function carrierEn(name) {
   if (/4PX|递四方/i.test(s)) return '4PX';
   if (/顺丰/.test(s)) return 'SF International';
   if (/华源/.test(s)) return 'Huayuan';
+  if (/云途/.test(s)) return 'YunExpress Line';
+  // estimate 模式产品名后缀（如「云途专线 经济专线」）
+  if (/经济专线/.test(s)) return 'Economy Line';
+  if (/标准快递/.test(s)) return 'Standard Express';
+  if (/特快专递/.test(s)) return 'Express Courier';
   return CARRIER_EN[s] || s;
 }
 const SHIP_LABEL_EN = { shipFastest: 'Fastest', shipCheapest: 'Cheapest', shipMiddle: 'Middle' };
 const PLATFORM_EN = { '淘宝': 'Taobao', '天猫': 'Tmall', '京东': 'JD.com', '拼多多': 'Pinduoduo', '1688': '1688' };
 const PLATFORM_ID = { '淘宝': 'taobao', '天猫': 'tmall', '京东': 'jd', '拼多多': 'pdd', '1688': '1688' };
-const CATEGORY_EN = { '蓝牙耳机': 'Bluetooth Earbuds', '无线充电器': 'Wireless Chargers', '瑜伽垫': 'Yoga Mats', '保温杯': 'Thermal Bottles', '手机壳': 'Phone Cases', '键盘': 'Keyboards', '智能手表': 'Smart Watches', '运动鞋': 'Sneakers', '行李箱': 'Luggage', 'LED台灯': 'LED Lamps', '宠物玩具': 'Pet Toys', '零食': 'Snacks' };
+const CATEGORY_EN = { '蓝牙耳机': 'Bluetooth Earbuds', '无线充电器': 'Wireless Chargers', '充电器': 'Chargers', '瑜伽垫': 'Yoga Mats', '保温杯': 'Thermal Bottles', '手机壳': 'Phone Cases', '键盘': 'Keyboards', '智能手表': 'Smart Watches', '运动鞋': 'Sneakers', '行李箱': 'Luggage', 'LED台灯': 'LED Lamps', '灯具': 'Lighting', '健身器材': 'Fitness Gear', '宠物玩具': 'Pet Toys', '玩具': 'Toys', '零食': 'Snacks', '默认': 'General' };
 const PRODUCT_NAME_EN = {
   'FED-5DAY-空派DDP小货': 'FED-5DAY Air DDP Small Parcel',
   'FEDEX美国空快-包裹（包税）': 'FEDEX US Air Express (Tax Included)',

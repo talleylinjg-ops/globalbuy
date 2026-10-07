@@ -12,6 +12,9 @@ const DICT = {
   'speaker': '音箱', 'webcam': '摄像头', 'drone': '无人机', 'camera': '相机',
   'microphone': '麦克风', 'earphone': '耳机', 'gaming': '游戏',
   'true wireless': '真无线', 'anc': '主动降噪',
+  // 食品零食
+  'snack': '零食', 'snacks': '零食', 'dried fruit': '果干', 'nuts': '坚果',
+  'tanghulu': '冰糖葫芦', 'freeze-dried': '冻干', 'food': '食品',
   // 服装
   't-shirt': 'T恤', 'tee': 'T恤', 'shirt': '衬衫', 'hoodie': '卫衣',
   'sweatshirt': '卫衣', 'sweater': '毛衣', 'jacket': '夹克', 'coat': '外套',

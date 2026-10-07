@@ -4,6 +4,7 @@ const CARRIER_PATTERNS = [
   ['huayuan', /华源/],
   ['sfintl', /顺丰国际|顺丰/],
   ['sf', /顺丰/],
+  ['yuntrack', /云途|YunTrack|YunExpress/i],
 ];
 
 export function carrierCodeOf(name) {
@@ -21,6 +22,12 @@ const PRODUCT_NAME_EN = {
   'FEDEX美国空快-包裹（包税）': 'FEDEX US Air Express (Tax Included)',
   'HKUPS蓝单南美6000（UPL22）': 'HKUPS Blue Line South America 6000 (UPL22)',
   'USXB-V06美国FEDEX专线小包（不接手表）': 'USXB-V06 US FEDEX Line Small Parcel (No Watches)',
+  '云途专线': 'YunExpress Line',
+  '云途专线小包': 'YunExpress Line Small Parcel',
+  '云途专线标准': 'YunExpress Line Standard',
+  '云途专线 经济专线': 'YunExpress Economy Line',
+  '云途专线 标准快递': 'YunExpress Standard Express',
+  '云途专线 特快专递': 'YunExpress Express Courier',
 };
 
 // 产品名显示：已知映射 → 英文；未知中文名降级为保留 ASCII 码部分（如 INT0014/S5110）

@@ -13,6 +13,12 @@ curl -sf --max-time 30 "$API/api/search?q=smart%20watch&country=US&currency=USD"
 curl -sf --max-time 30 "$API/api/search?q=luggage&country=US&currency=USD" -o "$OUT/search-luggage.json"
 curl -sf --max-time 30 "$API/api/search?q=keyboard&country=US&currency=USD" -o "$OUT/search-keyboard.json"
 curl -sf --max-time 30 "$API/api/search?q=sneakers&country=US&currency=USD" -o "$OUT/search-sneakers.json"
+curl -sf --max-time 30 "$API/api/search?q=wireless%20charger&country=US&currency=USD" -o "$OUT/search-wireless-charger.json"
+curl -sf --max-time 30 "$API/api/search?q=thermos&country=US&currency=USD" -o "$OUT/search-thermos.json"
+curl -sf --max-time 30 "$API/api/search?q=LED%20desk%20lamp&country=US&currency=USD" -o "$OUT/search-led-lamp.json"
+curl -sf --max-time 30 "$API/api/search?q=yoga%20mat&country=US&currency=USD" -o "$OUT/search-yoga-mat.json"
+curl -sf --max-time 30 "$API/api/search?q=cat%20toys&country=US&currency=USD" -o "$OUT/search-cat-toys.json"
+curl -sf --max-time 30 "$API/api/search?q=snacks&country=US&currency=USD" -o "$OUT/search-snacks.json"
 
 # 拷贝快照引用的商品图片，保证离线/降级时图片完整
 IMGS=$(node -e "
