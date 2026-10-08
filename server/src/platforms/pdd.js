@@ -73,11 +73,14 @@ export class PddAdapter extends PlatformAdapter {
 
   async _searchApi(keyword) {
     const page = Math.max(1, Number(opts.page) || 1);
+    // 携带推广位（多多客 ID / PID），返回结果含佣金与推广链接所需字段
+    const pid = this.config.pid || '';
     const data = await this.callApi('pdd.ddk.goods.search', {
       keyword,
       page,
       page_size: 20,
       sort_type: 0,
+      ...(pid ? { pid } : {}),
     });
     const list = data?.goods_search_response?.goods_list || [];
     const items = list.map((g) => this.mapGoods(g)).filter((g) => g.price > 0);
