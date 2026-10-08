@@ -16,7 +16,7 @@ export const CARRIER_ADAPTERS = {
   dhl: { name: 'DHL Express', adapter: DHLAdapter, fields: ['apiKey', 'apiSecret'] },
   ups: { name: 'UPS', adapter: UPSAdapter, fields: ['clientId', 'clientSecret'] },
   fedex: { name: 'FedEx', adapter: FedExAdapter, fields: ['apiKey', 'apiSecret'] },
-  ems: { name: 'EMS', adapter: EMSAdapter, fields: ['userId', 'apiKey'] },
+  ems: { name: 'EMS', adapter: EMSAdapter, fields: ['senderNo', 'authorization', 'userCode', 'baseUrl', 'productCode', 'senderAddress', 'defaultReceiveInfo'] },
   ptdsgj: { name: 'PTD 国际速递', adapter: PtdsgjAdapter, fields: ['token', 'pickupZone'] },
   zjhygj: { name: '华源国际', adapter: ZjhygjAdapter, fields: ['account', 'password', 'branchId'] },
   sfintl: { name: '顺丰国际', adapter: SFIntlAdapter, fields: ['appKey', 'appSecret', 'aesKey', 'customerCode', 'customerType', 'serviceCode', 'baseUrl'] },

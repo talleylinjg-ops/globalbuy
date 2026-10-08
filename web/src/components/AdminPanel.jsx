@@ -18,7 +18,15 @@ const FIELD_LABELS = {
   dhl: { apiKey: 'API Key', apiSecret: 'API Secret' },
   ups: { clientId: 'Client ID', clientSecret: 'Client Secret' },
   fedex: { apiKey: 'API Key', apiSecret: 'API Secret' },
-  ems: { userId: 'User ID', apiKey: 'API Key' },
+  ems: {
+    senderNo: 'admin.fieldEmsSenderNo',
+    authorization: 'admin.fieldEmsAuthorization',
+    userCode: 'admin.fieldEmsUserCode',
+    baseUrl: 'admin.fieldEmsBaseUrl',
+    productCode: 'admin.fieldEmsProductCode',
+    senderAddress: 'admin.fieldEmsSenderAddress',
+    defaultReceiveInfo: 'admin.fieldEmsReceiveInfo',
+  },
   ptdsgj: { token: 'API Token', pickupZone: 'admin.fieldPickupZone' },
   zjhygj: { account: 'admin.fieldAccount', password: 'admin.fieldPassword', branchId: 'admin.fieldBranchId' },
 };

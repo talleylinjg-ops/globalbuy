@@ -377,6 +377,13 @@
     "fieldAccount": "账号",
     "fieldPassword": "密码",
     "fieldBranchId": "租户 ID（branchId）",
+    "fieldEmsSenderNo": "客户代码（senderNo）",
+    "fieldEmsAuthorization": "授权码（authorization）",
+    "fieldEmsUserCode": "用户编码（userCode）",
+    "fieldEmsBaseUrl": "网关地址（baseUrl）",
+    "fieldEmsProductCode": "产品代码（productCode）",
+    "fieldEmsSenderAddress": "寄件地址（senderAddress）",
+    "fieldEmsReceiveInfo": "默认收件地址（receiveInfo）",
     "selectCarrierCo": "选择快递公司"
   },
   "common": {

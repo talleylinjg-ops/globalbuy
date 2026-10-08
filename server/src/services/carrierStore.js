@@ -14,7 +14,15 @@ function seedFromEnv() {
     dhl: { apiKey: process.env.CARRIER_DHL_API_KEY, apiSecret: process.env.CARRIER_DHL_API_SECRET },
     ups: { clientId: process.env.CARRIER_UPS_CLIENT_ID, clientSecret: process.env.CARRIER_UPS_CLIENT_SECRET },
     fedex: { apiKey: process.env.CARRIER_FEDEX_API_KEY, apiSecret: process.env.CARRIER_FEDEX_API_SECRET },
-    ems: { userId: process.env.CARRIER_EMS_USER_ID, apiKey: process.env.CARRIER_EMS_API_KEY },
+    ems: {
+      senderNo: process.env.CARRIER_EMS_SENDER_NO,
+      authorization: process.env.CARRIER_EMS_AUTHORIZATION,
+      userCode: process.env.CARRIER_EMS_USER_CODE,
+      baseUrl: process.env.CARRIER_EMS_BASE_URL,
+      productCode: process.env.CARRIER_EMS_PRODUCT_CODE,
+      senderAddress: process.env.CARRIER_EMS_SENDER_ADDRESS,
+      defaultReceiveInfo: process.env.CARRIER_EMS_DEFAULT_RECEIVE_INFO,
+    },
     ptdsgj: { token: process.env.CARRIER_PTDSGJ_TOKEN, pickupZone: process.env.CARRIER_PTDSGJ_PICKUP_ZONE },
     zjhygj: {
       account: process.env.CARRIER_ZJHYGJ_ACCOUNT,
@@ -34,7 +42,21 @@ function ensureSeeded() {
   if (!db[DB_KEY] || !Array.isArray(db[DB_KEY])) {
     db[DB_KEY] = seedFromEnv();
     saveDb();
+    return;
   }
+  // 已有配置时，用 env 补齐记录中缺失的键（不覆盖管理员已录入的值）
+  let changed = false;
+  for (const seed of seedFromEnv()) {
+    const rec = db[DB_KEY].find((r) => r.id === seed.id);
+    if (!rec) continue;
+    for (const [k, v] of Object.entries(seed)) {
+      if (v && (rec[k] === undefined || rec[k] === null || rec[k] === '')) {
+        rec[k] = v;
+        changed = true;
+      }
+    }
+  }
+  if (changed) saveDb();
 }
 
 export function getCarrierConfigs() {
@@ -76,7 +98,7 @@ export function deleteCarrier(id) {
 // 是否存在真实（非估算）快递商配置
 export function hasRealCarrier() {
   return getCarrierConfigs().some((c) => {
-    const keys = ['apiKey', 'appKey', 'appId', 'clientId', 'userId', 'token', 'account'];
+    const keys = ['apiKey', 'appKey', 'appId', 'clientId', 'userId', 'token', 'account', 'senderNo', 'authorization'];
     return keys.some((k) => c[k]);
   });
 }

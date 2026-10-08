@@ -425,6 +425,13 @@
     "fieldAccount": "Cuenta",
     "fieldPassword": "Contraseña",
     "fieldBranchId": "ID de inquilino (branchId)",
+    "fieldEmsSenderNo": "Código de remitente (senderNo)",
+    "fieldEmsAuthorization": "Código de autorización (authorization)",
+    "fieldEmsUserCode": "Código de usuario (userCode)",
+    "fieldEmsBaseUrl": "URL de pasarela (baseUrl)",
+    "fieldEmsProductCode": "Código de producto (productCode)",
+    "fieldEmsSenderAddress": "Dirección del remitente (senderAddress)",
+    "fieldEmsReceiveInfo": "Dirección de destinatario (receiveInfo)",
     "selectCarrierCo": "Seleccionar transportista"
   },
   "carrierName": {

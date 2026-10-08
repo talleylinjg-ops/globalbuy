@@ -390,6 +390,13 @@
     "fieldAccount": "Account",
     "fieldPassword": "Password",
     "fieldBranchId": "Tenant ID (branchId)",
+    "fieldEmsSenderNo": "Sender No (senderNo)",
+    "fieldEmsAuthorization": "Authorization code (authorization)",
+    "fieldEmsUserCode": "User code (userCode)",
+    "fieldEmsBaseUrl": "Gateway URL (baseUrl)",
+    "fieldEmsProductCode": "Product code (productCode)",
+    "fieldEmsSenderAddress": "Sender address (senderAddress)",
+    "fieldEmsReceiveInfo": "Default recipient address (receiveInfo)",
     "selectCarrierCo": "Select courier"
   },
   "common": {
