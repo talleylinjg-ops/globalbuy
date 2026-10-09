@@ -50,9 +50,12 @@ export class EMSAdapter extends CarrierAdapter {
     }
     let data;
     try {
+      // 网关要求 x-www-form-urlencoded 表单提交，logitcsInterface 为 JSON 字符串
+      const form = new URLSearchParams(this.envelope(apiCode, bizBody));
       data = await httpRequest(this.baseUrl, {
         method: 'POST',
-        body: this.envelope(apiCode, bizBody),
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: form.toString(),
         timeout: 8000,
       });
     } catch (e) {
@@ -68,9 +71,10 @@ export class EMSAdapter extends CarrierAdapter {
   // V2.7 5.24 预估邮费接口（productCode / weight克 / senderInfo / receiveInfo）
   async quote(p) {
     const { chargedKg } = CarrierAdapter.chargedWeight(p.weightKg, p.dims);
-    const receiveInfo = p.receiveInfo || this.cfg.defaultReceiveInfo;
+    // 优先显式传入的收件地址，其次配置的默认收件地址，最后同址寄递（连通性验证用）
+    const receiveInfo = p.receiveInfo || this.cfg.defaultReceiveInfo || this.cfg.senderAddress;
     if (!this.cfg.senderAddress || !receiveInfo) {
-      throw new CarrierError('EMS 预估邮费需配置寄件地址(senderAddress)与默认收件地址(defaultReceiveInfo)', 'NOT_CONFIGURED');
+      throw new CarrierError('EMS 预估邮费需配置寄件地址(senderAddress)', 'NOT_CONFIGURED');
     }
     const bizBody = {
       productCode: this.cfg.productCode || DEFAULT_PRODUCT_CODE,
