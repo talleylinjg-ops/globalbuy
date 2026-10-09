@@ -22,6 +22,12 @@
   - Luggage: https://globalbuy.pages.dev/p/luggage/
   - Keyboards: https://globalbuy.pages.dev/p/keyboard/
   - Sneakers: https://globalbuy.pages.dev/p/sneakers/
+  - Wireless chargers: https://globalbuy.pages.dev/p/wireless-charger/
+  - Thermos & tumblers: https://globalbuy.pages.dev/p/thermos/
+  - LED lamps: https://globalbuy.pages.dev/p/led-lamp/
+  - Yoga mats: https://globalbuy.pages.dev/p/yoga-mat/
+  - Cat toys: https://globalbuy.pages.dev/p/cat-toys/
+  - Chinese snacks: https://globalbuy.pages.dev/p/snacks/
 - Full reference for LLMs: https://globalbuy.pages.dev/llms-full.txt
 - Currency display: buyer-selectable (USD, EUR, GBP, JPY, and 20+ more); prices auto-converted from CNY.
 - Typical delivery: 5-10 business days by economical lines, 3-7 by express lines (varies by destination).

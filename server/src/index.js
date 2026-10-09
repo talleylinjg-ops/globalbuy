@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import { existsSync } from 'node:fs';
 import { config } from './config.js';
 import { loadDb } from './services/db.js';
 import apiRouter from './routes/index.js';
@@ -18,6 +19,18 @@ await loadDb().then(() => console.log('[db] MySQL ready')).catch((e) => {
 app.use(express.static(new URL('../public', import.meta.url).pathname, { maxAge: '7d' }));
 
 app.use('/api', apiRouter);
+
+// VPS 单端口部署：伺服前端构建产物（web/dist），API 路由以上已优先注册
+const webDist = new URL('../../web/dist', import.meta.url).pathname;
+if (existsSync(webDist)) {
+  app.use(express.static(webDist, { maxAge: '1d', index: ['index.html'] }));
+  // SPA / 落地页兜底：非 /api 请求返回 index.html（/p/* 为真实文件，静态中间件已命中）
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api/')) return next();
+    res.sendFile(`${webDist}/index.html`);
+  });
+  console.log('[server] serving web/dist static files');
+}
 
 // 统一错误处理
 app.use((err, req, res, next) => {

@@ -241,11 +241,19 @@ for (const file of files) {
     ? `<nav class="seo-related"><h2>Popular searches</h2><ul>${allPages.filter((p) => p.slug !== slug).map((p) => `<li><a href="/p/${p.slug}/">${esc(p.kw)}</a></li>`).join('')}</ul></nav>`
     : '';
 
+  // LCP 预加载：取首张产品图
+  const lcpItem = items[0];
+  const lcpImg = lcpItem && lcpItem.imageUrl
+    ? (lcpItem.imageUrl.startsWith('/demo/') ? lcpItem.imageUrl : `/demo${lcpItem.imageUrl}`)
+    : '';
+
   const productsLd = items.map((item, idx) => {
     const b = item.landed.breakdown;
     const titleEn = item.titleEn && item.titleEn !== item.title ? item.titleEn : item.title;
     const platform = PLATFORM_EN[item.platform] || item.platform;
   const imgPath = item.imageUrl ? (item.imageUrl.startsWith('/demo/') ? item.imageUrl : `/demo${item.imageUrl}`) : '';
+    // rating 为百分制（如 97.5），转 5 分制供 Google 富摘要
+    const rating5 = item.rating ? (item.rating / 20).toFixed(1) : null;
     return {
       '@type': 'ListItem',
       position: idx + 1,
@@ -253,6 +261,9 @@ for (const file of files) {
         '@type': 'Product',
         name: titleEn,
         image: imgPath ? [`${SITE}${imgPath}`] : undefined,
+        ...(rating5 && item.reviews
+          ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: rating5, bestRating: '5', worstRating: '1', reviewCount: Number(item.reviews) || undefined } }
+          : {}),
         offers: {
           '@type': 'Offer',
           price: b.goodsValue != null ? Number(b.goodsValue).toFixed(2) : undefined,
@@ -315,6 +326,7 @@ for (const file of files) {
     <meta name="twitter:image" content="${SITE}/og.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="${SITE}/favicon-32.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="${SITE}/apple-touch-icon.png" />
+    ${lcpImg ? `<link rel="preload" as="image" href="${SITE}${lcpImg}" fetchpriority="high" />` : ''}
     ${cssLinks}
     <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
   </head>

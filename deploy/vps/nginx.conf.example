@@ -1,0 +1,32 @@
+# CrossBuy Nginx 反向代理模板（TLS 由 certbot 自动填充）
+# 用法：
+#   sudo cp nginx.conf.example /etc/nginx/sites-available/crossbuy.conf
+#   sudo ln -s /etc/nginx/sites-available/crossbuy.conf /etc/nginx/sites-enabled/
+#   sudo certbot --nginx -d your-domain.com
+server {
+    listen 80;
+    server_name your-domain.com;
+
+    # 前端 + API 均由 Node 单端口伺服
+    location / {
+        proxy_pass http://127.0.0.1:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 60s;
+    }
+
+    # 静态资源长缓存（Vite 带 hash）
+    location ~* \.(js|css|png|jpg|jpeg|webp|svg|ico|woff2?)$ {
+        proxy_pass http://127.0.0.1:3001;
+        proxy_set_header Host $host;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript image/svg+xml;
+    gzip_min_length 1024;
+}
