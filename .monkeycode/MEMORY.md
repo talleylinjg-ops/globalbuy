@@ -131,6 +131,7 @@ Entries discovered by the Agent during task execution should follow this format:
   - 渠道凭据存储优先级：admin_db.json 的 carriers 配置 > .env 静态配置（CARRIER_* 变量）> 内置默认；排查用 python 检查 .env 值长度（勿打印真实值）与 admin_db.json 的 keys
   - 当前现状（2026-10-08）：.env 全部 CARRIER_* 为空、admin_db.json carriers 无凭据键（仅顺丰 sfintl 有生产凭据）；yuntrack/4px/dhl/ups/fedex 全部未配置
   - EMS 已对接《中小电商企业接口规范 V2.7》（4cf0c0d）：适配器按公共信封（apiCode/senderNo/authorization/timeStamp/logitcsInterface）封装，报价走 050005 预估邮费（返回人民币经 cnyToCurrency 转 USD）；凭据键 CARRIER_EMS_SENDER_NO/CARRIER_EMS_AUTHORIZATION/CARRIER_EMS_BASE_URL 等 7 个已在 .env 占位；**网关地址 V2.7 文档不含，需向邮政接入函索取**；050005 产品代码表均为国内产品（默认电商标快 115104300000691），跨境段资费待邮政国际产品接入
+  - EMS 网关实测要点（2026-10-09）：地址 https://api.ems.com.cn/amp-prod-api/f/amp/api/open、POST x-www-form-urlencoded（logitcsInterface 传 JSON 字符串）；senderNo 必须用客户代码 C1100296646500（用协议客户号 1100248949682 会报「客户未关联API接口」）；白名单层之前未强制 sign 签名（signKey 已存 .env 备用）；当前阻塞：沙箱出口 IP 123.56.157.253 未在协议客户 IP 白名单，需用户在邮政后台加白后重测
   - 无真实报价时搜索链路 fallback 到 data/shipping.js 静态费率表（carrier 字段=「云途专线」，estimate 模式产品名带「经济专线/标准快递/特快专递」后缀）——快照与演示数据因此带这两个中文名，英文界面靠 carrier.js/预渲染脚本映射为 YunExpress Line/Economy Line
   - 渠道 API 失败时 fetchQuotes 返回空不写缓存（每 30min 内会重试真实 API）；顺丰凭据在但服务未授权（1004），quote 超时 3s 由 per-channel 硬超时兜住
   - 若渠道 API 凭据重新可用：直接重跑 web/scripts/gen-demo-snapshots.sh 即可让快照带上真实多渠道报价
