@@ -137,3 +137,14 @@ Entries discovered by the Agent during task execution should follow this format:
   - 无真实报价时搜索链路 fallback 到 data/shipping.js 静态费率表（carrier 字段=「云途专线」，estimate 模式产品名带「经济专线/标准快递/特快专递」后缀）——快照与演示数据因此带这两个中文名，英文界面靠 carrier.js/预渲染脚本映射为 YunExpress Line/Economy Line
   - 渠道 API 失败时 fetchQuotes 返回空不写缓存（每 30min 内会重试真实 API）；顺丰凭据在但服务未授权（1004），quote 超时 3s 由 per-channel 硬超时兜住
   - 若渠道 API 凭据重新可用：直接重跑 web/scripts/gen-demo-snapshots.sh 即可让快照带上真实多渠道报价
+
+[4PX 凭据存储与配置生效机制]
+- Date: 2026-10-12
+- Context: 4PX 凭据丢失事故排查（9/23 后台配置的三件套被 10/9 存储初始化覆盖）
+- Category: Environment Configuration
+- Instructions:
+  - carriers 真实存储在 MySQL settings 表 k='carriers'（JSON 数组）；server/data/admin_db.json 是 9/8 迁移前的遗留文件，其 carriers 段已废弃，勿作为排查依据
+  - .env 的 CARRIER_* 键修改后 node --watch 不会自动重启（不监听 .env），必须 touch server/src/services/carrierService.js 或 carrierStore.js 触发重启才生效
+  - ensureSeeded 补齐逻辑「不覆盖非空值」，但首次从 seedFromEnv 初始化会用空 env 值覆盖整库（已发生一次凭据丢失事故）；改 carrierStore 结构前先确认 settings.carriers 现有值
+  - 4PX 真实报价耗时约 6 秒，carrierService per-job 超时已从 3s 放宽到 12s；报价缓存 TTL 30 分钟，全失败空结果也会被缓存，调试时需 touch 清缓存
+  - MySQL log_bin=OFF，binlog 未开启，数据误覆盖无法从 binlog 恢复
