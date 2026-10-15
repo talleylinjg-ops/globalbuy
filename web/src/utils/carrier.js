@@ -28,6 +28,16 @@ const PRODUCT_NAME_EN = {
   '云途专线 经济专线': 'YunExpress Economy Line',
   '云途专线 标准快递': 'YunExpress Standard Express',
   '云途专线 特快专递': 'YunExpress Express Courier',
+  '云途全球专线挂号（特快带电）': 'YunExpress Global Line Registered (Express, Battery)',
+  '云途全球专线挂号（标快带电）': 'YunExpress Global Line Registered (Standard, Battery)',
+  '云途全球专线挂号（特惠带电）': 'YunExpress Global Line Registered (Economy, Battery)',
+  '云途全球精选专线挂号（特惠带电）': 'YunExpress Global Select Line Registered (Economy, Battery)',
+  '云途全球云选专线挂号（带电）': 'YunExpress Global Choice Line Registered (Battery)',
+  '云途岛屿专线（特惠带电）': 'YunExpress Islands Line (Economy, Battery)',
+  '云途中包专线挂号（特惠带电）': 'YunExpress Mid-Bag Line Registered (Economy, Battery)',
+  '云途大货18000专线挂号（特惠带电）': 'YunExpress Bulk 18000 Line Registered (Economy, Battery)',
+  'WM云途全球专线挂号（标快带电）': 'WM YunExpress Global Line Registered (Standard, Battery)',
+  'WM云途全球专线挂号（特惠带电）': 'WM YunExpress Global Line Registered (Economy, Battery)',
 };
 
 // 产品名显示：已知映射 → 英文；未知中文名降级为保留 ASCII 码部分（如 INT0014/S5110）

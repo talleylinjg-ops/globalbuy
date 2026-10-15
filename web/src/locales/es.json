@@ -437,7 +437,8 @@
   "carrierName": {
     "sfintl": "SF Internacional",
     "4px": "4PX Express",
-    "huayuan": "Logística Huayuan"
+    "huayuan": "Logística Huayuan",
+    "yuntrack": "YunExpress"
   },
   "geo": {
     "priority": "Mercados clave",

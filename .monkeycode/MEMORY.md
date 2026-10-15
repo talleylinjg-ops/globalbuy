@@ -86,6 +86,9 @@ Entries discovered by the Agent during task execution should follow this format:
   - 校验顺序：token -> 权限(1004) -> 签名(2001) -> 客户(123149 客户信息不存在) -> 字段(127009 税金结算账号不合法)；paymentInfo 缺失或畸形 -> 业务 code=-1 系统异常
   - 沙盒已验证产品码：INT0014（0.5kg CN->US 报 ¥52 CNY，含住宅附加费）、INT0007（¥55，计费重取整 1kg）；INT0263/INT0255 沙盒无数据返回空 feeInfoList
   - 沙盒凭据（appKey be287d...、customerCode ICRME000SRN93）已配置进 db；生产凭据（appKey 39a47...）待「API 授权」审批通过（IUOP预估费用/快递柜查询/宅配延伸服务 2026-09-23 申请待审批），通过后仅改 baseUrl+appKey+appSecret+aesKey+customerCode
+  - 2026-10-13 交叉验证：SIT 与生产凭据严格隔离（互打 1005 App is not exist）；生产凭据 token 通、dispatch 1004 没权限=「IUOP预估费用」生产授权仍未批（与 9/23 申请待审批吻合）；SIT 凭据服务已授权（参数校验链全部正常应答），但 10/13 起任何真实产品码（INT0014/INT0262/INT0001）查价即业务 code=-1 系统异常（9/26 曾正常报价）——SIT 计费配置退化，需顺丰侧修复；崩溃点定位法：空biz→逐字段累加，customerCode→senderInfo→receiverInfo 依次报「客户编码必填/寄件方国家必填/到件方邮编必填」，postCode 过后即崩=查价环节
+  - 顺丰凭据 10/13 曾因 10/9 存储事故丢失（carriers 里仅剩空壳），已从历史记录恢复写回 MySQL settings（appKey 39a47.../customerCode 21012844/baseUrl api-ifsp.sf.global）；顺丰生产网关是 https://api-ifsp.sf.global（历史上曾误记 api.ifsp.sf.global）
+  - 2026-10-14 顺丰技术答复：直接生产联调（沙箱配置与生产不一致）；电商业务用 msgType=IPE_ESTIMATE_FEE（预估总运费，菜单 218）；文档站 openapi-portal.sf.global 内容 API=/openapi/console/noLogin/online/doc/{menuId}/zh-CN（返回签名 GCS URL 再下载正文）、菜单树=/doc/menu/list；接口清单：IPE_ESTIMATE_FEE(218 电商预估总运费)/IECS_QUERY_WEIGHT_FREIGHT(110 重量及运费查询-电商预付)/IOMS_QUERY_CHARGE(133 计费重和费用项查询-月结)/IUOP_ESTIMATE_FEE(85 国际快递预估运费)；1004 的解法=登录 http://openapi.sf.global/ →应用列表→详情→关联 API（181 关联API指引），需门户账号登录自助操作，已请用户关联 IPE_ESTIMATE_FEE；IPE_ESTIMATE_FEE 参数与 IUOP 版本基本一致，addServiceInfo.serviceCodeList 必填、paymentInfo/cargoInfo 非必填，电商产品码示例 INT0263
   - 适配器 sfinternational.js + sfcrypto.js；fields：appKey/appSecret/aesKey/customerCode/customerType/serviceCode(=msgType)/baseUrl
 
 [前端静态快照降级层（前台浏览零依赖后端）]
