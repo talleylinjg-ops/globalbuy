@@ -73,6 +73,21 @@ Entries discovered by the Agent during task execution should follow this format:
   - B 类客户（4PX 直接客户）access_token 可不传；沙箱域名 open-test.4px.com
   - 4px.js 的 productName 目前显示产品代码（如 S5537），产品中文名对照需产品列表接口（FOP 控制台查，待定）
 
+[云途 YunTrack OpenAPI 对接规范（已上线）]
+- Date: 2026-10-15（/v1/price-trial/get 报价全链路打通）
+- Context: 云途适配器按官方规范重写并上线真实报价
+- Category: Build Methods
+- Instructions:
+  - 网关 https://openapi.yunexpress.cn；token POST /openapi/oauth2/token body {grantType:'client_credentials', appId, appSecret}（不带 sourceKey），返回 accessToken（7200s）；响应字段名是 accessToken（曾误写 access_token 拿到 undefined）
+  - 签名 HMAC-SHA256(appSecret, 原文)→Base64；POST 原文="body=<紧凑json>&date=<ms>&method=POST&uri=<path>"；GET 原文="date=<ms>&method=GET&uri=<path?query>"（无 body= 键；uri 含 query string）
+  - 请求头 token/date/sign/Accept-Language:zh-CN/Content-Type:application/json;charset=utf-8
+  - 运费试算 GET /v1/price-trial/get（参数 snake_case）：country_code/weight(KG,3位小数)/weight_unit=KG/package_type(E带电,C普货,F特货)/postal_code/product_group_code/pieces/length/width/height/origin；POST 不存在（0200404001）
+  - 响应 result[] 是费用项列表（fee_name E1/E2 等分项），同 product_code+price_name 聚合 convert_amount 求和=产品总价；币种 RMB 经 cnyToCurrency 转 USD；interval_day "3-8" 格式
+  - USB2B- 开头是 B2B 大货渠道（香港联邦 1500+ RMB），轻小件场景已过滤；电商常用产品：THZXR 特惠带电/WMTHZXR 74.5 RMB 8-12天/BKZXR 标快 127 RMB 3-8 天（0.5kg 美国）
+  - 路由语义（实测）：不存在路径无 token 返回 401 0200401001（网关统一过滤器）、带 token /v1/* 报 0200404001、/openapi/* 报 403 0200403101——均=路径不存在，云途无 IP 白名单；0200401002 令牌无效=签名错或 token 字段没取对
+  - 文档站 open.yunexpress.cn 是 SPA 且门户 API 被 nginx 挡（全 fallback HTML）；归档文档 GitHub yihao97/yunexpress-api-docs 可直接拉 raw md（含全部接口参数表）；业务参数错误码 0206000x 目的入参校验
+  - yuntrack.js 已上线（f3f9a52）：quote 返回 10 产品数组，过滤 B2B；carrierName.yuntrack 词条与 12 条产品英文映射已补 en/es.json + carrier.js
+
 [顺丰国际 OpenAPI（sf.global 新网关）对接规范]
 - Date: 2026-09-26（沙盒全链路打通）
 - Context: 破解顺丰国际 api-ifsp.sf.global 网关加密协议并跑通 IUOP_ESTIMATE_FEE 运费试算
