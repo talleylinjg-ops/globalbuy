@@ -384,7 +384,12 @@
     "fieldEmsProductCode": "产品代码（productCode）",
     "fieldEmsSenderAddress": "寄件地址（senderAddress）",
     "fieldEmsReceiveInfo": "默认收件地址（receiveInfo）",
-    "selectCarrierCo": "选择快递公司"
+    "selectCarrierCo": "选择快递公司",
+    "parcels": "包裹列表（一单多仓拆单）",
+    "addParcel": "+ 添加包裹",
+    "parcelChannel": "渠道",
+    "parcelProduct": "产品/线路",
+    "parcelItemsPh": "包裹内商品（逗号分隔）"
   },
   "common": {
     "close": "收起",
@@ -424,7 +429,8 @@
     "estimatedTotal": "预估到手总价",
     "close": "关闭",
     "failed": "下单失败",
-    "toCountry": "收货国家"
+    "toCountry": "收货国家",
+    "multiParcelHint": "提示：若您的商品分布在不同仓库，订单会拆成多个包裹发货，全部追踪号将在发货时一次性提供，可在「查订单」页查看。"
   },
   "carrierName": {
     "sfintl": "顺丰国际",
@@ -442,5 +448,30 @@
   },
   "carrier": {
     "title": "国际快递渠道"
+  },
+  "track": {
+    "nav": "查订单",
+    "title": "订单追踪",
+    "subtitle": "输入下单时使用的订单号与邮箱，查询发货状态与全部包裹。",
+    "orderNo": "订单号",
+    "email": "下单邮箱",
+    "lookup": "查询",
+    "notFound": "未找到该订单，请核对订单号。",
+    "emailMismatch": "邮箱与订单不匹配，请使用下单时的邮箱。",
+    "error": "查询失败，请稍后重试。",
+    "items": "订单商品",
+    "parcels": "包裹（{count}）",
+    "noParcelsYet": "包裹还未发货，发货后全部追踪号会一次性显示在这里。",
+    "multiParcelHint": "该订单包含 {count} 个包裹，已一次性提供全部追踪号。",
+    "status": {
+      "pending": "待处理",
+      "processing": "备货中",
+      "shipped": "已发货",
+      "onhold": "暂缓",
+      "completed": "已完成",
+      "cancelled": "已取消",
+      "refunded": "已退款",
+      "delivered": "已签收"
+    }
   }
 }

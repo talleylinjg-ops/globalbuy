@@ -43,7 +43,7 @@ const CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'CNY', 'CAD', 'AUD', 'HKD', 'SGD
 
 const emptyCustomer = { name: '', email: '', phone: '', country: 'US', currency: 'USD', status: 'active', notes: '' };
 const emptyAddress = { customerId: '', label: 'Home', recipient: '', line1: '', line2: '', city: '', state: '', postal: '', country: 'US', phone: '', isDefault: false };
-const emptyOrder = { customerId: '', addressId: '', status: 'pending', carrier: '', trackingNo: '', currency: 'USD', tipRate: 0, notes: '', items: [{ title: '', price: 0, qty: 1 }] };
+const emptyOrder = { customerId: '', addressId: '', status: 'pending', carrier: '', trackingNo: '', currency: 'USD', tipRate: 0, notes: '', items: [{ title: '', price: 0, qty: 1 }], parcels: [] };
 
 export default function AdminPanel({ t }) {
   const [token, setToken] = useState(localStorage.getItem('cb_admin_token') || '');
@@ -1058,11 +1058,29 @@ function OrderForm({ customers, addresses, initial, editing, onSave, onCancel, t
   });
   const addItem = () => setForm((f) => ({ ...f, items: [...(f.items || []), { title: '', price: 0, qty: 1 }] }));
   const removeItem = (i) => setForm((f) => ({ ...f, items: (f.items || []).filter((_, idx) => idx !== i) }));
+  const setParcel = (i, k, v) => setForm((f) => {
+    const parcels = (f.parcels || []).map((pc, idx) => (idx === i ? { ...pc, [k]: v } : pc));
+    return { ...f, parcels };
+  });
+  const addParcel = () => setForm((f) => ({ ...f, parcels: [...(f.parcels || []), { carrier: f.carrier || '', productName: '', trackingNo: '', itemsDesc: '' }] }));
+  const removeParcel = (i) => setForm((f) => ({ ...f, parcels: (f.parcels || []).filter((_, idx) => idx !== i) }));
   const addressesForCustomer = addresses.filter((a) => a.customerId === form.customerId);
 
   const submit = (e) => {
     e.preventDefault();
     if (!form.customerId || !form.addressId) return;
+    const parcels = (form.parcels || [])
+      .map((pc) => ({
+        carrier: String(pc.carrier || '').trim(),
+        productName: String(pc.productName || '').trim(),
+        trackingNo: String(pc.trackingNo || '').trim(),
+        itemsDesc: String(pc.itemsDesc || '').trim(),
+        items: String(pc.itemsDesc || '').trim()
+          ? String(pc.itemsDesc).split(/[,;，；]/).map((s) => ({ title: s.trim(), quantity: 1 })).filter((it) => it.title)
+          : [],
+      }))
+      .filter((pc) => pc.trackingNo || pc.carrier);
+    const parcelsWithTracking = parcels.filter((pc) => pc.trackingNo);
     onSave({
       customerId: form.customerId,
       addressId: form.addressId,
@@ -1070,7 +1088,8 @@ function OrderForm({ customers, addresses, initial, editing, onSave, onCancel, t
       status: form.status || 'pending',
       currency: form.currency || 'USD',
       carrier: form.carrier || '',
-      trackingNo: form.trackingNo || '',
+      trackingNo: form.trackingNo || (parcelsWithTracking.length === 1 ? parcelsWithTracking[0].trackingNo : '') || '',
+      parcels,
       tipRate: Number(form.tipRate) || 0,
       notes: form.notes || '',
     });
@@ -1116,6 +1135,21 @@ function OrderForm({ customers, addresses, initial, editing, onSave, onCancel, t
           <div>
             <label className="settings-label">{t('admin.tracking')}</label>
             <input className="settings-control" value={form.trackingNo} onChange={(e) => set('trackingNo', e.target.value)} />
+          </div>
+          <div className="form-grid-full">
+            <div className="order-items-head">
+              <span>{t('admin.parcels')}</span>
+              <button type="button" className="btn btn-ghost btn-sm" onClick={addParcel}>{t('admin.addParcel')}</button>
+            </div>
+            {(form.parcels || []).map((pc, i) => (
+              <div className="order-item-row" key={i} style={{ flexWrap: 'wrap' }}>
+                <input className="settings-control" style={{ maxWidth: 130 }} placeholder={t('admin.parcelChannel')} value={pc.carrier} onChange={(e) => setParcel(i, 'carrier', e.target.value)} />
+                <input className="settings-control" style={{ maxWidth: 150 }} placeholder={t('admin.tracking')} value={pc.trackingNo} onChange={(e) => setParcel(i, 'trackingNo', e.target.value)} />
+                <input className="settings-control" style={{ maxWidth: 150 }} placeholder={t('admin.parcelProduct')} value={pc.productName} onChange={(e) => setParcel(i, 'productName', e.target.value)} />
+                <input className="settings-control" placeholder={t('admin.parcelItemsPh')} value={pc.itemsDesc} onChange={(e) => setParcel(i, 'itemsDesc', e.target.value)} />
+                <button type="button" className="btn btn-ghost btn-sm danger" onClick={() => removeParcel(i)}>✕</button>
+              </div>
+            ))}
           </div>
           <div>
             <label className="settings-label">{t('admin.tipRate')}</label>
@@ -1351,7 +1385,7 @@ function OrdersTab({ orders, customers, query, onQuery, onAdd, onEdit, onDelete,
     .filter((o) => {
       if (!query) return true;
       const q = query.toLowerCase();
-      return [o.orderNo, o.trackingNo, o.customer?.name, o.customer?.email].some((v) => v && String(v).toLowerCase().includes(q));
+      return [o.orderNo, o.trackingNo, o.customer?.name, o.customer?.email, ...(Array.isArray(o.parcels) ? o.parcels.map((pc) => pc.trackingNo) : [])].some((v) => v && String(v).toLowerCase().includes(q));
     });
   const pages = Math.max(1, Math.ceil(filtered.length / perPage));
   const cur = Math.min(page, pages);
@@ -1590,6 +1624,21 @@ function OrderDetail({ order, customer, onStatus, onEdit, onDelete, onAddNote, o
               <div className="wc-detail-row wc-grand-total"><span>{t('admin.orderTotal')}</span><span><b>{fmtCny(order.totalCny)}</b></span></div>
               <div className="wc-detail-row muted"><span>{t('admin.payAmount')}</span><span><b>{order.currency} {order.totalCurrency ?? '—'}</b></span></div>
               <div className="wc-detail-row muted"><span>{t('admin.carrierLabel')}</span><span>{order.carrier || '—'}{order.trackingNo ? ` · ${t('admin.tracking')} ${order.trackingNo}` : ''}</span></div>
+              {Array.isArray(order.parcels) && order.parcels.length > 0 && (
+                <div className="wc-detail-row" style={{ alignItems: 'flex-start' }}>
+                  <span>{t('admin.parcels')}</span>
+                  <span>
+                    {order.parcels.map((pc, i) => (
+                      <div key={i} style={{ marginBottom: 4 }}>
+                        <b>{pc.trackingNo || '—'}</b>
+                        {pc.carrier ? ` · ${pc.carrier}` : ''}
+                        {pc.productName ? ` · ${pc.productName}` : ''}
+                        {Array.isArray(pc.items) && pc.items.length > 0 ? ` · ${pc.items.map((it) => `${it.title} x${it.quantity}`).join(', ')}` : ''}
+                      </div>
+                    ))}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>

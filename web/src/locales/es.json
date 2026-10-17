@@ -237,7 +237,8 @@
     "estimatedTotal": "Total estimado en destino",
     "close": "Cerrar",
     "failed": "Error al realizar el pedido",
-    "toCountry": "País"
+    "toCountry": "País",
+    "multiParcelHint": "Nota: si sus artículos están en almacenes distintos, el pedido puede dividirse en varios paquetes. Todos los números de rastreo se entregarán de una vez y estarán disponibles en la página Rastrear pedido."
   },
   "admin": {
     "title": "Panel de administración",
@@ -432,7 +433,12 @@
     "fieldEmsProductCode": "Código de producto (productCode)",
     "fieldEmsSenderAddress": "Dirección del remitente (senderAddress)",
     "fieldEmsReceiveInfo": "Dirección de destinatario (receiveInfo)",
-    "selectCarrierCo": "Seleccionar transportista"
+    "selectCarrierCo": "Seleccionar transportista",
+    "parcels": "Paquetes (división multi-almacén)",
+    "addParcel": "+ Añadir paquete",
+    "parcelChannel": "Canal",
+    "parcelProduct": "Producto / Línea",
+    "parcelItemsPh": "Artículos del paquete (separados por coma)"
   },
   "carrierName": {
     "sfintl": "SF Internacional",
@@ -448,5 +454,30 @@
     "southAmerica": "América del Sur",
     "oceania": "Oceanía",
     "africa": "África"
+  },
+  "track": {
+    "nav": "Rastrear pedido",
+    "title": "Seguimiento del pedido",
+    "subtitle": "Introduzca el número de pedido y el correo usado en la compra para ver el estado del envío y todos los paquetes.",
+    "orderNo": "N.º de pedido",
+    "email": "Correo del pedido",
+    "lookup": "Consultar",
+    "notFound": "Pedido no encontrado. Revise el número de pedido.",
+    "emailMismatch": "El correo no coincide con este pedido. Use el correo de la compra.",
+    "error": "Error al consultar. Inténtelo más tarde.",
+    "items": "Artículos del pedido",
+    "parcels": "Paquetes ({count})",
+    "noParcelsYet": "Aún no hay paquetes enviados. Todos los números de rastreo aparecerán aquí de una vez.",
+    "multiParcelHint": "Este pedido se envía en {count} paquetes. Todos los números de rastreo se proporcionan de una vez.",
+    "status": {
+      "pending": "Pendiente",
+      "processing": "En preparación",
+      "shipped": "Enviado",
+      "onhold": "En espera",
+      "completed": "Completado",
+      "cancelled": "Cancelado",
+      "refunded": "Reembolsado",
+      "delivered": "Entregado"
+    }
   }
 }

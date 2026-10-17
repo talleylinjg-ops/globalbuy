@@ -397,7 +397,12 @@
     "fieldEmsProductCode": "Product code (productCode)",
     "fieldEmsSenderAddress": "Sender address (senderAddress)",
     "fieldEmsReceiveInfo": "Default recipient address (receiveInfo)",
-    "selectCarrierCo": "Select courier"
+    "selectCarrierCo": "Select courier",
+    "parcels": "Parcels (multi-warehouse split)",
+    "addParcel": "+ Add Parcel",
+    "parcelChannel": "Channel",
+    "parcelProduct": "Product / Line",
+    "parcelItemsPh": "Items in parcel (comma separated)"
   },
   "common": {
     "close": "Close",
@@ -437,7 +442,8 @@
     "estimatedTotal": "Estimated landed total",
     "close": "Close",
     "failed": "Order failed",
-    "toCountry": "Country"
+    "toCountry": "Country",
+    "multiParcelHint": "Note: if your items are stocked in different warehouses, the order may be split into multiple parcels. All tracking numbers will be provided at once and available on the Track Order page."
   },
   "carrierName": {
     "sfintl": "SF International",
@@ -453,5 +459,30 @@
     "southAmerica": "South America",
     "oceania": "Oceania",
     "africa": "Africa"
+  },
+  "track": {
+    "nav": "Track Order",
+    "title": "Order Tracking",
+    "subtitle": "Enter the order number and the email used at checkout to view shipment status and all parcels.",
+    "orderNo": "Order No.",
+    "email": "Order Email",
+    "lookup": "Track",
+    "notFound": "Order not found. Please check the order number.",
+    "emailMismatch": "Email does not match this order. Please use the email you ordered with.",
+    "error": "Lookup failed. Please try again later.",
+    "items": "Order Items",
+    "parcels": "Parcels ({count})",
+    "noParcelsYet": "No parcels shipped yet. All tracking numbers will appear here at once once shipped.",
+    "multiParcelHint": "This order ships in {count} parcels. All tracking numbers are provided at once.",
+    "status": {
+      "pending": "Pending",
+      "processing": "Processing",
+      "shipped": "Shipped",
+      "onhold": "On Hold",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "refunded": "Refunded",
+      "delivered": "Delivered"
+    }
   }
 }

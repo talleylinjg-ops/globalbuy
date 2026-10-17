@@ -13,6 +13,7 @@ import OrderModal from './components/OrderModal.jsx';
 
 // 管理端拆包：仅 #/admin 路由加载，减小主包体积
 const AdminPanel = lazy(() => import('./components/AdminPanel.jsx'));
+const TrackOrder = lazy(() => import('./components/TrackOrder.jsx'));
 
 const DEFAULT_COUNTRY = 'US';
 const DEFAULT_CURRENCY = 'USD';
@@ -28,10 +29,15 @@ function getAdminRoute() {
   return window.location.hash.startsWith('#/admin');
 }
 
+function getTrackRoute() {
+  return window.location.hash.startsWith('#/track');
+}
+
 // 从全部快递报价中挑三档：最快 / 最便宜 / 居中；三档尽量为三个不同报价
 
 export default function App() {
   const { t, lang, setLang, languages } = useI18n();  const [isAdmin, setIsAdmin] = useState(getAdminRoute());
+  const [isTrack, setIsTrack] = useState(getTrackRoute());
   const [meta, setMeta] = useState(null);
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -57,7 +63,7 @@ export default function App() {
   isDemoModeRef.current = Boolean(results?.demo || meta?.demo);
 
   useEffect(() => {
-    const onHash = () => setIsAdmin(getAdminRoute());
+    const onHash = () => { setIsAdmin(getAdminRoute()); setIsTrack(getTrackRoute()); };
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
@@ -266,8 +272,22 @@ export default function App() {
           </select>
         </div>
         <div className="container header-inner">
-          <h1 className="logo">CrossBuy</h1>
-          <p className="tagline">Buy More Save More</p>
+          <div className="header-nav" style={{ display: 'flex', alignItems: 'baseline', gap: 16, width: '100%' }}>
+            <div>
+              <h1 className="logo">CrossBuy</h1>
+              <p className="tagline">Buy More Save More</p>
+            </div>
+            {!isAdmin && (
+              <a
+                href="#/track"
+                className="header-track-link"
+                style={{ marginLeft: 'auto', fontSize: 14, fontWeight: 600, color: 'var(--brand, #c0392b)', textDecoration: 'none' }}
+                onClick={() => setIsTrack(true)}
+              >
+                {t('track.nav')}
+              </a>
+            )}
+          </div>
         </div>
       </header>
 
@@ -275,6 +295,10 @@ export default function App() {
         {isAdmin ? (
           <Suspense fallback={<div className="loading">...</div>}>
             <AdminPanel t={t} />
+          </Suspense>
+        ) : isTrack ? (
+          <Suspense fallback={<div className="loading">...</div>}>
+            <TrackOrder t={t} />
           </Suspense>
         ) : (
         <>

@@ -12,7 +12,7 @@ import adminRouter from './admin.js';
 import carriersRouter from './carriers.js';
 import carrierQuoteRouter from './carrierQuote.js';
 import { computeCombinedQuote } from '../services/combine.js';
-import { createRecord, genId, genOrderNo, listCollection } from '../services/db.js';
+import { createRecord, genId, genOrderNo, listCollection, getById } from '../services/db.js';
 
 const router = Router();
 
@@ -238,6 +238,48 @@ router.get('/tax/:country', (req, res) => {
 // 演示分类与热门搜索词
 router.get('/categories', (req, res) => {
   res.json({ categories: listMockCategories(), hotKeywords: HOT_KEYWORDS });
+});
+
+// 买家查单：orderNo + email 双因素校验（脱敏返回，支持一单多包裹）
+router.get('/orders/track', (req, res) => {
+  const orderNo = String(req.query.orderNo || '').trim().toUpperCase();
+  const email = String(req.query.email || '').trim().toLowerCase();
+  if (!orderNo || !email) return res.status(400).json({ error: 'orderNo and email required' });
+  const orders = listCollection('orders').filter((o) => String(o.orderNo || '').toUpperCase() === orderNo);
+  if (orders.length === 0) return res.status(404).json({ error: 'order not found' });
+  const o = orders[0];
+  const orderEmail = String(o.contact?.email || o.customer?.email || '').toLowerCase();
+  const customer = getById('customers', o.customerId);
+  const custEmail = String(customer?.email || '').toLowerCase();
+  if (!orderEmail && !custEmail) return res.status(403).json({ error: 'email mismatch' });
+  if (email !== orderEmail && email !== custEmail) return res.status(403).json({ error: 'email mismatch' });
+
+  // 一单多包裹：parcels 数组优先；旧单据回退单包裹字段
+  const parcels = Array.isArray(o.parcels) && o.parcels.length > 0
+    ? o.parcels
+    : (o.trackingNo ? [{ trackingNo: o.trackingNo, carrier: o.carrier, productName: '', items: [] }] : []);
+  const totalItems = (o.items || []).reduce((s, it) => s + (Number(it.quantity) || 0), 0);
+  const packedItems = parcels.reduce((s, pc) => s + (pc.items || []).reduce((x, it) => x + (Number(it.quantity) || 0), 0), 0);
+  const shipped = parcels.length > 0 && parcels.every((pc) => pc.trackingNo);
+  res.json({
+    orderNo: o.orderNo,
+    status: shipped ? 'shipped' : o.status,
+    createdAt: o.createdAt,
+    currency: o.currency || 'USD',
+    total: o.totalCurrency,
+    items: (o.items || []).map((it) => ({ title: it.title, platform: it.platform, quantity: it.quantity })),
+    parcels: parcels.map((pc) => ({
+      trackingNo: pc.trackingNo || '',
+      carrier: pc.carrier || o.carrier || '',
+      productName: pc.productName || '',
+      items: (pc.items || []).map((it) => ({ title: it.title, quantity: it.quantity })),
+    })),
+    shipmentPreview: {
+      expectedParcels: (o.expectedParcels) || null,
+      packed: packedItems,
+      totalItems,
+    },
+  });
 });
 
 export default router;
