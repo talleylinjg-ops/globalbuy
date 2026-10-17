@@ -121,7 +121,7 @@ export class SFIntlAdapter extends CarrierAdapter {
       serialNumber: 'CB' + Date.now() + crypto.randomInt(1000),
       customerCode: this.customerCode,
       customerType: this.customerType,
-      interProductCode: p.interProductCode || 'INT0014',
+      interProductCode: p.interProductCode || this.cfg.interProductCode || 'INT0263',
       parcelQuantity: 1,
       parcelTotalWeight: weight,
       weightUnit: 'KG',
@@ -164,36 +164,49 @@ export class SFIntlAdapter extends CarrierAdapter {
       throw new CarrierError('顺丰国际未配置 appKey/appSecret/aesKey/customerCode', 'NOT_CONFIGURED');
     }
     const { actualKg, volumetricKg, chargedKg } = CarrierAdapter.chargedWeight(p.weightKg, p.dims);
-    const data = await this.callApi(this.msgType, this.buildFeeBiz(p));
-    const d = data?.data;
-    const totalFee = Number(d?.totalFee ?? d?.totalPayFee ?? 0);
-    if (!d || totalFee <= 0) {
-      throw new CarrierError('顺丰国际无可报价（feeInfoList 为空，检查 interProductCode 与流向）', 'NO_QUOTE', data);
+    // interProductCode 支持逗号分隔多产品码并行询价（如 "INT0014,INT0263"）
+    const codes = String(this.cfg.interProductCode || 'INT0263')
+      .split(',').map((s) => s.trim()).filter(Boolean);
+    const settled = await Promise.allSettled(codes.map(async (code) => {
+      const data = await this.callApi(this.msgType, this.buildFeeBiz({ ...p, interProductCode: code }));
+      const d = data?.data;
+      const totalFee = Number(d?.totalFee ?? d?.totalPayFee ?? 0);
+      if (!d || totalFee <= 0) {
+        throw new CarrierError(`顺丰国际 ${code} 无可报价`, 'NO_QUOTE', data);
+      }
+      const currency = String(d.currency || 'CNY').toUpperCase();
+      let priceUsd;
+      if (currency === 'USD') priceUsd = totalFee;
+      else if (currency === 'CNY') priceUsd = cnyToCurrency(totalFee, 'USD');
+      else {
+        throw new CarrierError(`顺丰国际返回币种 ${currency} 暂不支持换算`, 'NO_QUOTE', data);
+      }
+      // 产品名只保留产品码（如 INT0014），费用明细为服务端中文描述，拼入名称会在非中文界面造成混排
+      return this.normalize({
+        carrier: this.cfg.code,
+        carrierName: this.cfg.name,
+        productName: d.interProductCode || code,
+        priceUsd: Number((priceUsd * (1 + (this.cfg.markupRate || 0))).toFixed(2)),
+        currency: 'USD',
+        daysMin: this.cfg.daysMin ?? 6,
+        daysMax: this.cfg.daysMax ?? 12,
+        source: 'api',
+        available: true,
+        chargedKg,
+        actualKg,
+        volumetricKg,
+        raw: d,
+      }, {});
+    }));
+    const quotes = settled
+      .filter((s) => s.status === 'fulfilled' && s.value)
+      .map((s) => s.value);
+    if (quotes.length === 0) {
+      const firstErr = settled.find((s) => s.status === 'rejected')?.reason;
+      if (firstErr) throw firstErr;
+      throw new CarrierError('顺丰国际无可报价', 'NO_QUOTE');
     }
-    const currency = String(d.currency || 'CNY').toUpperCase();
-    let priceUsd;
-    if (currency === 'USD') priceUsd = totalFee;
-    else if (currency === 'CNY') priceUsd = cnyToCurrency(totalFee, 'USD');
-    else {
-      // 其他币种：经 CNY 中转（feeInfoList 无汇率时按 CNY 近似处理场景有限，暂不支持）
-      throw new CarrierError(`顺丰国际返回币种 ${currency} 暂不支持换算`, 'NO_QUOTE', data);
-    }
-    // 产品名只保留产品码（如 INT0014），费用明细为服务端中文描述，拼入名称会在非中文界面造成混排
-    return [this.normalize({
-      carrier: this.cfg.code,
-      carrierName: this.cfg.name,
-      productName: d.interProductCode || this.cfg.code || 'SF International',
-      priceUsd: Number((priceUsd * (1 + (this.cfg.markupRate || 0))).toFixed(2)),
-      currency: 'USD',
-      daysMin: this.cfg.daysMin ?? 5,
-      daysMax: this.cfg.daysMax ?? 10,
-      source: 'api',
-      available: true,
-      chargedKg,
-      actualKg,
-      volumetricKg,
-      raw: d,
-    }, {})];
+    return quotes;
   }
 
   async test() {

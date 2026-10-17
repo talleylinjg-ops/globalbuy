@@ -19,7 +19,7 @@ export const CARRIER_ADAPTERS = {
   ems: { name: 'EMS', adapter: EMSAdapter, fields: ['senderNo', 'authorization', 'userCode', 'baseUrl', 'productCode', 'senderAddress', 'defaultReceiveInfo'] },
   ptdsgj: { name: 'PTD 国际速递', adapter: PtdsgjAdapter, fields: ['token', 'pickupZone'] },
   zjhygj: { name: '华源国际', adapter: ZjhygjAdapter, fields: ['account', 'password', 'branchId'] },
-  sfintl: { name: '顺丰国际', adapter: SFIntlAdapter, fields: ['appKey', 'appSecret', 'aesKey', 'customerCode', 'customerType', 'serviceCode', 'baseUrl'] },
+  sfintl: { name: '顺丰国际', adapter: SFIntlAdapter, fields: ['appKey', 'appSecret', 'aesKey', 'customerCode', 'customerType', 'serviceCode', 'interProductCode', 'baseUrl'] },
 };
 
 // 内置默认快递商（未配置密钥时走估算模式，保证开箱可用）
