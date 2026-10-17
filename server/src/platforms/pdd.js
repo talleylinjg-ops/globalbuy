@@ -3,6 +3,7 @@ import { PlatformAdapter } from './base.js';
 import { mockSearch } from '../data/mockProducts.js';
 import { isMostlyAscii, translateKeywordToChinese } from '../services/translate.js';
 import { httpRequest } from '../carriers/http.js';
+import { getPddToken } from '../routes/pddauth.js';
 
 // ============ 拼多多开放平台（多多进宝 DDK）============
 // 网关 https://gw-api.pinduoduo.com/api/router，form 表单提交
@@ -81,16 +82,27 @@ export class PddAdapter extends PlatformAdapter {
       // 回退推荐池（免 pid 已验证）：返回拼多多真实热门商品，保证真实数据源可用
       return this._recommendApi(keyword, page);
     }
-    const data = await this.callApi('pdd.ddk.goods.search', {
-      keyword,
-      page,
-      page_size: 20,
-      sort_type: 0,
-      ...(pid ? { pid } : {}),
-    });
-    const list = data?.goods_search_response?.goods_list || [];
-    const items = list.map((g) => this.mapGoods(g)).filter((g) => g.price > 0);
-    return { sourceType: 'api', platform: 'pdd', keyword, items };
+    // search 接口要求 OAuth access_token（应用完成授权备案），无 token 也先尝试直调
+    const token = await getPddToken().catch(() => null);
+    try {
+      const data = await this.callApi('pdd.ddk.goods.search', {
+        keyword,
+        page,
+        page_size: 20,
+        sort_type: 0,
+        pid,
+        ...(token ? { access_token: token.accessToken } : {}),
+      });
+      const list = data?.goods_search_response?.goods_list || [];
+      const items = list.map((g) => this.mapGoods(g)).filter((g) => g.price > 0);
+      return { sourceType: 'api', platform: 'pdd', keyword, items };
+    } catch (e) {
+      // 未授权备案（60001）时回退推荐池，保持真实数据源不断供
+      if (String(e.message).includes('60001') || String(e.message).includes('备案')) {
+        return this._recommendApi(keyword, page);
+      }
+      throw e;
+    }
   }
 
   async _recommendApi(keyword, page) {

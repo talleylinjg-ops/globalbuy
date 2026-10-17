@@ -11,6 +11,7 @@ import imgRouter from './img.js';
 import adminRouter from './admin.js';
 import carriersRouter from './carriers.js';
 import carrierQuoteRouter from './carrierQuote.js';
+import pddAuthRouter from './pddauth.js';
 import { computeCombinedQuote } from '../services/combine.js';
 import { createRecord, genId, genOrderNo, listCollection, getById } from '../services/db.js';
 
@@ -21,6 +22,7 @@ router.use('/', imgRouter);
 router.use('/admin', adminRouter);
 router.use('/admin/carriers', carriersRouter);
 router.use('/carriers', carrierQuoteRouter);
+router.use('/pdd', pddAuthRouter);
 
 // 健康检查
 router.get('/health', (req, res) => {
