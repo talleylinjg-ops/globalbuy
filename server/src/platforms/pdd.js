@@ -49,7 +49,7 @@ export class PddAdapter extends PlatformAdapter {
     });
     if (data && data.error_response) {
       const err = data.error_response;
-      throw new Error(`拼多多 API ${err.error_msg || '错误'}（${err.error_code}）`);
+      throw new Error(`拼多多 API ${err.sub_msg || err.error_msg || '错误'}（${err.error_code}）`);
     }
     if (!data || typeof data !== 'object') {
       throw new Error(`拼多多网关响应异常: ${String(data).slice(0, 120)}`);
@@ -68,13 +68,19 @@ export class PddAdapter extends PlatformAdapter {
         items: items.map((p) => ({ ...p, adapter: 'pdd' })),
       };
     }
-    return this._searchApi(keyword);
+    return this._searchApi(keyword, opts);
   }
 
-  async _searchApi(keyword) {
+  async _searchApi(keyword, opts = {}) {
     const page = Math.max(1, Number(opts.page) || 1);
     // 携带推广位（多多客 ID / PID），返回结果含佣金与推广链接所需字段
-    const pid = this.config.pid || '';
+    // pid 格式为「数字_数字」，残缺值同样视为未配置
+    const pid = /^\d+_\d+$/.test(String(this.config.pid || '')) ? this.config.pid : '';
+    if (!pid) {
+      // 未配置推广位时 ddk.goods.search 会报 60001（要求 pid 备案），
+      // 回退推荐池（免 pid 已验证）：返回拼多多真实热门商品，保证真实数据源可用
+      return this._recommendApi(keyword, page);
+    }
     const data = await this.callApi('pdd.ddk.goods.search', {
       keyword,
       page,
@@ -85,6 +91,17 @@ export class PddAdapter extends PlatformAdapter {
     const list = data?.goods_search_response?.goods_list || [];
     const items = list.map((g) => this.mapGoods(g)).filter((g) => g.price > 0);
     return { sourceType: 'api', platform: 'pdd', keyword, items };
+  }
+
+  async _recommendApi(keyword, page) {
+    const data = await this.callApi('pdd.ddk.goods.recommend.get', {
+      channel_type: 0,
+      page,
+      page_size: 20,
+    });
+    const list = data?.goods_basic_detail_response?.list || [];
+    const items = list.map((g) => this.mapGoods(g)).filter((g) => g.price > 0);
+    return { sourceType: 'api', platform: 'pdd', keyword, items, recommendPool: true };
   }
 
   mapGoods(g) {
