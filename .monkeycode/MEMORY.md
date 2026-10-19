@@ -181,3 +181,12 @@ Entries discovered by the Agent during task execution should follow this format:
   - pdd.ddk.goods.recommend.get 免 pid 免 token 可直调（推荐池 20 条/页），未备案时 PddAdapter 自动回退到它保数据源
   - 应用类型「多多客联盟」权限包含 ddk 商品搜索；凭据在 .env PDD_CLIENT_ID/PDD_CLIENT_SECRET/PDD_PID，redirect_uri 已配 https://5173-*.monkeycode-ai.online/api/pdd/callback
   - 多多进宝后台推广位「多多分享/社交默认」是账号自带分享位，未经媒体备案流程，不能用于 API 调用
+
+[多包裹 v2 拆单规则与提示时机（用户拍板）]
+- Date: 2026-10-19
+- Context: 一单多仓多包裹功能规划（v1 手动编辑包裹已上线 088e486，v2 自动拆单待实施）
+- Category: Workflow & Collaboration
+- Instructions:
+  - 拆单依据：按「仓库」拆，不同发货仓的商品分属不同包裹（商品数据需新增 warehouse 字段）
+  - 提示时机两处都要：下单成功页即提示「可能分多个包裹」（预告语义）+ 仓库实际拆单后/发货前显示确定包裹数与追踪号
+  - 实施顺序：顺丰生产估价接口关联通过 → 先打通报价开闸 → 再实施多包裹 v2
