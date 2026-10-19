@@ -166,3 +166,15 @@ Entries discovered by the Agent during task execution should follow this format:
   - ensureSeeded 补齐逻辑「不覆盖非空值」，但首次从 seedFromEnv 初始化会用空 env 值覆盖整库（已发生一次凭据丢失事故）；改 carrierStore 结构前先确认 settings.carriers 现有值
   - 4PX 真实报价耗时约 6 秒，carrierService per-job 超时已从 3s 放宽到 12s；报价缓存 TTL 30 分钟，全失败空结果也会被缓存，调试时需 touch 清缓存
   - MySQL log_bin=OFF，binlog 未开启，数据误覆盖无法从 binlog 恢复
+
+[拼多多 DDK 备案与搜索打通全流程]
+- Date: 2026-10-18
+- Context: 拼多多真实数据源接入排障（60001 备案报错），全链路已打通
+- Category: Troubleshooting & Debugging
+- Instructions:
+  - 拼多多 search 接口（pdd.ddk.goods.search）必须同时携带 pid + custom_parameters（与绑定备案时的 uid 一致，本项目用 {"uid":"crossbuy"}），缺任一即报 60001；pid 格式「数字_数字」
+  - 绑定备案状态查询：pdd.ddk.member.authority.query（免 token），bind=1 即备案成功
+  - 绑定备案链接生成：pdd.ddk.rp.prom.url.generate + channel_type=10（用户浏览器打开授权一次即可）；OAuth 授权页 oauth.pinduoduo.com 用户浏览器无法访问，走备案链接路径
+  - pdd.ddk.goods.recommend.get 免 pid 免 token 可直调（推荐池 20 条/页），未备案时 PddAdapter 自动回退到它保数据源
+  - 应用类型「多多客联盟」权限包含 ddk 商品搜索；凭据在 .env PDD_CLIENT_ID/PDD_CLIENT_SECRET/PDD_PID，redirect_uri 已配 https://5173-*.monkeycode-ai.online/api/pdd/callback
+  - 多多进宝后台推广位「多多分享/社交默认」是账号自带分享位，未经媒体备案流程，不能用于 API 调用
