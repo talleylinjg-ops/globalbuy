@@ -10,7 +10,7 @@ const router = Router();
 const CID = process.env.PDD_CLIENT_ID || '';
 const CSC = process.env.PDD_CLIENT_SECRET || '';
 const REDIRECT = process.env.PDD_REDIRECT_URI || '';
-const AUTHORIZE_URL = 'https://oauth.pinduoduo.com/authorize';
+const AUTHORIZE_URL = 'https://open.pinduoduo.com/oauth/authorize';
 // token 存储键与提前刷新余量（临期 1h 内自动用 refresh_token 续期）
 const TOKEN_KEY = 'pddToken';
 const REFRESH_MARGIN_MS = 60 * 60 * 1000;

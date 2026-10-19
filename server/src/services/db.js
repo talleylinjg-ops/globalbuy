@@ -221,6 +221,7 @@ const seed = () => ({
 
 let db = null;
 let initPromise = null;
+let initialized = false;
 
 // 读取旧 JSON 文件（仅用于一次性迁移）
 function readLegacyJson() {
@@ -271,6 +272,7 @@ async function initFromMysql() {
   } else {
     db = loaded;
   }
+  initialized = true;
   return db;
 }
 
@@ -302,6 +304,8 @@ async function flushAll(data) {
 
 // saveDb 保持同步签名（旧调用点零改动）：settings/动态键全量写，行级 CRUD 走 upsertRow
 export function saveDb() {
+  // 初始化未完成时禁止落盘：同步骨架（seed）会覆盖 MySQL 真值（历史事故：carriers 凭据被清空）
+  if (!initialized) return;
   if (!db) return;
   for (const [k, v] of Object.entries(db.settings || {})) {
     if (k === 'admins') {
