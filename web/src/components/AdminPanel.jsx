@@ -1062,8 +1062,28 @@ function OrderForm({ customers, addresses, initial, editing, onSave, onCancel, t
     const parcels = (f.parcels || []).map((pc, idx) => (idx === i ? { ...pc, [k]: v } : pc));
     return { ...f, parcels };
   });
-  const addParcel = () => setForm((f) => ({ ...f, parcels: [...(f.parcels || []), { carrier: f.carrier || '', productName: '', trackingNo: '', itemsDesc: '' }] }));
+  const addParcel = () => setForm((f) => ({ ...f, parcels: [...(f.parcels || []), { carrier: f.carrier || '', productName: '', trackingNo: '', itemsDesc: '', warehouse: '' }] }));
   const removeParcel = (i) => setForm((f) => ({ ...f, parcels: (f.parcels || []).filter((_, idx) => idx !== i) }));
+  // 按发货仓一键拆分：订单 items 按 warehouse 分组生成包裹预填（管理员再补追踪号/合并调整）
+  const splitByWarehouse = () => setForm((f) => {
+    const groups = new Map();
+    for (const it of f.items || []) {
+      const wh = String(it.warehouse || '').trim();
+      if (!wh) continue;
+      if (!groups.has(wh)) groups.set(wh, []);
+      groups.get(wh).push(String(it.title || '').trim() || it.itemId);
+    }
+    if (groups.size < 2) return f;
+    const parcels = [...groups.entries()].map(([wh, titles]) => ({
+      carrier: f.carrier || '',
+      productName: '',
+      trackingNo: '',
+      itemsDesc: titles.join(', '),
+      warehouse: wh,
+    }));
+    return { ...f, parcels };
+  });
+  const warehouseGroupCount = new Set((form.items || []).map((it) => String(it.warehouse || '').trim()).filter(Boolean)).size;
   const addressesForCustomer = addresses.filter((a) => a.customerId === form.customerId);
 
   const submit = (e) => {
@@ -1075,6 +1095,7 @@ function OrderForm({ customers, addresses, initial, editing, onSave, onCancel, t
         productName: String(pc.productName || '').trim(),
         trackingNo: String(pc.trackingNo || '').trim(),
         itemsDesc: String(pc.itemsDesc || '').trim(),
+        warehouse: String(pc.warehouse || '').trim(),
         items: String(pc.itemsDesc || '').trim()
           ? String(pc.itemsDesc).split(/[,;，；]/).map((s) => ({ title: s.trim(), quantity: 1 })).filter((it) => it.title)
           : [],
@@ -1084,7 +1105,7 @@ function OrderForm({ customers, addresses, initial, editing, onSave, onCancel, t
     onSave({
       customerId: form.customerId,
       addressId: form.addressId,
-      items: (form.items || []).filter((it) => it.title).map((it) => ({ title: it.title, price: Number(it.price) || 0, qty: Number(it.qty) || 1 })),
+      items: (form.items || []).filter((it) => it.title).map((it) => ({ title: it.title, price: Number(it.price) || 0, qty: Number(it.qty) || 1, warehouse: String(it.warehouse || '').trim() })),
       status: form.status || 'pending',
       currency: form.currency || 'USD',
       carrier: form.carrier || '',
@@ -1139,13 +1160,19 @@ function OrderForm({ customers, addresses, initial, editing, onSave, onCancel, t
           <div className="form-grid-full">
             <div className="order-items-head">
               <span>{t('admin.parcels')}</span>
-              <button type="button" className="btn btn-ghost btn-sm" onClick={addParcel}>{t('admin.addParcel')}</button>
+              <div style={{ display: 'flex', gap: 8 }}>
+                {warehouseGroupCount > 1 && (
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={splitByWarehouse}>{t('admin.splitByWarehouse')}</button>
+                )}
+                <button type="button" className="btn btn-ghost btn-sm" onClick={addParcel}>{t('admin.addParcel')}</button>
+              </div>
             </div>
             {(form.parcels || []).map((pc, i) => (
               <div className="order-item-row" key={i} style={{ flexWrap: 'wrap' }}>
                 <input className="settings-control" style={{ maxWidth: 130 }} placeholder={t('admin.parcelChannel')} value={pc.carrier} onChange={(e) => setParcel(i, 'carrier', e.target.value)} />
                 <input className="settings-control" style={{ maxWidth: 150 }} placeholder={t('admin.tracking')} value={pc.trackingNo} onChange={(e) => setParcel(i, 'trackingNo', e.target.value)} />
                 <input className="settings-control" style={{ maxWidth: 150 }} placeholder={t('admin.parcelProduct')} value={pc.productName} onChange={(e) => setParcel(i, 'productName', e.target.value)} />
+                <input className="settings-control" style={{ maxWidth: 90 }} placeholder={t('admin.parcelWarehouse')} value={pc.warehouse} onChange={(e) => setParcel(i, 'warehouse', e.target.value)} />
                 <input className="settings-control" placeholder={t('admin.parcelItemsPh')} value={pc.itemsDesc} onChange={(e) => setParcel(i, 'itemsDesc', e.target.value)} />
                 <button type="button" className="btn btn-ghost btn-sm danger" onClick={() => removeParcel(i)}>✕</button>
               </div>
@@ -1631,6 +1658,7 @@ function OrderDetail({ order, customer, onStatus, onEdit, onDelete, onAddNote, o
                     {order.parcels.map((pc, i) => (
                       <div key={i} style={{ marginBottom: 4 }}>
                         <b>{pc.trackingNo || '—'}</b>
+                        {pc.warehouse ? ` · [${t(`warehouse.${pc.warehouse}`) === `warehouse.${pc.warehouse}` ? pc.warehouse : t(`warehouse.${pc.warehouse}`)}]` : ''}
                         {pc.carrier ? ` · ${pc.carrier}` : ''}
                         {pc.productName ? ` · ${pc.productName}` : ''}
                         {Array.isArray(pc.items) && pc.items.length > 0 ? ` · ${pc.items.map((it) => `${it.title} x${it.quantity}`).join(', ')}` : ''}

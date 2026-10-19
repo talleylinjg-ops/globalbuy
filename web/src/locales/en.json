@@ -402,7 +402,9 @@
     "addParcel": "+ Add Parcel",
     "parcelChannel": "Channel",
     "parcelProduct": "Product / Line",
-    "parcelItemsPh": "Items in parcel (comma separated)"
+    "parcelItemsPh": "Items in parcel (comma separated)",
+    "splitByWarehouse": "Split by Warehouse",
+    "parcelWarehouse": "Warehouse"
   },
   "common": {
     "close": "Close",
@@ -443,7 +445,8 @@
     "close": "Close",
     "failed": "Order failed",
     "toCountry": "Country",
-    "multiParcelHint": "Note: if your items are stocked in different warehouses, the order may be split into multiple parcels. All tracking numbers will be provided at once and available on the Track Order page."
+    "multiParcelHint": "Note: if your items are stocked in different warehouses, the order may be split into multiple parcels. All tracking numbers will be provided at once and available on the Track Order page.",
+    "multiParcelPlanned": "Your items ship from {n} warehouses and will arrive in {n} separate parcels. All tracking numbers will be provided at once."
   },
   "carrierName": {
     "sfintl": "SF International",
@@ -483,6 +486,12 @@
       "cancelled": "Cancelled",
       "refunded": "Refunded",
       "delivered": "Delivered"
-    }
+    },
+    "warehouseSplitPreview": "Items in this order are stocked at {warehouses} and will ship in {n} separate parcels. Tracking numbers will be provided at once."
+  },
+  "warehouse": {
+    "sz": "Shenzhen Warehouse",
+    "yw": "Yiwu Warehouse",
+    "gz": "Guangzhou Warehouse"
   }
 }

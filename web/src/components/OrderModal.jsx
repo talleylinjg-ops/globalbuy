@@ -63,7 +63,11 @@ export default function OrderModal({ item, country, currency, carrier, quotes, d
             <p>{t('order.orderNo')}: <b>{result.orderNo}</b></p>
             <p>{t('order.estimatedTotal')}: <b>{result.currency} {result.total.toLocaleString()}</b></p>
             <p className="order-success-carrier">{carrierDisplayName(result.carrier, t)} · {result.daysMin}-{result.daysMax} {t('result.days')}</p>
-            <div className="order-success-multi-hint">{t('order.multiParcelHint')}</div>
+            {result.expectedParcels > 1 ? (
+              <div className="order-success-multi-hint">{t('order.multiParcelPlanned', { n: result.expectedParcels })}</div>
+            ) : (
+              <div className="order-success-multi-hint">{t('order.multiParcelHint')}</div>
+            )}
             <a
               className="btn btn-ghost"
               href={`#/track`}

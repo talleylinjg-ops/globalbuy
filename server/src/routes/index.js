@@ -155,10 +155,14 @@ router.post('/orders', async (req, res, next) => {
         itemId: it.itemId,
         title: it.title,
         platform: it.platform,
+        warehouse: it.warehouse,
         quantity: it.quantity,
         priceCny: it.price,
         currency: destCurrency,
       })),
+      // 按发货仓拆单：预计包裹数与仓库清单（发货前按此分仓打包）
+      warehouses: quote.warehouses,
+      expectedParcels: quote.expectedParcels,
       subtotalCny: b.goodsValueCny,
       shippingCny: b.intlShippingCny,
       dutyCny: b.dutyCny,
@@ -200,6 +204,9 @@ router.post('/orders', async (req, res, next) => {
       daysMax: quote.daysMax,
       breakdown: b,
       taxNote: quote.taxNote,
+      // 按发货仓拆单预告
+      expectedParcels: quote.expectedParcels,
+      warehouses: quote.warehouses,
     });
   } catch (err) {
     next(err);
@@ -274,10 +281,12 @@ router.get('/orders/track', (req, res) => {
       trackingNo: pc.trackingNo || '',
       carrier: pc.carrier || o.carrier || '',
       productName: pc.productName || '',
+      warehouse: pc.warehouse || '',
       items: (pc.items || []).map((it) => ({ title: it.title, quantity: it.quantity })),
     })),
     shipmentPreview: {
       expectedParcels: (o.expectedParcels) || null,
+      warehouses: Array.isArray(o.warehouses) ? o.warehouses : [],
       packed: packedItems,
       totalItems,
     },

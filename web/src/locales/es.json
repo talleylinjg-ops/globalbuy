@@ -238,7 +238,8 @@
     "close": "Cerrar",
     "failed": "Error al realizar el pedido",
     "toCountry": "País",
-    "multiParcelHint": "Nota: si sus artículos están en almacenes distintos, el pedido puede dividirse en varios paquetes. Todos los números de rastreo se entregarán de una vez y estarán disponibles en la página Rastrear pedido."
+    "multiParcelHint": "Nota: si sus artículos están en almacenes distintos, el pedido puede dividirse en varios paquetes. Todos los números de rastreo se entregarán de una vez y estarán disponibles en la página Rastrear pedido.",
+    "multiParcelPlanned": "Sus artículos salen de {n} almacenes y llegarán en {n} paquetes separados. Todos los números de rastreo se entregarán de una vez."
   },
   "admin": {
     "title": "Panel de administración",
@@ -438,7 +439,9 @@
     "addParcel": "+ Añadir paquete",
     "parcelChannel": "Canal",
     "parcelProduct": "Producto / Línea",
-    "parcelItemsPh": "Artículos del paquete (separados por coma)"
+    "parcelItemsPh": "Artículos del paquete (separados por coma)",
+    "splitByWarehouse": "Dividir por almacén",
+    "parcelWarehouse": "Almacén"
   },
   "carrierName": {
     "sfintl": "SF Internacional",
@@ -478,6 +481,12 @@
       "cancelled": "Cancelado",
       "refunded": "Reembolsado",
       "delivered": "Entregado"
-    }
+    },
+    "warehouseSplitPreview": "Los artículos de este pedido están en {warehouses} y se enviarán en {n} paquetes separados. Los números de rastreo se entregarán de una vez."
+  },
+  "warehouse": {
+    "sz": "Almacén de Shenzhen",
+    "yw": "Almacén de Yiwu",
+    "gz": "Almacén de Guangzhou"
   }
 }

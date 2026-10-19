@@ -43,6 +43,20 @@ export async function computeCombinedQuote(opts) {
   );
   const items = resolved.map(({ product }) => product);
 
+  // 按发货仓分组：同仓商品可合并一个国际包裹，跨仓拆单（各包裹独立计费与清关）
+  const groupsMap = new Map();
+  for (const { product, quantity } of resolved) {
+    const wh = product.warehouse || 'sz';
+    if (!groupsMap.has(wh)) groupsMap.set(wh, []);
+    groupsMap.get(wh).push({ product, quantity });
+  }
+  const groups = [...groupsMap.entries()].map(([warehouse, members]) => ({
+    warehouse,
+    members,
+    weightKg: members.reduce((s, { product, quantity }) => s + ((product.weightGrams || 500) / 1000) * quantity, 0),
+    valueCny: members.reduce((s, { product, quantity }) => s + (Number(product.price) || 0) * quantity, 0),
+  }));
+
   const totalWeightKg = lines.reduce((s, p) => s + (p.weightGrams || 500) / 1000, 0);
   const goodsValueCny = lines.reduce((s, p) => s + (Number(p.price) || 0), 0);
 
@@ -60,46 +74,90 @@ export async function computeCombinedQuote(opts) {
     carrierResult.quotes.find((q) => q.carrier === carrierResult.recommended) ||
     carrierResult.quotes[0];
 
-  // 运费按实际总重量/报价计费重线性缩放；不足首重（0.5kg）按首重全价
-  const weightFactor = chosen ? Math.max(totalWeightKg, 0.05) / (chosen.chargedKg || 0.5) : 0;
-  const shippingUsd = chosen ? chosen.priceUsd * Math.max(weightFactor, 1) : 0;
-  const shippingCny = shippingUsd * (config.ratesUsdToCny || 7.2);
+  // 运费：单次询价（与商品搜索共用报价缓存），各组按自身计费重缩放（不足首重按首重全价）
 
-  // 统一税费：免征额按合并货值判定，再按货值比例分摊到各商品
+  // 统一税费基线（单仓合并寄时与各组口径一致）；跨仓拆单后实际税费按各组包裹独立判定
   const tax = getTaxRule(destCountry);
-  const fx = taxRateCny(currency, destCountry, tax);
-  const deMinimisCny = tax.deMinimis === Infinity ? Infinity : tax.deMinimis * fx;
-  const vatThresholdCny = tax.vatThreshold === Infinity ? Infinity : tax.vatThreshold * fx;
 
-  let dutyCnyTotal = 0;
-  let vatCnyTotal = 0;
+  // 跨仓拆单：各仓库包裹独立计费（首重各自起步）与独立清关（免征额按各自包裹货值判定）
+  const groupResults = groups.map((g) => {
+    const taxG = getTaxRule(destCountry);
+    const fxG = taxRateCny(currency, destCountry, taxG);
+    const deMinimisG = taxG.deMinimis === Infinity ? Infinity : taxG.deMinimis * fxG;
+    const vatThresholdG = taxG.vatThreshold === Infinity ? Infinity : taxG.vatThreshold * fxG;
+    const factorG = chosen ? Math.max(g.weightKg, 0.05) / (chosen.chargedKg || 0.5) : 0;
+    const shippingCnyG = chosen ? chosen.priceUsd * Math.max(factorG, 1) * (config.ratesUsdToCny || 7.2) : 0;
+    let dutyCnyG = 0;
+    let vatCnyG = 0;
+    for (const { product, quantity } of g.members) {
+      const lineValueCny = (Number(product.price) || 0) * quantity;
+      const share = g.valueCny > 0 ? lineValueCny / g.valueCny : 0;
+      const dutyRate = getCategoryDutyRate(product.category || '默认');
+      const freeCny = deMinimisG === Infinity ? lineValueCny : Math.min(deMinimisG * share, lineValueCny);
+      const lineDuty = Math.max(lineValueCny - freeCny, 0) * dutyRate;
+      const freeVatCny = vatThresholdG === Infinity ? lineValueCny : Math.min(vatThresholdG * share, lineValueCny);
+      const lineVatBase = Math.max(lineValueCny - freeVatCny, 0);
+      const lineVat = lineVatBase > 0 ? (lineVatBase + lineDuty) * taxG.vatRate : 0;
+      dutyCnyG += lineDuty;
+      vatCnyG += lineVat;
+    }
+    return {
+      warehouse: g.warehouse,
+      weightKg: round(g.weightKg, 3),
+      goodsValueCny: round(g.valueCny, 2),
+      shippingCny: round(shippingCnyG, 2),
+      dutyCny: round(dutyCnyG, 2),
+      vatCny: round(vatCnyG, 2),
+      itemCount: g.members.reduce((s, { quantity }) => s + quantity, 0),
+      lineDutyVat: g.members.map(({ product, quantity }) => {
+        const lineValueCny = (Number(product.price) || 0) * quantity;
+        const share = g.valueCny > 0 ? lineValueCny / g.valueCny : 0;
+        const dutyRate = getCategoryDutyRate(product.category || '默认');
+        const freeCny = deMinimisG === Infinity ? lineValueCny : Math.min(deMinimisG * share, lineValueCny);
+        const lineDuty = Math.max(lineValueCny - freeCny, 0) * dutyRate;
+        const freeVatCny = vatThresholdG === Infinity ? lineValueCny : Math.min(vatThresholdG * share, lineValueCny);
+        const lineVatBase = Math.max(lineValueCny - freeVatCny, 0);
+        const lineVat = lineVatBase > 0 ? (lineVatBase + lineDuty) * taxG.vatRate : 0;
+        return { itemId: product.itemId, dutyCny: lineDuty, vatCny: lineVat, dutyRate };
+      }),
+    };
+  });
+
+  // 拆单后：运费/税费取各组和；单仓时与合并口径完全一致
+  const shippingCny = groupResults.reduce((s, g) => s + g.shippingCny, 0);
+  const dutyCnyTotal = groupResults.reduce((s, g) => s + g.dutyCny, 0);
+  const vatCnyTotal = groupResults.reduce((s, g) => s + g.vatCny, 0);
+  const lineDutyVatMap = new Map();
+  for (const g of groupResults) {
+    for (const lv of g.lineDutyVat) {
+      const prev = lineDutyVatMap.get(lv.itemId);
+      lineDutyVatMap.set(lv.itemId, {
+        dutyCny: (prev?.dutyCny || 0) + lv.dutyCny,
+        vatCny: (prev?.vatCny || 0) + lv.vatCny,
+        dutyRate: lv.dutyRate,
+      });
+    }
+  }
+
   const perItem = resolved.map(({ product, quantity }) => {
     const p = product;
     const lineCount = quantity;
     const priceCny = Number(p.price) || 0;
-    const lineValueCny = priceCny * lineCount;
-    const share = goodsValueCny > 0 ? lineValueCny / goodsValueCny : 0;
-    const dutyRate = getCategoryDutyRate(p.category || '默认');
-    const freeCny = deMinimisCny === Infinity ? lineValueCny : Math.min(deMinimisCny * share, lineValueCny);
-    const taxableCny = Math.max(lineValueCny - freeCny, 0);
-    const dutyCny = taxableCny * dutyRate;
-    const freeVatCny = vatThresholdCny === Infinity ? lineValueCny : Math.min(vatThresholdCny * share, lineValueCny);
-    const vatBaseCny = Math.max(lineValueCny - freeVatCny, 0);
-    const vatCny = vatBaseCny > 0 ? (vatBaseCny + dutyCny) * tax.vatRate : 0;
-    dutyCnyTotal += dutyCny;
-    vatCnyTotal += vatCny;
     const lineWeightKg = ((p.weightGrams || 500) / 1000) * lineCount;
+    // 拆单后运费分摊（展示用）：按重量比例摊整单运费
     const shippingShareCny = totalWeightKg > 0 ? shippingCny * (lineWeightKg / totalWeightKg) : 0;
+    const lv = lineDutyVatMap.get(p.itemId) || { dutyCny: 0, vatCny: 0, dutyRate: getCategoryDutyRate(p.category || '默认') };
     return {
       itemId: p.itemId,
       title: p.title,
       platform: p.platform,
+      warehouse: p.warehouse || 'sz',
       quantity: lineCount,
       price: priceCny,
       weightGrams: p.weightGrams || 500,
-      dutyRate,
-      dutyCny: round(dutyCny, 2),
-      vatCny: round(vatCny, 2),
+      dutyRate: lv.dutyRate,
+      dutyCny: round(lv.dutyCny, 2),
+      vatCny: round(lv.vatCny, 2),
       // 运费分摊（展示用）：按重量比例
       shippingShareCny: round(shippingShareCny, 2),
       shippingShare: round(cnyToCurrency(shippingShareCny, currency)),
@@ -160,5 +218,17 @@ export async function computeCombinedQuote(opts) {
     savings: round(cnyToCurrency(separateTotalCny - totalCny, currency)),
     taxNote: tax.note || '',
     taxNoteEn: tax.noteEn || '',
+    // 按仓库拆单：包裹数预告与各仓计费明细
+    expectedParcels: groupResults.length,
+    warehouses: groupResults.map((g) => g.warehouse),
+    groups: groupResults.map((g) => ({
+      warehouse: g.warehouse,
+      weightKg: g.weightKg,
+      goodsValueCny: g.goodsValueCny,
+      shippingCny: g.shippingCny,
+      dutyCny: g.dutyCny,
+      vatCny: g.vatCny,
+      itemCount: g.itemCount,
+    })),
   };
 }

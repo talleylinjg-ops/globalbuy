@@ -18,6 +18,7 @@ export const MOCK_PRODUCTS = [
     shopType: '专营店',
     commissionRate: 0.06,
     weightGrams: 180,
+    warehouse: 'sz',
   },
   {
     platform: 'taobao',
@@ -34,6 +35,7 @@ export const MOCK_PRODUCTS = [
     shopType: '普通',
     commissionRate: 0.08,
     weightGrams: 170,
+    warehouse: 'sz',
   },
   {
     platform: 'tmall',
@@ -50,6 +52,7 @@ export const MOCK_PRODUCTS = [
     shopType: '旗舰店',
     commissionRate: 0.04,
     weightGrams: 190,
+    warehouse: 'sz',
   },
   {
     platform: 'jd',
@@ -66,6 +69,7 @@ export const MOCK_PRODUCTS = [
     shopType: '自营',
     commissionRate: 0.03,
     weightGrams: 180,
+    warehouse: 'sz',
   },
   {
     platform: 'jd',
@@ -82,6 +86,7 @@ export const MOCK_PRODUCTS = [
     shopType: '旗舰店',
     commissionRate: 0.05,
     weightGrams: 175,
+    warehouse: 'sz',
   },
   {
     platform: 'pdd',
@@ -98,6 +103,7 @@ export const MOCK_PRODUCTS = [
     shopType: '专营店',
     commissionRate: 0.1,
     weightGrams: 165,
+    warehouse: 'sz',
   },
   {
     platform: 'pdd',
@@ -114,6 +120,7 @@ export const MOCK_PRODUCTS = [
     shopType: '普通',
     commissionRate: 0.12,
     weightGrams: 160,
+    warehouse: 'sz',
   },
   {
     platform: '1688',
@@ -130,6 +137,7 @@ export const MOCK_PRODUCTS = [
     shopType: '企业店',
     commissionRate: 0.0,
     weightGrams: 170,
+    warehouse: 'sz',
     minOrder: 2,
   },
   {
@@ -147,6 +155,7 @@ export const MOCK_PRODUCTS = [
     shopType: '企业店',
     commissionRate: 0.0,
     weightGrams: 165,
+    warehouse: 'sz',
     minOrder: 5,
   },
 
@@ -166,6 +175,7 @@ export const MOCK_PRODUCTS = [
     shopType: '专营店',
     commissionRate: 0.05,
     weightGrams: 120,
+    warehouse: 'sz',
   },
   {
     platform: 'jd',
@@ -182,6 +192,7 @@ export const MOCK_PRODUCTS = [
     shopType: '旗舰店',
     commissionRate: 0.03,
     weightGrams: 130,
+    warehouse: 'sz',
   },
   {
     platform: 'pdd',
@@ -198,6 +209,7 @@ export const MOCK_PRODUCTS = [
     shopType: '普通',
     commissionRate: 0.09,
     weightGrams: 120,
+    warehouse: 'sz',
   },
   {
     platform: '1688',
@@ -214,6 +226,7 @@ export const MOCK_PRODUCTS = [
     shopType: '企业店',
     commissionRate: 0.0,
     weightGrams: 125,
+    warehouse: 'sz',
     minOrder: 10,
   },
 
@@ -233,6 +246,7 @@ export const MOCK_PRODUCTS = [
     shopType: '普通',
     commissionRate: 0.06,
     weightGrams: 1200,
+    warehouse: 'yw',
   },
   {
     platform: 'jd',
@@ -249,6 +263,7 @@ export const MOCK_PRODUCTS = [
     shopType: '自营',
     commissionRate: 0.03,
     weightGrams: 1300,
+    warehouse: 'yw',
   },
   {
     platform: 'pdd',
@@ -265,6 +280,7 @@ export const MOCK_PRODUCTS = [
     shopType: '普通',
     commissionRate: 0.1,
     weightGrams: 1150,
+    warehouse: 'yw',
   },
   {
     platform: '1688',
@@ -281,6 +297,7 @@ export const MOCK_PRODUCTS = [
     shopType: '企业店',
     commissionRate: 0.0,
     weightGrams: 1200,
+    warehouse: 'yw',
     minOrder: 5,
   },
 
@@ -300,6 +317,7 @@ export const MOCK_PRODUCTS = [
     shopType: '专营店',
     commissionRate: 0.05,
     weightGrams: 400,
+    warehouse: 'yw',
   },
   {
     platform: 'jd',
@@ -316,6 +334,7 @@ export const MOCK_PRODUCTS = [
     shopType: '自营',
     commissionRate: 0.03,
     weightGrams: 420,
+    warehouse: 'yw',
   },
   {
     platform: 'pdd',
@@ -332,6 +351,7 @@ export const MOCK_PRODUCTS = [
     shopType: '普通',
     commissionRate: 0.11,
     weightGrams: 400,
+    warehouse: 'yw',
   },
   {
     platform: '1688',
@@ -348,6 +368,7 @@ export const MOCK_PRODUCTS = [
     shopType: '企业店',
     commissionRate: 0.0,
     weightGrams: 400,
+    warehouse: 'yw',
     minOrder: 3,
   },
 
@@ -367,6 +388,7 @@ export const MOCK_PRODUCTS = [
     shopType: '普通',
     commissionRate: 0.08,
     weightGrams: 50,
+    warehouse: 'sz',
   },
   {
     platform: 'jd',
@@ -383,6 +405,7 @@ export const MOCK_PRODUCTS = [
     shopType: '自营',
     commissionRate: 0.03,
     weightGrams: 50,
+    warehouse: 'sz',
   },
   {
     platform: 'pdd',
@@ -399,6 +422,7 @@ export const MOCK_PRODUCTS = [
     shopType: '普通',
     commissionRate: 0.13,
     weightGrams: 50,
+    warehouse: 'sz',
   },
   {
     platform: '1688',
@@ -415,6 +439,7 @@ export const MOCK_PRODUCTS = [
     shopType: '企业店',
     commissionRate: 0.0,
     weightGrams: 50,
+    warehouse: 'sz',
     minOrder: 10,
   },
 
@@ -434,6 +459,7 @@ export const MOCK_PRODUCTS = [
     shopType: '专营店',
     commissionRate: 0.05,
     weightGrams: 900,
+    warehouse: 'sz',
   },
   {
     platform: 'jd',
@@ -450,6 +476,7 @@ export const MOCK_PRODUCTS = [
     shopType: '自营',
     commissionRate: 0.03,
     weightGrams: 950,
+    warehouse: 'sz',
   },
   {
     platform: 'pdd',
@@ -466,6 +493,7 @@ export const MOCK_PRODUCTS = [
     shopType: '普通',
     commissionRate: 0.1,
     weightGrams: 900,
+    warehouse: 'sz',
   },
   {
     platform: '1688',
@@ -482,6 +510,7 @@ export const MOCK_PRODUCTS = [
     shopType: '企业店',
     commissionRate: 0.0,
     weightGrams: 920,
+    warehouse: 'sz',
     minOrder: 5,
   },
 
@@ -500,6 +529,7 @@ export const MOCK_PRODUCTS = [
     shopType: '旗舰店',
     commissionRate: 0.08,
     weightGrams: 220,
+    warehouse: 'sz',
   },
   {
     platform: 'jd',
@@ -515,6 +545,7 @@ export const MOCK_PRODUCTS = [
     shopType: '自营',
     commissionRate: 0.03,
     weightGrams: 240,
+    warehouse: 'sz',
   },
   {
     platform: 'pdd',
@@ -530,6 +561,7 @@ export const MOCK_PRODUCTS = [
     shopType: '普通',
     commissionRate: 0.12,
     weightGrams: 200,
+    warehouse: 'sz',
   },
 
   // ===== 运动鞋 =====
@@ -547,6 +579,7 @@ export const MOCK_PRODUCTS = [
     shopType: '旗舰店',
     commissionRate: 0.06,
     weightGrams: 800,
+    warehouse: 'yw',
   },
   {
     platform: 'jd',
@@ -562,6 +595,7 @@ export const MOCK_PRODUCTS = [
     shopType: '自营',
     commissionRate: 0.03,
     weightGrams: 750,
+    warehouse: 'yw',
   },
   {
     platform: 'pdd',
@@ -577,6 +611,7 @@ export const MOCK_PRODUCTS = [
     shopType: '普通',
     commissionRate: 0.1,
     weightGrams: 850,
+    warehouse: 'yw',
   },
   {
     platform: '1688',
@@ -592,6 +627,7 @@ export const MOCK_PRODUCTS = [
     shopType: '企业店',
     commissionRate: 0.0,
     weightGrams: 820,
+    warehouse: 'yw',
     minOrder: 10,
   },
 
@@ -610,6 +646,7 @@ export const MOCK_PRODUCTS = [
     shopType: '旗舰店',
     commissionRate: 0.07,
     weightGrams: 2600,
+    warehouse: 'yw',
   },
   {
     platform: 'jd',
@@ -625,6 +662,7 @@ export const MOCK_PRODUCTS = [
     shopType: '自营',
     commissionRate: 0.03,
     weightGrams: 4200,
+    warehouse: 'yw',
   },
   {
     platform: 'pdd',
@@ -640,6 +678,7 @@ export const MOCK_PRODUCTS = [
     shopType: '普通',
     commissionRate: 0.12,
     weightGrams: 2500,
+    warehouse: 'yw',
   },
   {
     platform: '1688',
@@ -655,6 +694,7 @@ export const MOCK_PRODUCTS = [
     shopType: '企业店',
     commissionRate: 0.0,
     weightGrams: 2600,
+    warehouse: 'yw',
     minOrder: 5,
   },
 
@@ -673,6 +713,7 @@ export const MOCK_PRODUCTS = [
     shopType: '旗舰店',
     commissionRate: 0.08,
     weightGrams: 700,
+    warehouse: 'sz',
   },
   {
     platform: 'jd',
@@ -688,6 +729,7 @@ export const MOCK_PRODUCTS = [
     shopType: '自营',
     commissionRate: 0.03,
     weightGrams: 800,
+    warehouse: 'sz',
   },
   {
     platform: 'pdd',
@@ -703,6 +745,7 @@ export const MOCK_PRODUCTS = [
     shopType: '普通',
     commissionRate: 0.12,
     weightGrams: 400,
+    warehouse: 'sz',
   },
 
   // ===== 宠物玩具 =====
@@ -720,6 +763,7 @@ export const MOCK_PRODUCTS = [
     shopType: '旗舰店',
     commissionRate: 0.08,
     weightGrams: 350,
+    warehouse: 'yw',
   },
   {
     platform: 'jd',
@@ -735,6 +779,7 @@ export const MOCK_PRODUCTS = [
     shopType: '自营',
     commissionRate: 0.03,
     weightGrams: 280,
+    warehouse: 'yw',
   },
   {
     platform: 'pdd',
@@ -750,6 +795,7 @@ export const MOCK_PRODUCTS = [
     shopType: '普通',
     commissionRate: 0.12,
     weightGrams: 120,
+    warehouse: 'yw',
   },
 
   // ===== 零食果干 =====
@@ -767,6 +813,7 @@ export const MOCK_PRODUCTS = [
     shopType: '旗舰店',
     commissionRate: 0.08,
     weightGrams: 300,
+    warehouse: 'gz',
   },
   {
     platform: 'jd',
@@ -782,6 +829,7 @@ export const MOCK_PRODUCTS = [
     shopType: '自营',
     commissionRate: 0.03,
     weightGrams: 500,
+    warehouse: 'gz',
   },
   {
     platform: 'pdd',
@@ -797,6 +845,7 @@ export const MOCK_PRODUCTS = [
     shopType: '普通',
     commissionRate: 0.1,
     weightGrams: 400,
+    warehouse: 'gz',
   },
   {
     platform: '1688',
@@ -812,6 +861,7 @@ export const MOCK_PRODUCTS = [
     shopType: '企业店',
     commissionRate: 0.0,
     weightGrams: 800,
+    warehouse: 'gz',
     minOrder: 20,
   },
 ];

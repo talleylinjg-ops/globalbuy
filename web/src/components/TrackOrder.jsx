@@ -3,6 +3,11 @@ import { useState } from 'react';
 import { apiUrl } from '../api.js';
 
 export default function TrackOrder({ t }) {
+  // 仓库显示名：词条缺失时回退大写仓库代码（i18n 硬要求：非中文界面不得出现词条键混排）
+  const whName = (code) => {
+    const s = t(`warehouse.${code}`);
+    return s === `warehouse.${code}` ? String(code).toUpperCase() : s;
+  };
   const statusLabel = (s) => {
     const k = `track.status.${s}`;
     return t(k) === k ? s : t(k);
@@ -74,6 +79,11 @@ export default function TrackOrder({ t }) {
               {t('track.multiParcelHint', { count: order.parcels.length })}
             </div>
           )}
+          {order.parcels.length === 0 && (order.shipmentPreview?.expectedParcels || 0) > 1 && (
+            <div className="track-multi-hint">
+              {t('track.warehouseSplitPreview', { n: order.shipmentPreview.expectedParcels, warehouses: (order.shipmentPreview.warehouses || []).map(whName).join(' / ') })}
+            </div>
+          )}
 
           <h4 style={{ margin: '14px 0 8px' }}>{t('track.items')}</h4>
           <div className="track-items">
@@ -96,7 +106,7 @@ export default function TrackOrder({ t }) {
                 <div className="track-parcel" key={i}>
                   <div className="track-parcel-head">
                     <b>{pc.trackingNo || '—'}</b>
-                    <span className="muted">{[pc.carrier, pc.productName].filter(Boolean).join(' · ')}</span>
+                    <span className="muted">{[pc.carrier, pc.productName, pc.warehouse && whName(pc.warehouse)].filter(Boolean).join(' · ')}</span>
                   </div>
                   {pc.items?.length > 0 && (
                     <div className="track-parcel-items muted">

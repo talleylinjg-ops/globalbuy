@@ -389,7 +389,9 @@
     "addParcel": "+ 添加包裹",
     "parcelChannel": "渠道",
     "parcelProduct": "产品/线路",
-    "parcelItemsPh": "包裹内商品（逗号分隔）"
+    "parcelItemsPh": "包裹内商品（逗号分隔）",
+    "splitByWarehouse": "按仓库一键拆分",
+    "parcelWarehouse": "仓库"
   },
   "common": {
     "close": "收起",
@@ -430,7 +432,8 @@
     "close": "关闭",
     "failed": "下单失败",
     "toCountry": "收货国家",
-    "multiParcelHint": "提示：若您的商品分布在不同仓库，订单会拆成多个包裹发货，全部追踪号将在发货时一次性提供，可在「查订单」页查看。"
+    "multiParcelHint": "提示：若您的商品分布在不同仓库，订单会拆成多个包裹发货，全部追踪号将在发货时一次性提供，可在「查订单」页查看。",
+    "multiParcelPlanned": "您购买的商品分属 {n} 个发货仓，将按仓库拆成 {n} 个包裹分别发出，全部追踪号会在发货时一次性提供。"
   },
   "carrierName": {
     "sfintl": "顺丰国际",
@@ -472,6 +475,12 @@
       "cancelled": "已取消",
       "refunded": "已退款",
       "delivered": "已签收"
-    }
+    },
+    "warehouseSplitPreview": "该订单商品分属 {warehouses}，预计拆成 {n} 个包裹发货，追踪号发货时一次性提供。"
+  },
+  "warehouse": {
+    "sz": "深圳仓",
+    "yw": "义乌仓",
+    "gz": "广州仓"
   }
 }
