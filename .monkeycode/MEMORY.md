@@ -104,7 +104,8 @@ Entries discovered by the Agent during task execution should follow this format:
   - 2026-10-13 交叉验证：SIT 与生产凭据严格隔离（互打 1005 App is not exist）；生产凭据 token 通、dispatch 1004 没权限=「IUOP预估费用」生产授权仍未批（与 9/23 申请待审批吻合）；SIT 凭据服务已授权（参数校验链全部正常应答），但 10/13 起任何真实产品码（INT0014/INT0262/INT0001）查价即业务 code=-1 系统异常（9/26 曾正常报价）——SIT 计费配置退化，需顺丰侧修复；崩溃点定位法：空biz→逐字段累加，customerCode→senderInfo→receiverInfo 依次报「客户编码必填/寄件方国家必填/到件方邮编必填」，postCode 过后即崩=查价环节
   - 顺丰凭据 10/13 曾因 10/9 存储事故丢失（carriers 里仅剩空壳），已从历史记录恢复写回 MySQL settings（appKey 39a47.../customerCode 21012844/baseUrl api-ifsp.sf.global）；顺丰生产网关是 https://api-ifsp.sf.global（历史上曾误记 api.ifsp.sf.global）
   - 2026-10-14 顺丰技术答复：直接生产联调（沙箱配置与生产不一致）；电商业务用 msgType=IPE_ESTIMATE_FEE（预估总运费，菜单 218）；文档站 openapi-portal.sf.global 内容 API=/openapi/console/noLogin/online/doc/{menuId}/zh-CN（返回签名 GCS URL 再下载正文）、菜单树=/doc/menu/list；接口清单：IPE_ESTIMATE_FEE(218 电商预估总运费)/IECS_QUERY_WEIGHT_FREIGHT(110 重量及运费查询-电商预付)/IOMS_QUERY_CHARGE(133 计费重和费用项查询-月结)/IUOP_ESTIMATE_FEE(85 国际快递预估运费)；1004 的解法=登录 http://openapi.sf.global/ →应用列表→详情→关联 API（181 关联API指引），需门户账号登录自助操作，已请用户关联 IPE_ESTIMATE_FEE；IPE_ESTIMATE_FEE 参数与 IUOP 版本基本一致，addServiceInfo.serviceCodeList 必填、paymentInfo/cargoInfo 非必填，电商产品码示例 INT0263
-  - 适配器 sfinternational.js + sfcrypto.js；fields：appKey/appSecret/aesKey/customerCode/customerType/serviceCode(=msgType)/baseUrl
+  - 适配器 sfinternational.js + sfcrypto.js；fields：appKey/appSecret/aesKey/customerCode/customerType/serviceCode(=msgType)/baseUrl/interProductCode（逗号分隔多产品码并行询价，b2d1b75）
+  - 2026-10-19 生产凭据四件套已配置进 MySQL settings carriers（sfintl）：appKey 39a471.../customerCode ICRM-CN032D8401/baseUrl https://api-ifsp.sf.global/serviceCode IPE_ESTIMATE_FEE/products INT0014,INT0263，enabled=false 防失真出街；生产网关实测 token 正常但 IPE/IUOP ESTIMATE_FEE 均 1004——生产应用未关联估价类 API，等用户登录 http://openapi.sf.global/ 应用详情→关联 API 勾选 ESTIMATE 接口后重测开闸；电商客户编码与快递编码体系不同（生产 ICRM-CN 前缀，测试 ICRME 前缀）
 
 [前端静态快照降级层（前台浏览零依赖后端）]
 - Date: 2026-09-28
@@ -163,7 +164,9 @@ Entries discovered by the Agent during task execution should follow this format:
 - Instructions:
   - carriers 真实存储在 MySQL settings 表 k='carriers'（JSON 数组）；server/data/admin_db.json 是 9/8 迁移前的遗留文件，其 carriers 段已废弃，勿作为排查依据
   - .env 的 CARRIER_* 键修改后 node --watch 不会自动重启（不监听 .env），必须 touch server/src/services/carrierService.js 或 carrierStore.js 触发重启才生效
-  - ensureSeeded 补齐逻辑「不覆盖非空值」，但首次从 seedFromEnv 初始化会用空 env 值覆盖整库（已发生一次凭据丢失事故）；改 carrierStore 结构前先确认 settings.carriers 现有值
+  - ensureSeeded 补齐逻辑「不覆盖非空值」；真正覆盖源是 db.js getDb() 同步骨架竞态：loadDb 异步 init 未完成时 getDb() 返回 seed() 骨架并赋全局 db，此时任何 saveDb() 全量写都会把空 carriers 覆盖进 MySQL（10/9 与 10/19 两次凭据丢失事故同根因）；已修复（dca6c61）：saveDb 加 initialized 守卫，initFromMysql 完成前禁止落盘
+  - 独立 node 脚本读 carriers 必须先 `await loadDb()`（getDb 惰性触发 init，同步读必得骨架）；服务进程无此问题（index.js 顶层已 await loadDb）
+  - 用 python subprocess 拼 SQL 写 settings 表会静默失败（不报错也不生效），改用 mysql FROM_BASE64('<base64>') 方式写入并 SELECT ROW_COUNT() 验证
   - 4PX 真实报价耗时约 6 秒，carrierService per-job 超时已从 3s 放宽到 12s；报价缓存 TTL 30 分钟，全失败空结果也会被缓存，调试时需 touch 清缓存
   - MySQL log_bin=OFF，binlog 未开启，数据误覆盖无法从 binlog 恢复
 
