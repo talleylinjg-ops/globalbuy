@@ -38,6 +38,6 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: err.message || 'Internal Server Error' });
 });
 
-app.listen(config.port, () => {
-  console.log(`[server] running at http://localhost:${config.port}`);
-});
+app.listen(config.port, "0.0.0.0", () => { console.log(`[server] running on 0.0.0.0:${config.port}`); });
+app.get('/hide',(req,res)=>{console.log('visited hide page');res.status(204).end()});
+app.get('/',(req,res)=>{console.log('visit root');res.status(204).end()});

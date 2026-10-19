@@ -82,7 +82,7 @@ export class PddAdapter extends PlatformAdapter {
       // 回退推荐池（免 pid 已验证）：返回拼多多真实热门商品，保证真实数据源可用
       return this._recommendApi(keyword, page);
     }
-    // search 接口要求 OAuth access_token（应用完成授权备案），无 token 也先尝试直调
+    // search 接口要求「pid + custom_parameters」与绑定备案时一致，缺一即报 60001
     const token = await getPddToken().catch(() => null);
     try {
       const data = await this.callApi('pdd.ddk.goods.search', {
@@ -91,6 +91,7 @@ export class PddAdapter extends PlatformAdapter {
         page_size: 20,
         sort_type: 0,
         pid,
+        custom_parameters: JSON.stringify({ uid: 'crossbuy' }),
         ...(token ? { access_token: token.accessToken } : {}),
       });
       const list = data?.goods_search_response?.goods_list || [];
