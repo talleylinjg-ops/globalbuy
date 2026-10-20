@@ -33,7 +33,7 @@ export default function SimpleApp() {
   return (
     <div className="simple-app">
       <header className="simple-header">
-        <a className="simple-logo" href="#/simple">CrossBuy</a>
+        <a className="simple-logo" href="#/">CrossBuy</a>
         <form
           className="simple-search"
           onSubmit={(e) => { e.preventDefault(); doSearch(query.trim()); }}

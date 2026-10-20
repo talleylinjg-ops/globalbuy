@@ -30,6 +30,10 @@ const DEFAULT_HOT_KEYWORDS = [
   '降噪',
 ];
 
+// 完整版（多语言主站）路由：#/simple 与其子页 #/track #/account #/admin
+// 其余地址（根路径 #/ 等）= 纯中文简易版（对外展示默认入口）
+const FULL_ROUTE_PREFIXES = ['#/simple', '#/track', '#/account', '#/admin'];
+
 function getAdminRoute() {
   return window.location.hash.startsWith('#/admin');
 }
@@ -42,8 +46,8 @@ function getAccountRoute() {
   return window.location.hash.startsWith('#/account');
 }
 
-function getSimpleRoute() {
-  return window.location.hash.startsWith('#/simple');
+function getFullRoute() {
+  return FULL_ROUTE_PREFIXES.some((p) => window.location.hash.startsWith(p));
 }
 
 // 从全部快递报价中挑三档：最快 / 最便宜 / 居中；三档尽量为三个不同报价
@@ -52,7 +56,7 @@ export default function App() {
   const { t, lang, setLang, languages } = useI18n();  const [isAdmin, setIsAdmin] = useState(getAdminRoute());
   const [isTrack, setIsTrack] = useState(getTrackRoute());
   const [isAccount, setIsAccount] = useState(getAccountRoute());
-  const [isSimple, setIsSimple] = useState(getSimpleRoute());
+  const [isFull, setIsFull] = useState(getFullRoute());
   const [meta, setMeta] = useState(null);
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -79,7 +83,7 @@ export default function App() {
   isDemoModeRef.current = Boolean(results?.demo || meta?.demo);
 
   useEffect(() => {
-    const onHash = () => { setIsAdmin(getAdminRoute()); setIsTrack(getTrackRoute()); setIsAccount(getAccountRoute()); setIsSimple(getSimpleRoute()); };
+    const onHash = () => { setIsAdmin(getAdminRoute()); setIsTrack(getTrackRoute()); setIsAccount(getAccountRoute()); setIsFull(getFullRoute()); };
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
@@ -98,13 +102,13 @@ export default function App() {
   // 首访自动预搜索默认热搜：访客打开即看到价格与快递选项，无需先输入
   const autoSearchedRef = useRef(false);
   useEffect(() => {
-    if (!meta || autoSearchedRef.current || isAdmin || isSimple || lastSearch || loading) return;
+    if (!meta || autoSearchedRef.current || !isFull || lastSearch || loading) return;
     autoSearchedRef.current = true;
     // 落地页/外链带 ?q= 进入时优先用户关键词，否则默认热搜
     const urlQ = new URLSearchParams(window.location.search).get('q');
     doSearch(urlQ || meta.hotKeywords?.[0] || DEFAULT_HOT_KEYWORDS[0]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [meta, isAdmin]);
+  }, [meta, isFull]);
 
   // 合并包裹：切换选中、调用统一计价接口
   const toggleCombine = useCallback((item) => {
@@ -274,7 +278,7 @@ export default function App() {
 
   return (
     <div>
-      {!isSimple && (
+      {isFull && (
       <header className="header">
         <div className="lang-switcher">
           <AccountMenu t={t} onOpen={() => { setIsAccount(true); setIsTrack(false); }} />
@@ -301,7 +305,7 @@ export default function App() {
         <div className="container header-inner">
           <div className="header-nav" style={{ display: 'flex', alignItems: 'baseline', gap: 16, width: '100%' }}>
             <a
-              href="#/"
+              href="#/simple"
               className="logo-link"
               onClick={() => { setIsTrack(false); setIsAdmin(false); setIsAccount(false); }}
               title={t('app.home')}
@@ -314,7 +318,7 @@ export default function App() {
       </header>
       )}
 
-      <main className={isSimple ? 'simple-page' : 'container'}>
+      <main className={isFull ? 'container' : 'simple-page'}>
         {isAdmin ? (
           <Suspense fallback={<div className="loading">...</div>}>
             <AdminPanel t={t} />
@@ -327,13 +331,9 @@ export default function App() {
           <Suspense fallback={<div className="loading">...</div>}>
             <AccountPage t={t} lang={lang} />
           </Suspense>
-        ) : isSimple ? (
-          <Suspense fallback={<div className="loading">...</div>}>
-            <SimpleApp />
-          </Suspense>
-        ) : (
-        <>
-        <SearchPanel
+        ) : isFull ? (
+          <>
+          <SearchPanel
           query={query}
           setQuery={setQuery}
           onSearch={doSearch}
@@ -437,10 +437,14 @@ export default function App() {
           </div>
         )}
         </>
+        ) : (
+          <Suspense fallback={<div className="loading">...</div>}>
+            <SimpleApp />
+          </Suspense>
         )}
       </main>
 
-      {!isAdmin && (
+      {isFull && !isAdmin && (
         <section className="container faq-section" aria-labelledby="faq-title">
           <h2 id="faq-title">{t('faq.title')}</h2>
           <p className="faq-subtitle">{t('faq.subtitle')}</p>
@@ -455,6 +459,7 @@ export default function App() {
         </section>
       )}
 
+      {isFull && (
       <CombineBar
         items={combineList}
         result={combineResult}
@@ -465,6 +470,7 @@ export default function App() {
         t={t}
         lang={lang}
       />
+      )}
 
       {detailItemId && (
         <ProductModal
@@ -490,10 +496,12 @@ export default function App() {
         />
       )}
 
+      {isFull && (
       <footer className="footer">
         <p className="note">{t('footer.note')}</p>
         <p>{t('footer.disclaimer')}</p>
       </footer>
+      )}
     </div>
   );
 }
