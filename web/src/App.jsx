@@ -4,6 +4,7 @@ import { useI18n } from './i18n.js';
 import { pickShippingTiers } from './utils/shipping.js';
 import { fetchMeta, searchProducts, parseLink, apiUrl } from './api.js';
 import { useMember, memberLogout } from './authStore.js';
+import AccountMenu from './components/AccountMenu.jsx';
 import ProductCard from './components/ProductCard.jsx';
 import SearchPanel from './components/SearchPanel.jsx';
 import SettingsPanel from './components/SettingsPanel.jsx';
@@ -281,7 +282,7 @@ export default function App() {
       {isFull && (
       <header className="header">
         <div className="lang-switcher">
-          <AccountMenu t={t} onOpen={() => { setIsAccount(true); setIsTrack(false); }} />
+          <AccountMenu t={t} />
           {!isAdmin && (
             <a
               href="#/track"
@@ -506,21 +507,3 @@ export default function App() {
   );
 }
 
-// header 会员入口：未登录 Sign in，登录显示名字（点击进会员中心）
-function AccountMenu({ t, onOpen }) {
-  const session = useMember();
-  const customer = session?.customer || {};
-  const label = session
-    ? (customer.name || customer.email || '').split(' ')[0] || t('account.myAccount')
-    : t('account.signIn');
-  return (
-    <a
-      href="#/account"
-      className="header-account-link"
-      onClick={onOpen}
-      title={session ? t('account.myAccount') : t('account.signIn')}
-    >
-      <span className="account-link-text">{label}</span>
-    </a>
-  );
-}

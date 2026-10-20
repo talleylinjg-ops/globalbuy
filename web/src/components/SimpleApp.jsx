@@ -1,17 +1,71 @@
 import { useState, useEffect } from 'react';
 import { apiUrl, fetchMeta, searchProducts } from '../api.js';
 import { matchSpecGroups, specGroupLabel, specValueLabel } from '../utils/specOptions.js';
+import { useMember, memberFetch } from '../authStore.js';
+import AccountMenu from './AccountMenu.jsx';
 
-// 简易展示版（#/simple）：纯中文、隐藏全部快递信息（渠道/运费/时效/清关/仓库）
-// 仅展示商品与人民币价格，下单由服务端自动选渠道；用于对外分享
+// 简易展示版（根路径）：中英双语、会员系统、后台入口；隐藏全部快递信息（渠道/运费/时效/清关）
+// 商品价人民币展示，下单由服务端自动选渠道；用于对外分享
 const PLATFORM_ZH = { pdd: '拼多多', taobao: '淘宝', tmall: '天猫', '1688': '1688', jd: '京东', ali: '速卖通' };
+const PLATFORM_EN = { pdd: 'PDD', taobao: 'Taobao', tmall: 'Tmall', '1688': '1688', jd: 'JD', ali: 'AliExpress' };
+const LANGS = [{ code: 'zh', label: '中文' }, { code: 'en', label: 'English' }];
+const LANG_KEY = 'crossbuy_lang';
+
+const STR = {
+  zh: {
+    'account.signIn': '登录', 'account.myAccount': '我的账户',
+    searchPlaceholder: '搜索想买的商品，如：手机壳 / 数据线',
+    search: '搜索', hot: '热搜：', sold: '已售', buyers: '人已买',
+    noResults: '没有找到相关商品，换个关键词试试',
+    serviceDown: '搜索服务暂时不可用，请稍后再试',
+    loading: '加载中...', searching: '正在搜索...',
+    description: '商品介绍', note: '备注', notePlaceholder: '对规格有特殊要求请在此说明（选填）',
+    quantity: '数量', orderNow: '立即下单',
+    confirmOrder: '确认下单', spec: '规格：', total: '合计：', totalNote: '（商品金额，以人民币计）',
+    name: '姓名 *', phone: '手机', email: '邮箱 *', country: '国家 / 地区', countryPh: '如 US / GB',
+    state: '省 / 州', city: '城市 *', postal: '邮编', line1: '详细地址 *', line2: '补充地址',
+    useSaved: '使用已存地址', savedNone: '暂无已存地址',
+    saveAddress: '保存到地址簿',
+    formError: '请填写姓名、邮箱、城市和详细地址',
+    submitting: '提交中...', submitOrder: '提交订单',
+    doneTitle: '下单成功', orderNo: '订单号：', doneNote: '我们会尽快为您安排，请留意邮箱通知。', done: '完成',
+    admin: '管理', footer: 'CrossBuy · 精选中国好物',
+  },
+  en: {
+    'account.signIn': 'Sign In', 'account.myAccount': 'My Account',
+    searchPlaceholder: 'Search products, e.g. phone case / cable',
+    search: 'Search', hot: 'Hot: ', sold: 'Sold', buyers: ' buyers',
+    noResults: 'No products found, try another keyword',
+    serviceDown: 'Search service unavailable, please try later',
+    loading: 'Loading...', searching: 'Searching...',
+    description: 'Description', note: 'Note', notePlaceholder: 'Special requirements (optional)',
+    quantity: 'Quantity', orderNow: 'Order Now',
+    confirmOrder: 'Confirm Order', spec: 'Specs: ', total: 'Total: ', totalNote: ' (product amount, CNY)',
+    name: 'Name *', phone: 'Phone', email: 'Email *', country: 'Country / Region', countryPh: 'e.g. US / GB',
+    state: 'State / Province', city: 'City *', postal: 'Postal Code', line1: 'Address *', line2: 'Address Line 2',
+    useSaved: 'Use saved address', savedNone: 'No saved addresses',
+    saveAddress: 'Save to address book',
+    formError: 'Name, email, city and address are required',
+    submitting: 'Submitting...', submitOrder: 'Submit Order',
+    doneTitle: 'Order Placed', orderNo: 'Order No.: ', doneNote: 'We will process your order shortly, please check your email.', done: 'Done',
+    admin: 'Admin', footer: 'CrossBuy · Selected products from China',
+  },
+};
+
+function useSimpleLang() {
+  const [lang, setLangState] = useState(() => localStorage.getItem(LANG_KEY) || 'zh');
+  const setLang = (l) => { setLangState(l); localStorage.setItem(LANG_KEY, l); };
+  return { lang, setLang, t: (k) => STR[lang]?.[k] ?? STR.zh[k] ?? k };
+}
 
 export default function SimpleApp() {
+  const { lang, setLang, t } = useSimpleLang();
   const [query, setQuery] = useState('');
   const [hot, setHot] = useState([]);
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [detailItemId, setDetailItemId] = useState(null);
+  const pzh = lang === 'zh' ? PLATFORM_ZH : PLATFORM_EN;
 
   useEffect(() => {
     fetchMeta().then((m) => setHot(m.hotKeywords || [])).catch(() => {});
@@ -40,26 +94,37 @@ export default function SimpleApp() {
         >
           <input
             className="settings-control"
-            placeholder="搜索想买的商品，如：手机壳 / 数据线"
+            placeholder={t('searchPlaceholder')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-          <button type="submit" className="btn btn-primary">搜索</button>
+          <button type="submit" className="btn btn-primary">{t('search')}</button>
         </form>
+        <div className="simple-header-tools">
+          <AccountMenu t={t} />
+          <select
+            className="lang-select"
+            value={lang}
+            onChange={(e) => setLang(e.target.value)}
+            aria-label="Language"
+          >
+            {LANGS.map((l) => <option key={l.code} value={l.code}>{l.label}</option>)}
+          </select>
+        </div>
       </header>
 
       <main className="simple-main">
         <div className="simple-hot">
-          热搜：
-          {(hot.length ? hot : ['手机壳', '数据线', '蓝牙耳机']).map((k) => (
+          {t('hot')}
+          {(hot.length ? hot : (lang === 'zh' ? ['手机壳', '数据线', '蓝牙耳机'] : ['phone case', 'cable', 'earbuds'])).map((k) => (
             <button key={k} type="button" className="simple-hot-tag" onClick={() => doSearch(k)}>{k}</button>
           ))}
         </div>
 
-        {loading && <div className="loading">正在搜索...</div>}
-        {!loading && results?.error && <div className="track-error">搜索服务暂时不可用，请稍后再试</div>}
+        {loading && <div className="loading">{t('searching')}</div>}
+        {!loading && results?.error && <div className="track-error">{t('serviceDown')}</div>}
         {!loading && !results?.error && list.length === 0 && (
-          <div className="simple-empty">没有找到相关商品，换个关键词试试</div>
+          <div className="simple-empty">{t('noResults')}</div>
         )}
 
         <div className="simple-grid">
@@ -72,7 +137,7 @@ export default function SimpleApp() {
                 <div className="product-title">{p.title}</div>
                 <div className="product-stats">
                   <span className="product-price">¥{p.price.toLocaleString()}</span>
-                  <span className="muted">{PLATFORM_ZH[p.platform] || ''}{p.sales > 0 ? ` · 已售${p.sales.toLocaleString()}` : ''}</span>
+                  <span className="muted">{pzh[p.platform] || ''}{p.sales > 0 ? ` · ${t('sold')}${p.sales.toLocaleString()}` : ''}</span>
                 </div>
               </div>
             </div>
@@ -80,17 +145,20 @@ export default function SimpleApp() {
         </div>
       </main>
 
-      <footer className="simple-footer">CrossBuy · 精选中国好物</footer>
+      <footer className="simple-footer">
+        {t('footer')}
+        <a className="simple-admin-link" href="#/admin">{t('admin')}</a>
+      </footer>
 
       {detailItemId && (
-        <SimpleDetail itemId={detailItemId} onClose={() => setDetailItemId(null)} />
+        <SimpleDetail itemId={detailItemId} lang={lang} t={t} onClose={() => setDetailItemId(null)} />
       )}
     </div>
   );
 }
 
-// 简版详情弹窗：图集 + 中文描述 + 属性点选 + 数量 + 下单（无任何物流信息）
-function SimpleDetail({ itemId, onClose }) {
+// 简版详情弹窗：图集 + 属性点选 + 数量 + 下单（无任何物流信息）
+function SimpleDetail({ itemId, lang, t, onClose }) {
   const [detail, setDetail] = useState(null);
   const [error, setError] = useState('');
   const [activeImg, setActiveImg] = useState('');
@@ -103,7 +171,7 @@ function SimpleDetail({ itemId, onClose }) {
     fetch(apiUrl(`/api/product/${encodeURIComponent(itemId)}`))
       .then(async (res) => {
         const d = await res.json();
-        if (!res.ok) throw new Error(d.error || '加载失败');
+        if (!res.ok) throw new Error(d.error || 'load failed');
         return d;
       })
       .then((d) => {
@@ -121,7 +189,7 @@ function SimpleDetail({ itemId, onClose }) {
     setActiveImg(gallery[(cur + dir + gallery.length) % gallery.length]);
   };
   const specText = [
-    ...specGroups.map((g) => (selections[g.key] ? `${specGroupLabel(g, 'zh')}：${specValueLabel(selections[g.key], 'zh')}` : '')),
+    ...specGroups.map((g) => (selections[g.key] ? `${specGroupLabel(g, lang)}: ${specValueLabel(selections[g.key], lang)}` : '')),
     skuNote.trim(),
   ].filter(Boolean).join('; ');
 
@@ -129,7 +197,7 @@ function SimpleDetail({ itemId, onClose }) {
     <div className="order-modal-mask" onClick={onClose}>
       <div className="product-modal" onClick={(e) => e.stopPropagation()}>
         <button className="order-modal-close" onClick={onClose}>×</button>
-        {!detail && !error && <div className="loading">加载中...</div>}
+        {!detail && !error && <div className="loading">{t('loading')}</div>}
         {error && <div className="track-error">{error}</div>}
         {detail && (
           <div className="product-detail-grid">
@@ -137,7 +205,7 @@ function SimpleDetail({ itemId, onClose }) {
               <img className="product-detail-img" src={activeImg || detail.imageUrl} alt="" />
               {(detail.gallery || []).length > 1 && (
                 <div className="product-gallery-wrap">
-                  <button type="button" className="product-gallery-arrow" aria-label="上一张" onClick={() => stepGallery(-1)}>‹</button>
+                  <button type="button" className="product-gallery-arrow" aria-label="prev" onClick={() => stepGallery(-1)}>‹</button>
                   <div className="product-gallery">
                     {detail.gallery.map((g, i) => (
                       <button
@@ -149,32 +217,34 @@ function SimpleDetail({ itemId, onClose }) {
                       </button>
                     ))}
                   </div>
-                  <button type="button" className="product-gallery-arrow" aria-label="下一张" onClick={() => stepGallery(1)}>›</button>
+                  <button type="button" className="product-gallery-arrow" aria-label="next" onClick={() => stepGallery(1)}>›</button>
                 </div>
               )}
               {detail.description && (
                 <div className="product-detail-desc">
-                  <div className="simple-desc-title">商品介绍</div>
-                  <p>{detail.description}</p>
+                  <div className="simple-desc-title">{t('description')}</div>
+                  <p>{lang !== 'zh' && detail.descriptionEn ? detail.descriptionEn : detail.description}</p>
                 </div>
               )}
             </div>
 
             <div className="product-detail-info">
-              <h3 className="product-detail-title">{detail.title}</h3>
+              <h3 className="product-detail-title">
+                {lang !== 'zh' && detail.titleEn ? detail.titleEn : detail.title}
+              </h3>
               <div className="product-detail-price-row">
                 <span className="product-detail-price">¥{detail.price.toLocaleString()}</span>
                 {detail.originalPrice > detail.price && (
                   <span className="product-detail-orig">¥{detail.originalPrice.toLocaleString()}</span>
                 )}
                 {detail.sales > 0 && (
-                  <span className="product-detail-sales">{detail.sales.toLocaleString()}+人已买</span>
+                  <span className="product-detail-sales">{detail.sales.toLocaleString()}+{t('buyers')}</span>
                 )}
               </div>
 
               {specGroups.map((g) => (
                 <div className="product-sku-block" key={g.key}>
-                  <div className="settings-label">{specGroupLabel(g, 'zh')}</div>
+                  <div className="settings-label">{specGroupLabel(g, lang)}</div>
                   <div className="product-sku-list">
                     {g.values.map((v) => {
                       const active = selections[g.key] === v;
@@ -187,7 +257,7 @@ function SimpleDetail({ itemId, onClose }) {
                           onClick={() => setSelections((s) => ({ ...s, [g.key]: active ? null : v }))}
                         >
                           {hex && <span className="spec-dot" style={{ background: hex }} aria-hidden="true" />}
-                          {specValueLabel(v, 'zh')}
+                          {specValueLabel(v, lang)}
                         </button>
                       );
                     })}
@@ -195,19 +265,19 @@ function SimpleDetail({ itemId, onClose }) {
                 </div>
               ))}
               <div className="product-sku-block">
-                <div className="settings-label">备注</div>
+                <div className="settings-label">{t('note')}</div>
                 <textarea
                   className="settings-control product-spec-note"
                   rows={2}
                   maxLength={200}
-                  placeholder="对规格有特殊要求请在此说明（选填）"
+                  placeholder={t('notePlaceholder')}
                   value={skuNote}
                   onChange={(e) => setSkuNote(e.target.value)}
                 />
               </div>
 
               <div className="product-qty-block">
-                <div className="settings-label">数量</div>
+                <div className="settings-label">{t('quantity')}</div>
                 <div className="product-qty-row">
                   <button type="button" className="product-qty-btn" onClick={() => setQty((q) => Math.max(1, q - 1))}>−</button>
                   <input
@@ -221,7 +291,7 @@ function SimpleDetail({ itemId, onClose }) {
               </div>
 
               <button className="btn btn-primary product-order-btn" onClick={() => setShowOrder(true)}>
-                立即下单
+                {t('orderNow')}
               </button>
             </div>
           </div>
@@ -230,12 +300,13 @@ function SimpleDetail({ itemId, onClose }) {
           <SimpleOrder
             item={{
               itemId: detail.itemId,
-              title: detail.title,
+              title: lang !== 'zh' && detail.titleEn ? detail.titleEn : detail.title,
               imageUrl: detail.imageUrl,
               price: detail.price,
               qty,
               skuName: specText,
             }}
+            lang={lang} t={t}
             onClose={() => setShowOrder(false)}
             onDone={() => { setShowOrder(false); onClose(); }}
           />
@@ -245,37 +316,62 @@ function SimpleDetail({ itemId, onClose }) {
   );
 }
 
-// 简版下单：仅联系人 + 收货地址 + 金额合计（人民币），无渠道/运费/时效
-function SimpleOrder({ item, onClose, onDone }) {
+// 简版下单：会员预填/地址簿 + 联系人 + 收货地址 + 金额合计（人民币），无渠道/运费/时效
+function SimpleOrder({ item, lang, t, onClose, onDone }) {
+  const session = useMember();
   const [form, setForm] = useState({ name: '', phone: '', email: '', country: '', state: '', city: '', postal: '', line1: '', line2: '' });
+  const [addresses, setAddresses] = useState([]);
+  const [saveAddress, setSaveAddress] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [orderNo, setOrderNo] = useState('');
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
   const total = item.price * item.qty;
 
+  // 会员登录态：预填资料 + 拉取地址簿
+  useEffect(() => {
+    if (!session) return;
+    const c = session.customer || {};
+    setForm((f) => ({ ...f, name: f.name || c.name || '', email: f.email || c.email || '' }));
+    memberFetch('/api/auth/addresses')
+      .then(async (res) => (res.ok ? res.json() : []))
+      .then((list) => setAddresses(Array.isArray(list) ? list : []))
+      .catch(() => {});
+  }, [session]);
+
+  const applyAddress = (id) => {
+    const a = addresses.find((x) => x.id === id);
+    if (!a) return;
+    setForm((f) => ({
+      ...f,
+      name: a.recipient || f.name, phone: a.phone || f.phone,
+      country: a.country || f.country, state: a.state || '', city: a.city || '',
+      postal: a.postal || '', line1: a.line1 || '', line2: a.line2 || '',
+    }));
+  };
+
   const submit = async (e) => {
     e.preventDefault();
     setError('');
     if (!form.name || !form.email || !form.line1 || !form.city) {
-      setError('请填写姓名、邮箱、城市和详细地址');
+      setError(t('formError'));
       return;
     }
     setSubmitting(true);
     try {
-      const res = await fetch(apiUrl('/api/orders'), {
+      const res = await memberFetch('/api/orders', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           items: [{ itemId: item.itemId, quantity: item.qty, skuName: item.skuName }],
           contact: { name: form.name, phone: form.phone, email: form.email },
           address: { line1: form.line1, line2: form.line2, city: form.city, state: form.state, postal: form.postal, country: form.country || 'US' },
           currency: 'CNY',
           serviceFeeRate: 0,
+          saveAddress: Boolean(session && saveAddress),
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || '下单失败');
+      if (!res.ok) throw new Error(data.error || 'order failed');
       setOrderNo(data.order?.orderNo || data.orderNo || '');
     } catch (err) {
       setError(err.message);
@@ -290,10 +386,10 @@ function SimpleOrder({ item, onClose, onDone }) {
         <div className="product-modal simple-order-modal" onClick={(e) => e.stopPropagation()}>
           <button className="order-modal-close" onClick={onDone}>×</button>
           <div className="simple-order-done">
-            <h3>下单成功</h3>
-            <p>订单号：<b>{orderNo}</b></p>
-            <p className="muted">我们会尽快为您安排，请留意邮箱通知。</p>
-            <button className="btn btn-primary" onClick={onDone}>完成</button>
+            <h3>{t('doneTitle')}</h3>
+            <p>{t('orderNo')}<b>{orderNo}</b></p>
+            <p className="muted">{t('doneNote')}</p>
+            <button className="btn btn-primary" onClick={onDone}>{t('done')}</button>
           </div>
         </div>
       </div>
@@ -304,59 +400,75 @@ function SimpleOrder({ item, onClose, onDone }) {
     <div className="order-modal-mask" onClick={onClose}>
       <div className="product-modal simple-order-modal" onClick={(e) => e.stopPropagation()}>
         <button className="order-modal-close" onClick={onClose}>×</button>
-        <h3 className="simple-order-title">确认下单</h3>
+        <h3 className="simple-order-title">{t('confirmOrder')}</h3>
         <div className="simple-order-item">
           <img src={item.imageUrl} alt="" />
           <div className="simple-order-item-info">
             <div className="simple-order-item-name">{item.title}</div>
-            {item.skuName && <div className="muted">规格：{item.skuName}</div>}
+            {item.skuName && <div className="muted">{t('spec')}{item.skuName}</div>}
             <div className="simple-order-item-price">¥{item.price.toLocaleString()} × {item.qty}</div>
           </div>
         </div>
-        <div className="simple-order-total">合计：<b>¥{total.toLocaleString()}</b><span className="muted">（商品金额，以人民币计）</span></div>
+        <div className="simple-order-total">{t('total')}<b>¥{total.toLocaleString()}</b><span className="muted">{t('totalNote')}</span></div>
 
         <form onSubmit={submit}>
+          {session && addresses.length > 0 && (
+            <div className="simple-address-pick">
+              <select className="settings-control" defaultValue="" onChange={(e) => applyAddress(e.target.value)}>
+                <option value="">{t('useSaved')}</option>
+                {addresses.map((a) => (
+                  <option key={a.id} value={a.id}>{a.recipient} · {a.line1}, {a.city} {a.country}</option>
+                ))}
+              </select>
+            </div>
+          )}
           <div className="form-grid">
             <div>
-              <label className="settings-label">姓名 *</label>
+              <label className="settings-label">{t('name')}</label>
               <input className="settings-control" value={form.name} onChange={(e) => set('name', e.target.value)} required />
             </div>
             <div>
-              <label className="settings-label">手机</label>
+              <label className="settings-label">{t('phone')}</label>
               <input className="settings-control" value={form.phone} onChange={(e) => set('phone', e.target.value)} />
             </div>
             <div>
-              <label className="settings-label">邮箱 *</label>
+              <label className="settings-label">{t('email')}</label>
               <input className="settings-control" type="email" value={form.email} onChange={(e) => set('email', e.target.value)} required />
             </div>
             <div>
-              <label className="settings-label">国家 / 地区</label>
-              <input className="settings-control" value={form.country} onChange={(e) => set('country', e.target.value)} maxLength={2} placeholder="如 US / GB" />
+              <label className="settings-label">{t('country')}</label>
+              <input className="settings-control" value={form.country} onChange={(e) => set('country', e.target.value)} maxLength={2} placeholder={t('countryPh')} />
             </div>
             <div>
-              <label className="settings-label">省 / 州</label>
+              <label className="settings-label">{t('state')}</label>
               <input className="settings-control" value={form.state} onChange={(e) => set('state', e.target.value)} />
             </div>
             <div>
-              <label className="settings-label">城市 *</label>
+              <label className="settings-label">{t('city')}</label>
               <input className="settings-control" value={form.city} onChange={(e) => set('city', e.target.value)} required />
             </div>
             <div>
-              <label className="settings-label">邮编</label>
+              <label className="settings-label">{t('postal')}</label>
               <input className="settings-control" value={form.postal} onChange={(e) => set('postal', e.target.value)} />
             </div>
             <div className="form-grid-full">
-              <label className="settings-label">详细地址 *</label>
+              <label className="settings-label">{t('line1')}</label>
               <input className="settings-control" value={form.line1} onChange={(e) => set('line1', e.target.value)} required />
             </div>
             <div className="form-grid-full">
-              <label className="settings-label">补充地址</label>
+              <label className="settings-label">{t('line2')}</label>
               <input className="settings-control" value={form.line2} onChange={(e) => set('line2', e.target.value)} />
             </div>
           </div>
+          {session && (
+            <label className="simple-save-address">
+              <input type="checkbox" checked={saveAddress} onChange={(e) => setSaveAddress(e.target.checked)} />
+              <span>{t('saveAddress')}</span>
+            </label>
+          )}
           {error && <div className="track-error">{error}</div>}
           <button type="submit" className="btn btn-primary simple-order-btn" disabled={submitting}>
-            {submitting ? '提交中...' : '提交订单'}
+            {submitting ? t('submitting') : t('submitOrder')}
           </button>
         </form>
       </div>
