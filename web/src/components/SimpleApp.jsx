@@ -68,8 +68,13 @@ export default function SimpleApp() {
   const pzh = lang === 'zh' ? PLATFORM_ZH : PLATFORM_EN;
 
   useEffect(() => {
-    fetchMeta().then((m) => setHot(m.hotKeywords || [])).catch(() => {});
-    doSearch('');
+    // 首屏用热搜词搜索：后端 /api/search 要求 q 非空，空关键词会 400
+    let searched = false;
+    const fallback = lang === 'zh' ? '手机壳' : 'phone case';
+    const run = (kw) => { if (!searched) { searched = true; doSearch(kw); } };
+    fetchMeta()
+      .then((m) => { setHot(m.hotKeywords || []); run(m.hotKeywords?.[0] || fallback); })
+      .catch(() => run(fallback));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -137,7 +142,10 @@ export default function SimpleApp() {
                 <div className="product-title">{p.title}</div>
                 <div className="product-stats">
                   <span className="product-price">¥{p.price.toLocaleString()}</span>
-                  <span className="muted">{pzh[p.platform] || ''}{p.sales > 0 ? ` · ${t('sold')}${p.sales.toLocaleString()}` : ''}</span>
+                  <span className="muted">
+                    {pzh[p.platform] ? ` · ${pzh[p.platform]}` : ''}
+                    {p.sales > 0 ? ` · ${t('sold')}${p.sales.toLocaleString()}` : ''}
+                  </span>
                 </div>
               </div>
             </div>
