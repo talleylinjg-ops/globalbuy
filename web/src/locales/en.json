@@ -405,7 +405,11 @@
     "parcelProduct": "Product / Line",
     "parcelItemsPh": "Items in parcel (comma separated)",
     "splitByWarehouse": "Split by Warehouse",
-    "parcelWarehouse": "Warehouse"
+    "parcelWarehouse": "Warehouse",
+    "initialPassword": "Initial Password",
+    "resetPassword": "Reset Password",
+    "passwordHint": "Min 6 chars; leave empty to create an archive-only customer",
+    "canLogin": "Can sign in to storefront"
   },
   "common": {
     "close": "Close",

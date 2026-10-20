@@ -7,8 +7,28 @@ import {
   login, authMiddleware as auth, requireSuper, verifyPassword, changeOwnPassword, getProfile, updateProfile,
   listAdmins, createAdmin, updateAdmin, deleteAdmin,
 } from '../services/auth.js';
+import {
+  safeCustomer, makeCredentials, adminResetCustomerPassword,
+} from '../services/customerAuth.js';
 
 const router = Router();
+
+const normEmail = (e) => String(e || '').trim().toLowerCase();
+const normUpper = (v) => String(v || '').trim().toUpperCase();
+// 后台会员编辑保护：这些字段只能走凭据流程（注册/改密），直接写入会破坏前台登录
+const CREDENTIAL_FIELDS = ['salt', 'passwordHash', 'registeredAt', 'token', 'id', 'createdAt', 'updatedAt'];
+const stripCredentials = (body = {}) => {
+  const patch = { ...body };
+  for (const k of CREDENTIAL_FIELDS) delete patch[k];
+  return patch;
+};
+function assertEmailAvailable(email, exceptId = null) {
+  if (!email) return;
+  const dup = (getDb().customers || []).find(
+    (c) => c.id !== exceptId && String(c.email || '').trim().toLowerCase() === email
+  );
+  if (dup) throw Object.assign(new Error('email already registered'), { status: 409 });
+}
 
 // 登录（username + password；未传 username 兼容默认 admin 账号）
 router.post('/login', (req, res) => {
@@ -91,7 +111,7 @@ router.get('/customers', auth, (req, res) => {
       .sort((x, y) => String(y.createdAt).localeCompare(String(x.createdAt)));
     const spendUsd = toUsd(co.reduce((s, o) => s + (Number(o.totalCny) || 0), 0));
     return {
-      ...c,
+      ...safeCustomer(c),
       stats: {
         ordersCount: co.length,
         lastOrderAt: co[0]?.createdAt || null,
@@ -107,23 +127,62 @@ router.get('/customers', auth, (req, res) => {
 router.get('/customers/:id', auth, (req, res) => {
   const c = getById('customers', req.params.id);
   if (!c) return res.status(404).json({ error: 'not found' });
-  res.json(c);
+  res.json(safeCustomer(c));
 });
 
+// 后台创建会员：带 password 则同时生成前台登录凭据；不填则为档案型会员
 router.post('/customers', auth, (req, res) => {
-  const { name, email, phone, country, currency, notes, status } = req.body || {};
+  const { name, email, phone, country, currency, notes, status, password } = req.body || {};
   if (!name) return res.status(400).json({ error: 'name required' });
+  const mail = normEmail(email);
+  try {
+    assertEmailAvailable(mail);
+  } catch (e) {
+    return res.status(e.status || 400).json({ error: e.message });
+  }
+  if (password && String(password).length < 6) {
+    return res.status(400).json({ error: 'password too short (min 6)' });
+  }
   const record = createRecord('customers', {
-    name, email: email || '', phone: phone || '', country: country || 'US',
-    currency: currency || 'USD', notes: notes || '', status: status || 'active',
+    name,
+    email: mail,
+    phone: String(phone || '').trim(),
+    country: normUpper(country) || 'US',
+    currency: normUpper(currency) || 'USD',
+    notes: notes || '',
+    status: status || 'active',
+    registeredAt: new Date().toISOString(),
+    ...(password ? makeCredentials(password) : {}),
   });
-  res.json(record);
+  res.json(safeCustomer(record));
 });
 
+// 后台编辑会员：凭据字段只读保护；newPassword 选填即重置密码
 router.put('/customers/:id', auth, (req, res) => {
-  const c = updateRecord('customers', req.params.id, req.body || {});
+  const c = getById('customers', req.params.id);
   if (!c) return res.status(404).json({ error: 'not found' });
-  res.json(c);
+  const { newPassword, ...body } = req.body || {};
+  const patch = stripCredentials(body);
+  if (patch.email !== undefined) {
+    const mail = normEmail(patch.email);
+    try {
+      assertEmailAvailable(mail, req.params.id);
+    } catch (e) {
+      return res.status(e.status || 400).json({ error: e.message });
+    }
+    patch.email = mail;
+  }
+  if (patch.country !== undefined) patch.country = normUpper(patch.country);
+  if (patch.currency !== undefined) patch.currency = normUpper(patch.currency);
+  if (newPassword) {
+    try {
+      adminResetCustomerPassword(req.params.id, newPassword);
+    } catch (e) {
+      return res.status(e.status || 400).json({ error: e.message });
+    }
+  }
+  const updated = updateRecord('customers', req.params.id, patch);
+  res.json(safeCustomer(updated));
 });
 
 router.delete('/customers/:id', auth, requireSuper, (req, res) => {

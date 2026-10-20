@@ -442,7 +442,11 @@
     "parcelProduct": "Producto / Línea",
     "parcelItemsPh": "Artículos del paquete (separados por coma)",
     "splitByWarehouse": "Dividir por almacén",
-    "parcelWarehouse": "Almacén"
+    "parcelWarehouse": "Almacén",
+    "initialPassword": "Contraseña inicial",
+    "resetPassword": "Restablecer contraseña",
+    "passwordHint": "Mínimo 6 caracteres; dejar vacío crea un cliente solo de archivo",
+    "canLogin": "Puede iniciar sesión en la tienda"
   },
   "carrierName": {
     "sfintl": "SF Internacional",

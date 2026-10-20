@@ -896,6 +896,15 @@ body {
   text-align: left;
 }
 .wc-name-link:hover { text-decoration: underline; }
+.login-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #16a34a;
+  margin-left: 6px;
+  vertical-align: 1px;
+}
 .wc-empty { text-align: center; color: var(--text-dim); padding: 28px 0 !important; }
 
 /* 状态 pill 扩展色（WooCommerce 配色） */

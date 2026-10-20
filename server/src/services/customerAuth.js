@@ -15,6 +15,8 @@ function makeCredentials(password) {
   return { salt, passwordHash: hashPassword(password, salt) };
 }
 
+export { makeCredentials };
+
 function verifyCredentials(password, salt, passwordHash) {
   try {
     const h = hashPassword(password, salt);
@@ -35,8 +37,12 @@ function findCustomerByEmail(email) {
 function safeCustomer(c) {
   if (!c) return null;
   const { salt, passwordHash, ...safe } = c;
+  // canLogin：有无凭据（后台建的档案型会员无密码，不能登录前台）
+  safe.canLogin = Boolean(passwordHash);
   return safe;
 }
+
+export { safeCustomer };
 
 export function registerCustomer({ name, email, password }) {
   const mail = normEmail(email);

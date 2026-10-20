@@ -392,7 +392,11 @@
     "parcelProduct": "产品/线路",
     "parcelItemsPh": "包裹内商品（逗号分隔）",
     "splitByWarehouse": "按仓库一键拆分",
-    "parcelWarehouse": "仓库"
+    "parcelWarehouse": "仓库",
+    "initialPassword": "初始密码",
+    "resetPassword": "重置密码",
+    "passwordHint": "至少 6 位；留空则该会员暂不能登录前台",
+    "canLogin": "可登录前台"
   },
   "common": {
     "close": "收起",

@@ -922,11 +922,17 @@ function AdminsTab({ username: currentUsername, showNotice, t }) {
 // ===== 客户表单 =====
 function CustomerForm({ initial, editing, onSave, onCancel, t }) {
   const [form, setForm] = useState(initial);
+  const [password, setPassword] = useState('');
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
   const submit = (e) => {
     e.preventDefault();
     if (!form.name) return;
-    onSave({ name: form.name, email: form.email || '', phone: form.phone || '', country: form.country || 'US', currency: form.currency || 'USD', status: form.status || 'active', notes: form.notes || '' });
+    const payload = { name: form.name, email: form.email || '', phone: form.phone || '', country: form.country || 'US', currency: form.currency || 'USD', status: form.status || 'active', notes: form.notes || '' };
+    if (password) {
+      if (editing) payload.newPassword = password;
+      else payload.password = password;
+    }
+    onSave(payload);
   };
   return (
     <div className="card admin-form">
@@ -960,6 +966,17 @@ function CustomerForm({ initial, editing, onSave, onCancel, t }) {
             <select className="settings-control" value={form.status} onChange={(e) => set('status', e.target.value)}>
               {CUSTOMER_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
+          </div>
+          <div>
+            <label className="settings-label">{editing ? t('admin.resetPassword') : t('admin.initialPassword')}</label>
+            <input
+              className="settings-control"
+              type="password"
+              autoComplete="new-password"
+              placeholder={t('admin.passwordHint')}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
           </div>
           <div className="form-grid-full">
             <label className="settings-label">{t('admin.notes')}</label>
@@ -1313,7 +1330,10 @@ function CustomersTab({ customers, query, onQuery, onAdd, onEdit, onDelete, t })
             return (
               <tr key={c.id} className={selected?.id === c.id ? 'wc-row-active' : ''}>
                 <td>
-                  <button className="wc-name-link" onClick={() => setSelected(selected?.id === c.id ? null : c)}>{c.name}</button>
+                  <button className="wc-name-link" onClick={() => setSelected(selected?.id === c.id ? null : c)}>
+                    {c.name}
+                    {c.canLogin && <span className="login-dot" title={t('admin.canLogin')} />}
+                  </button>
                   {c.notes && <div className="muted-note">{c.notes}</div>}
                 </td>
                 <td>{c.email}</td>
