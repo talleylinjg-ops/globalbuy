@@ -106,6 +106,7 @@ Entries discovered by the Agent during task execution should follow this format:
   - 2026-10-14 顺丰技术答复：直接生产联调（沙箱配置与生产不一致）；电商业务用 msgType=IPE_ESTIMATE_FEE（预估总运费，菜单 218）；文档站 openapi-portal.sf.global 内容 API=/openapi/console/noLogin/online/doc/{menuId}/zh-CN（返回签名 GCS URL 再下载正文）、菜单树=/doc/menu/list；接口清单：IPE_ESTIMATE_FEE(218 电商预估总运费)/IECS_QUERY_WEIGHT_FREIGHT(110 重量及运费查询-电商预付)/IOMS_QUERY_CHARGE(133 计费重和费用项查询-月结)/IUOP_ESTIMATE_FEE(85 国际快递预估运费)；1004 的解法=登录 http://openapi.sf.global/ →应用列表→详情→关联 API（181 关联API指引），需门户账号登录自助操作，已请用户关联 IPE_ESTIMATE_FEE；IPE_ESTIMATE_FEE 参数与 IUOP 版本基本一致，addServiceInfo.serviceCodeList 必填、paymentInfo/cargoInfo 非必填，电商产品码示例 INT0263
   - 适配器 sfinternational.js + sfcrypto.js；fields：appKey/appSecret/aesKey/customerCode/customerType/serviceCode(=msgType)/baseUrl/interProductCode（逗号分隔多产品码并行询价，b2d1b75）
   - 2026-10-19 生产凭据四件套已配置进 MySQL settings carriers（sfintl）：appKey 39a471.../customerCode ICRM-CN032D8401/baseUrl https://api-ifsp.sf.global/serviceCode IPE_ESTIMATE_FEE/products INT0014,INT0263，enabled=false 防失真出街；生产网关实测 token 正常但 IPE/IUOP ESTIMATE_FEE 均 1004——生产应用未关联估价类 API，等用户登录 http://openapi.sf.global/ 应用详情→关联 API 勾选 ESTIMATE 接口后重测开闸；电商客户编码与快递编码体系不同（生产 ICRM-CN 前缀，测试 ICRME 前缀）
+  - 2026-10-20 顺丰估价接口审批通过，生产渠道已开闸出街：IPE_ESTIMATE_FEE 实测 US 0.5kg INT0263=93.38 CNY/INT0014=299 CNY，GB/DE/AU 多国稳定，adapter 1.2s 返回 2 条；出街报价 sfintl INT0263≈13 USD/INT0014≈42 USD；改 carriers 后必须「改库→kill 服务子进程→touch index.js 重启」三步走（教训见下）
 
 [前端静态快照降级层（前台浏览零依赖后端）]
 - Date: 2026-09-28
@@ -169,6 +170,7 @@ Entries discovered by the Agent during task execution should follow this format:
   - ensureSeeded 补齐逻辑「不覆盖非空值」；真正覆盖源是 db.js getDb() 同步骨架竞态：loadDb 异步 init 未完成时 getDb() 返回 seed() 骨架并赋全局 db，此时任何 saveDb() 全量写都会把空 carriers 覆盖进 MySQL（10/9 与 10/19 两次凭据丢失事故同根因）；已修复（dca6c61）：saveDb 加 initialized 守卫，initFromMysql 完成前禁止落盘
   - 独立 node 脚本读 carriers 必须先 `await loadDb()`（getDb 惰性触发 init，同步读必得骨架）；服务进程无此问题（index.js 顶层已 await loadDb）
   - 用 python subprocess 拼 SQL 写 settings 表会静默失败（不报错也不生效），改用 mysql FROM_BASE64('<base64>') 方式写入并 SELECT ROW_COUNT() 验证
+  - 10/20 教训三连：①独立脚本 saveDb() 是 fire-and-forget（async catch 不 await），脚本立即 process.exit 会导致写库丢失——必须用 `await pool.query("UPDATE settings SET v=? WHERE k=?", [json, 'carriers'])` 直写并回读验证；②改 MySQL carriers 后服务进程内存不会自动刷新，且旧进程运行期任何 saveDb（如 admin 登录写 token）会把内存旧值全量写回覆盖改动——正确顺序：改库→kill 3001 监听子进程→touch src/index.js 让 watch 拉起；③node --watch 会失灵（长时间运行后 touch 不再触发重启，日志停在旧 Restarting），此时 kill 子进程后 watch 显示 "Failed running...Waiting for file changes"，必须再 touch index.js 才会拉起；还有孤儿 node src/index.js（无 watch）抢占 3001 的情况——排查用 `ss -tlnp | grep :3001` 看监听进程的启动时间与父进程
   - 4PX 真实报价耗时约 6 秒，carrierService per-job 超时已从 3s 放宽到 12s；报价缓存 TTL 30 分钟，全失败空结果也会被缓存，调试时需 touch 清缓存
   - MySQL log_bin=OFF，binlog 未开启，数据误覆盖无法从 binlog 恢复
 
