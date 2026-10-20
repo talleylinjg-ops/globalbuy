@@ -104,10 +104,8 @@ export default function ProductModal({ itemId, onClose, onOrder, t, lang }) {
                     })}
                   </div>
                 )}
-                <div className="product-meta-row muted">
-                  {detail.shopName && <span>{detail.shopName}</span>}
-                  {detail.brand && <span>{detail.brand}</span>}
-                </div>
+                {/* 店铺名仅后台可见，前台只展示品牌 */}
+                {detail.brand && <div className="product-meta-row muted"><span>{detail.brand}</span></div>}
 
                 {hasSkus ? (
                   <div className="product-sku-block">

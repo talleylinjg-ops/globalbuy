@@ -4,7 +4,7 @@
 export const SPEC_GROUPS = [
   {
     key: 'color',
-    match: /壳|衣|裤|鞋|包|车|机|膜|带|罩|垫|镜/,
+    match: /壳|衣|裤|鞋|包|车|机|膜|带|罩|垫|镜|线|灯|器|盒|支架|表|笔|玩具|杯|壶/,
     label: { zh: '颜色', en: 'Color', es: 'Color' },
     values: [
       { zh: '黑色', en: 'Black', es: 'Negro', hex: '#1f2937' },
