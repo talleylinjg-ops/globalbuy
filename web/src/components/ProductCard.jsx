@@ -87,7 +87,10 @@ export default function ProductCard({ item, currency, currencySymbol, shippingTi
           {item.brand && <span className="pill">{item.brand}</span>}
           {item.category && (() => {
             const key = `category.${item.category}`;
-            return <span className="pill">{t(key) === key ? item.category : t(key)}</span>;
+            const translated = t(key);
+            // 非中文界面且类目无词条（含中文原文）时隐藏该标签（i18n 硬要求：零混排）
+            if (translated === key && lang !== 'zh' && /[\u4e00-\u9fff]/.test(item.category)) return null;
+            return <span className="pill">{translated === key ? item.category : translated}</span>;
           })()}
           {item.inStock && <span className="pill good">{t('result.inStock')}</span>}
           <span className="pill source-badge">{item.sourceType === 'api' ? t('source.api') : t('source.mock')}</span>

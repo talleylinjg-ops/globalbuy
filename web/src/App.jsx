@@ -260,6 +260,15 @@ export default function App() {
     <div>
       <header className="header">
         <div className="lang-switcher">
+          {!isAdmin && (
+            <a
+              href="#/track"
+              className="header-track-link"
+              onClick={() => setIsTrack(true)}
+            >
+              {t('track.nav')}
+            </a>
+          )}
           <select
             className="lang-select"
             value={lang}
@@ -277,16 +286,6 @@ export default function App() {
               <h1 className="logo">CrossBuy</h1>
               <p className="tagline">Buy More Save More</p>
             </div>
-            {!isAdmin && (
-              <a
-                href="#/track"
-                className="header-track-link"
-                style={{ marginLeft: 'auto', fontSize: 14, fontWeight: 600, color: 'var(--brand, #c0392b)', textDecoration: 'none' }}
-                onClick={() => setIsTrack(true)}
-              >
-                {t('track.nav')}
-              </a>
-            )}
           </div>
         </div>
       </header>

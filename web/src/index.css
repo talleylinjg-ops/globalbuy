@@ -65,7 +65,23 @@ body {
   top: 18px;
   right: 24px;
   z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
+.header-track-link {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  padding: 7px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  transition: background 0.15s;
+}
+.header-track-link:hover { background: rgba(255, 255, 255, 0.24); }
 .lang-select {
   background: rgba(255, 255, 255, 0.14);
   border: 1px solid rgba(255,255,255,0.35);

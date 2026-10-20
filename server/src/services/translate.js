@@ -297,6 +297,26 @@ const ZH_TO_EN_ENTRIES = Object.entries({
   '心率': 'Heart Rate', '支付宝': 'Alipay', '自嗨球': 'Self-rolling Ball', '球': 'Ball',
   '仿真鱼': 'Realistic Fish', '鱼': 'Fish', '火龙果干': 'Freeze-dried Dragon Fruit',
   '水果干': 'Dried Fruit', '冰糖葫芦': 'Tanghulu',   '孕妇可吃': 'Pregnancy-safe', '可贴牌': 'OEM Available',
+  // 第四批：手机壳/数码配件高频词（拼多多真实商品标题残留收口）
+  '液态硅胶': 'Liquid Silicone', '液态': 'Liquid', '气囊': 'Air-cushion', '四角': 'Four-corner',
+  '全包': 'Full-coverage', '半包': 'Half-coverage', '质感': 'Textured', '磨砂': 'Frosted',
+  '软套': 'Soft Case', '软壳': 'Soft Case', '硬壳': 'Hard Case', '适用': 'Compatible with',
+  '适用iPhone': 'Compatible with iPhone', '直边': 'Straight Edge', '防摔': 'Drop-proof',
+  '镜头全包': 'Full Lens Protection', '镜头': 'Lens', '摄像头': 'Camera',
+  '保护套': 'Protective Case', '手机壳': 'Phone Case', '壳膜': 'Case & Film',
+  '套装': 'Set', '赠品': 'Free Gift', '新款': 'New', '爆款': 'Hot Sale',
+  '高级感': 'Premium', '皮纹': 'Leather Texture', '皮革': 'Leather', '透明': 'Clear',
+  '简约': 'Minimalist', '可爱': 'Cute', '卡通': 'Cartoon', '情侣': 'Couple',
+  '网红': 'Trending', '同款': 'Same Style', '官网': 'Official', '旗舰': 'Flagship',
+  '正品': 'Authentic', '包邮': 'Free Shipping', 'ins风': 'INS Style', 'ins': 'INS',
+  '磁吸': 'MagSafe', '支架': 'Stand', '指环': 'Ring Holder', '腕带': 'Wrist Strap',
+  '斜挎': 'Crossbody', '挂绳': 'Lanyard', '卡包': 'Card Holder', '钱包': 'Wallet',
+  '奢': 'Luxury', '女款': 'For Women', '男款': 'For Men', '款': 'Style',
+  '小众': 'Niche', '设计感': 'Designer', '纯色': 'Solid Color', '撞色': 'Color-block',
+  '渐变': 'Gradient', '花纹': 'Pattern', '图案': 'Print', '印花': 'Printed',
+  '星空': 'Starry Sky', '宇宙': 'Galaxy', '月亮': 'Moon', '星星': 'Star',
+  '花朵': 'Floral', '玫瑰': 'Rose', '蝴蝶': 'Butterfly', '猫咪': 'Cat',
+  '狗狗': 'Dog', '小熊': 'Bear', '兔子': 'Rabbit', '恐龙': 'Dinosaur',
 }).sort((a, b) => b[0].length - a[0].length);
 
 export function translateTitleToEnglish(title) {
@@ -307,7 +327,12 @@ export function translateTitleToEnglish(title) {
   for (const [zh, en] of ZH_TO_EN_ENTRIES) {
     if (out.includes(zh)) out = out.split(zh).join(` ${en} `);
   }
-  return out.replace(/\s+/g, ' ').trim();
+  out = out.replace(/\s+/g, ' ').trim();
+  // 兜底：词典未覆盖的残留中文一律剔除（i18n 硬要求：非中文界面零混排）
+  if (/[\u4e00-\u9fff]/.test(out)) {
+    out = out.replace(/[^\x20-\x7e]/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+  return out;
 }
 
 // 检测输入是否主要为英文（用于决定是否需要翻译成中文）
