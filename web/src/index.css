@@ -1694,3 +1694,21 @@ body {
 .track-parcel-items { margin-top: 10px; border-top: 1px dashed var(--border); padding-top: 10px; }
 .track-parcel-item { font-size: 0.85rem; color: var(--text); padding: 3px 0; }
 .track-parcel-item span { color: var(--text-dim); }
+
+/* 会员表单：文字与输入框拉开距离、统一对齐 */
+.account-auth-form .settings-label,
+.account-addr-form .settings-label,
+.account-details-form .settings-label {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  white-space: normal;
+}
+.account-auth-form .settings-control,
+.account-addr-form .settings-control,
+.account-details-form .settings-control {
+  padding: 12px 14px;
+  font-size: 0.98rem;
+  width: 100%;
+  box-sizing: border-box;
+}
