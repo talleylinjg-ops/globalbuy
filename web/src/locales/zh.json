@@ -544,5 +544,14 @@
     "savedAddresses": "收货地址",
     "addressNew": "填写新地址",
     "saveAddress": "保存到我的地址簿"
+  },
+  "product": {
+    "viewDetail": "查看详情",
+    "selectSpec": "选择规格",
+    "specNote": "规格备注",
+    "specNotePlaceholder": "请填写颜色、尺码、容量、航程等规格要求（选填）",
+    "specNoteHelp": "该商品规格由卖家提供，下单后客服按备注配货",
+    "orderNow": "立即下单",
+    "description": "商品介绍"
   }
 }

@@ -143,6 +143,60 @@ export class PddAdapter extends PlatformAdapter {
       rawCoupon: g.coupon_min_order_amount ? Number(g.coupon_min_order_amount) / 100 : 0,
     };
   }
+
+  // 商品详情 + 图集/描述 + SKU（若有）
+  // DDK pdd.ddk.goods.detail 请求参数为 goods_sign 单值；CPS 响应不含 skus（SKU 属商家内部数据，
+  // 仅 OEM/商家授权接口可见），故真实商品返回 skus:[]，买家以「规格备注」自由填写颜色/尺码等
+  async detail(itemId) {
+    const goodsSign = String(itemId).replace(/^pdd_/, '');
+    if (!goodsSign) throw new Error('invalid pdd itemId');
+    if (!this.isConfigured()) {
+      const mock = mockSearch('').find((p) => p.itemId === itemId);
+      if (!mock) throw new Error('item not found');
+      return {
+        platform: 'pdd',
+        itemId,
+        title: mock.title,
+        imageUrl: mock.imageUrl,
+        price: mock.price,
+        originalPrice: mock.originalPrice,
+        gallery: [mock.imageUrl],
+        description: '',
+        skus: [{ skuId: 'default', spec: '', price: mock.price, thumbUrl: mock.imageUrl, stock: 999 }],
+      };
+    }
+    const data = await this.callApi('pdd.ddk.goods.detail', { goods_sign: goodsSign });
+    const g = data?.goods_detail_response?.goods_details?.[0];
+    if (!g) throw new Error('pdd detail: goods not found');
+    const base = this.mapGoods(g);
+    const skus = (g.skus || [])
+      .map((s) => {
+        const groupFen = Number(s.min_group_price ?? 0);
+        const price = groupFen / 100;
+        return {
+          skuId: String(s.sku_id ?? ''),
+          spec: String(s.spec ?? ''),
+          price,
+          thumbUrl: s.thumb_url || base.imageUrl,
+          stock: Number(s.stock ?? 0),
+        };
+      })
+      .filter((s) => s.skuId && s.price > 0);
+    return {
+      platform: 'pdd',
+      itemId,
+      title: base.title,
+      imageUrl: base.imageUrl,
+      price: base.price,
+      originalPrice: base.originalPrice,
+      sales: base.sales,
+      shopName: base.shopName,
+      gallery: Array.isArray(g.goods_gallery_urls) ? g.goods_gallery_urls.slice(0, 8) : [],
+      description: String(g.goods_desc || g.desc_txt || ''),
+      // 全部 SKU 的最低价作为起价；无 SKU 数据时回退主价
+      skus: skus.length > 0 ? skus : [],
+    };
+  }
 }
 
 // sales_tip 形如「已拼2.3万+件」，提取为数值

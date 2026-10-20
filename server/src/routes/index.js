@@ -16,6 +16,8 @@ import customerAuthRouter from './customerauth.js';
 import { computeCombinedQuote } from '../services/combine.js';
 import { resolveCustomerSession } from '../services/customerAuth.js';
 import { createRecord, genId, genOrderNo, listCollection, getById } from '../services/db.js';
+import { createAdapters } from '../platforms/index.js';
+import { MOCK_PRODUCTS } from '../data/mockProducts.js';
 
 const router = Router();
 
@@ -87,6 +89,33 @@ router.post('/combine', async (req, res, next) => {
   }
 });
 
+// 商品详情 + SKU 规格（颜色/尺码/航程等），买家选规格后下单
+// pdd_ 前缀走拼多多 DDK goods.detail 真实接口；其余（内置商品池）返回默认单 SKU
+router.get('/product/:itemId', async (req, res, next) => {
+  try {
+    const itemId = String(req.params.itemId || '');
+    if (itemId.startsWith('pdd_')) {
+      const detail = await createAdapters().pdd.detail(itemId);
+      return res.json(detail);
+    }
+    const product = MOCK_PRODUCTS.find((p) => p.itemId === itemId);
+    if (!product) return res.status(404).json({ error: 'item not found' });
+    res.json({
+      platform: product.platform || 'mock',
+      itemId,
+      title: product.title,
+      imageUrl: product.imageUrl,
+      price: product.price,
+      originalPrice: product.originalPrice || product.price,
+      sales: product.sales || 0,
+      shopName: product.shopName || '',
+      skus: [{ skuId: 'default', spec: '', price: product.price, thumbUrl: product.imageUrl, stock: 999 }],
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // 游客下单：商品 + 数量 + 收货信息 -> 统一计价 -> 订单入库（MySQL）
 // 已登录会员下单：自动绑定会员账号；saveAddress=true 时收货地址存入地址簿
 router.post('/orders', async (req, res, next) => {
@@ -116,8 +145,47 @@ router.post('/orders', async (req, res, next) => {
     const destCountry = String(address?.country || country || 'US').toUpperCase();
     const destCurrency = String(currency || 'USD').toUpperCase();
 
+    // 真实平台商品（pdd_）预取详情：构造商品对象（重量/仓库取默认）+ SKU 规格价（服务端查询防篡改）
+    const pddAdapter = createAdapters().pdd;
+    const pddProductCache = new Map();
+    const skuPriceMap = new Map();
+    const pddIds = [...new Set(items.map((i) => String(i.itemId || '')).filter((id) => id.startsWith('pdd_')))];
+    await Promise.allSettled(pddIds.map(async (itemId) => {
+      try {
+        const d = await pddAdapter.detail(itemId);
+        const product = {
+          itemId: d.itemId,
+          platform: 'pdd',
+          adapter: 'pdd',
+          title: d.title,
+          imageUrl: d.imageUrl,
+          price: d.price,
+          originalPrice: d.originalPrice || d.price,
+          weightGrams: 500,
+          warehouse: 'sz',
+          shopName: d.shopName || '',
+          sales: d.sales || 0,
+        };
+        pddProductCache.set(itemId, product);
+        for (const s of d.skus || []) {
+          skuPriceMap.set(`${itemId}|${s.skuId}`, { price: s.price, spec: s.spec });
+        }
+      } catch { /* 详情失败：resolveProduct 回 null，combine 报 no valid items */ }
+    }));
+    const resolveProduct = (itemId) =>
+      pddProductCache.get(String(itemId)) || MOCK_PRODUCTS.find((p) => p.itemId === itemId) || null;
+    const resolveSku = (i) => skuPriceMap.get(`${String(i.itemId)}|${String(i.skuId)}`) || null;
+
     const quote = await computeCombinedQuote({
-      items: items.map((i) => ({ itemId: String(i.itemId || ''), quantity: Number(i.quantity) || 1 })),
+      items: items.map((i) => {
+        const sku = resolveSku(i);
+        return {
+          itemId: String(i.itemId || ''),
+          quantity: Number(i.quantity) || 1,
+          ...(sku ? { priceOverride: sku.price } : {}),
+        };
+      }),
+      resolveProduct,
       country: destCountry,
       currency: destCurrency,
       carrier: carrier || undefined,
@@ -195,13 +263,16 @@ router.post('/orders', async (req, res, next) => {
       customerId: customer.id,
       addressId: addressRecord.id,
       status: 'pending',
-      items: quote.perItem.map((it) => ({
+      items: quote.perItem.map((it, idx) => ({
         itemId: it.itemId,
         title: it.title,
         platform: it.platform,
         warehouse: it.warehouse,
         quantity: it.quantity,
         priceCny: it.price,
+        // 买家选择的规格（如「颜色:黑色;尺码:L」），与请求顺序一一对应
+        skuId: String(items[idx]?.skuId || ''),
+        skuName: String(resolveSku(items[idx])?.spec || items[idx]?.skuName || ''),
         currency: destCurrency,
       })),
       // 按发货仓拆单：预计包裹数与仓库清单（发货前按此分仓打包）

@@ -70,7 +70,12 @@ export default function OrderModal({ item, country, currency, carrier, quotes, d
         method: 'POST',
         headers,
         body: JSON.stringify({
-          items: [{ itemId: item.itemId, quantity: Number(form.quantity) || 1 }],
+          items: [{
+            itemId: item.itemId,
+            quantity: Number(form.quantity) || 1,
+            skuId: item.skuId || '',
+            skuName: item.skuName || '',
+          }],
           contact: { name: form.name, email: form.email, phone: form.phone },
           address: {
             line1: form.line1, line2: form.line2, city: form.city,
@@ -127,6 +132,7 @@ export default function OrderModal({ item, country, currency, carrier, quotes, d
               <img src={item.imageUrl || `/images/${item.itemId}.jpg`} alt="" className="order-item-img" />
               <div className="order-item-info">
                 <div className="order-item-title">{lang !== 'zh' && item.titleEn ? item.titleEn : item.title}</div>
+                {item.skuName && <div className="order-item-sku">{item.skuName}</div>}
                 <div className="order-item-price">
                   {item.landed?.breakdown?.total != null
                     ? `${item.landed.breakdown.total} ${currency} / ${t('result.landedTotal')}`

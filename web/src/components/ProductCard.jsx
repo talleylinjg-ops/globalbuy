@@ -31,7 +31,7 @@ function fmtInt(n) {
   return String(n);
 }
 
-export default function ProductCard({ item, currency, currencySymbol, shippingTiers, inCombine, onToggleCombine, onOrder, t, lang }) {
+export default function ProductCard({ item, currency, currencySymbol, shippingTiers, inCombine, onToggleCombine, onOrder, onDetail, t, lang }) {
   const [showBreakdown, setShowBreakdown] = useState(false);
   const b = item.landed.breakdown;
   const platformClass = PLATFORM_CLASS[item.platform] || '';
@@ -62,7 +62,7 @@ export default function ProductCard({ item, currency, currencySymbol, shippingTi
   return (
     <div className={`card ${item.isTopPick ? 'top' : item.isRecommended ? 'recommended' : ''}`}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productLd) }} />
-      <div className="card-media">
+      <div className="card-media" style={{ cursor: 'pointer' }} onClick={onDetail} title={t('product.viewDetail')}>
         <span className={`platform-badge ${platformClass}`}>{platformName}</span>
         <img
           src={item.imageUrl || placeholderUrl(item)}
@@ -81,7 +81,7 @@ export default function ProductCard({ item, currency, currencySymbol, shippingTi
       </div>
 
       <div className="card-body">
-        <h3 className="card-title">{title}</h3>
+        <h3 className="card-title card-title-link" onClick={onDetail}>{title}</h3>
 
         <div className="card-meta">
           {item.brand && <span className="pill">{item.brand}</span>}

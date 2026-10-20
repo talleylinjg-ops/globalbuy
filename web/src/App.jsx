@@ -11,6 +11,7 @@ import Loading from './components/Loading.jsx';
 import CarrierPicker from './components/CarrierPicker.jsx';
 import CombineBar from './components/CombineBar.jsx';
 import OrderModal from './components/OrderModal.jsx';
+import ProductModal from './components/ProductModal.jsx';
 
 // 管理端拆包：仅 #/admin 路由加载，减小主包体积
 const AdminPanel = lazy(() => import('./components/AdminPanel.jsx'));
@@ -65,6 +66,7 @@ export default function App() {
   const [combineList, setCombineList] = useState([]);
   const [combineResult, setCombineResult] = useState(null);
   const [orderItem, setOrderItem] = useState(null);
+  const [detailItemId, setDetailItemId] = useState(null);
   const [combineLoading, setCombineLoading] = useState(false);
   const isDemoModeRef = useRef(false);
   isDemoModeRef.current = Boolean(results?.demo || meta?.demo);
@@ -414,6 +416,7 @@ export default function App() {
                 inCombine={combineList.some((x) => x.itemId === item.itemId)}
                 onToggleCombine={() => toggleCombine(item)}
                 onOrder={() => setOrderItem(item)}
+                onDetail={() => setDetailItemId(item.itemId)}
                 t={t}
                 lang={lang}
               />
@@ -449,6 +452,16 @@ export default function App() {
         t={t}
         lang={lang}
       />
+
+      {detailItemId && (
+        <ProductModal
+          itemId={detailItemId}
+          onClose={() => setDetailItemId(null)}
+          onOrder={(detailedItem) => { setDetailItemId(null); setOrderItem(detailedItem); }}
+          t={t}
+          lang={lang}
+        />
+      )}
 
       {orderItem && (
         <OrderModal

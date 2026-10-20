@@ -550,5 +550,14 @@
     "savedAddresses": "Direcciones guardadas",
     "addressNew": "Usar una nueva dirección",
     "saveAddress": "Guardar en mi libreta de direcciones"
+  },
+  "product": {
+    "viewDetail": "Ver detalles",
+    "selectSpec": "Elegir opciones",
+    "specNote": "Nota de especificaciones",
+    "specNotePlaceholder": "Color, talla, capacidad, autonomía, etc. (opcional)",
+    "specNoteHelp": "Las opciones las proporciona el vendedor; elegiremos según tu nota",
+    "orderNow": "Pedir ahora",
+    "description": "Descripción"
   }
 }

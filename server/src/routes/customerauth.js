@@ -97,6 +97,7 @@ router.get('/orders/:id', authCustomerMiddleware, (req, res) => {
     items: (o.items || []).map((it) => ({
       title: it.title, platform: it.platform, warehouse: it.warehouse || '',
       quantity: it.quantity, price: it.price,
+      skuId: it.skuId || '', skuName: it.skuName || '',
     })),
     parcels: parcels.map((pc) => ({
       trackingNo: pc.trackingNo || '',

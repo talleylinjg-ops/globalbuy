@@ -25,12 +25,27 @@ export async function computeCombinedQuote(opts) {
     : (Array.isArray(opts.itemIds)
         ? opts.itemIds.map((id) => ({ itemId: id, quantity: 1 }))
         : []);
+  // 商品解析：默认查内置商品池；真实平台商品（如拼多多）由调用方注入 resolveProduct
+  const resolveProduct =
+    typeof opts.resolveProduct === 'function'
+      ? opts.resolveProduct
+      : (itemId) => MOCK_PRODUCTS.find((p) => p.itemId === itemId) || null;
+  const productOrNulls = await Promise.all(
+    rawItems.map(({ itemId, priceOverride }) =>
+      Promise.resolve()
+        .then(() => resolveProduct(String(itemId)))
+        .catch(() => null)
+        .then((p) => ({ product: p || null, priceOverride }))
+    )
+  );
   const resolved = rawItems
-    .map(({ itemId, quantity }) => {
-      const product = MOCK_PRODUCTS.find((p) => p.itemId === itemId);
+    .map(({ itemId, quantity }, idx) => {
+      const { product, priceOverride } = productOrNulls[idx];
       if (!product) return null;
       const qty = Math.max(1, Math.min(99, Number(quantity) || 1));
-      return { product, quantity: qty };
+      // SKU 级价格覆盖：买家选择规格后由服务端查得的规格价（防客户端传价篡改）
+      const p = Number(priceOverride) > 0 ? { ...product, price: Number(priceOverride) } : product;
+      return { product: p, quantity: qty };
     })
     .filter(Boolean);
   if (resolved.length === 0) {
