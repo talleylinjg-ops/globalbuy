@@ -1331,7 +1331,7 @@ body {
 .header-account-link:hover { background: rgba(255, 255, 255, 0.24); }
 
 /* ---------- 会员中心 Account ---------- */
-.account-wrap { max-width: 1080px; margin: 0 auto; padding: 12px 16px 56px; }
+.account-wrap { max-width: 1200px; margin: 0 auto; padding: 16px 24px 64px; }
 .account-title { margin: 2px 0 20px; font-size: 1.65rem; font-weight: 700; letter-spacing: -0.01em; }
 
 /* 未登录 hero（与 Track 页同款设计语言） */
@@ -1344,17 +1344,17 @@ body {
 .account-hero-banner {
   display: flex;
   align-items: center;
-  gap: 18px;
-  padding: 24px 28px;
-  margin-bottom: 22px;
-  border-radius: 18px;
+  gap: 22px;
+  padding: 30px 34px;
+  margin-bottom: 28px;
+  border-radius: 20px;
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
   color: #fff;
   box-shadow: 0 10px 28px rgba(79, 70, 229, 0.3);
 }
 .account-hero-avatar {
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.2);
   border: 2px solid rgba(255, 255, 255, 0.45);
@@ -1366,8 +1366,8 @@ body {
   flex: none;
 }
 .account-hero-info { flex: 1; min-width: 0; }
-.account-hero-info h2 { margin: 0 0 3px; font-size: 1.3rem; font-weight: 700; }
-.account-hero-info p { margin: 0; font-size: 0.88rem; opacity: 0.85; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.account-hero-info h2 { margin: 0 0 4px; font-size: 1.45rem; font-weight: 700; }
+.account-hero-info p { margin: 0; font-size: 0.95rem; opacity: 0.85; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .account-hero-logout {
   color: #fff;
   border-color: rgba(255, 255, 255, 0.5);
@@ -1378,17 +1378,17 @@ body {
 
 /* Dashboard 统计卡 */
 .account-dash { display: flex; flex-direction: column; gap: 14px; }
-.account-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.account-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 @media (max-width: 560px) { .account-stat-grid { grid-template-columns: 1fr; } }
 .account-stat-card {
-  padding: 20px 24px;
-  border-radius: 16px;
+  padding: 26px 30px;
+  border-radius: 18px;
   display: flex;
   flex-direction: column;
   gap: 4px;
   background: linear-gradient(135deg, rgba(79, 70, 229, 0.06) 0%, rgba(124, 58, 237, 0.05) 100%);
 }
-.account-stat-value { font-size: 1.9rem; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; line-height: 1.1; }
+.account-stat-value { font-size: 2.3rem; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; line-height: 1.1; }
 .account-stat-label { font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
 
 /* 订单详情摘要头（与 Track summary 同款） */
@@ -1397,9 +1397,9 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  padding: 16px 20px;
-  margin: 14px 0 18px;
-  border-radius: 14px;
+  padding: 22px 26px;
+  margin: 16px 0 20px;
+  border-radius: 16px;
   background: linear-gradient(135deg, rgba(79, 70, 229, 0.06) 0%, rgba(124, 58, 237, 0.05) 100%);
 }
 @media (max-width: 560px) { .account-order-summary { flex-direction: column; align-items: flex-start; gap: 8px; } }
@@ -1409,11 +1409,11 @@ body {
 
 /* 未登录：登录/注册分段卡 */
 .account-auth-card {
-  max-width: 460px;
-  margin: 32px auto;
+  max-width: 520px;
+  margin: 20px auto;
   padding: 0;
   overflow: hidden;
-  border-radius: 18px;
+  border-radius: 20px;
 }
 .account-auth-tabs {
   display: grid;
@@ -1422,7 +1422,7 @@ body {
   border-bottom: 1px solid var(--border);
 }
 .account-auth-tabs button {
-  padding: 15px 0;
+  padding: 17px 0;
   background: none;
   border: none;
   font-size: 1rem;
@@ -1436,8 +1436,8 @@ body {
   background: var(--bg-card);
   box-shadow: inset 0 -3px 0 var(--accent);
 }
-.account-auth-form { display: flex; flex-direction: column; gap: 16px; padding: 26px 28px 24px; }
-.account-auth-form .btn-primary { width: 100%; padding: 12px 0; font-size: 1rem; }
+.account-auth-form { display: flex; flex-direction: column; gap: 20px; padding: 32px 34px 30px; }
+.account-auth-form .btn-primary { width: 100%; padding: 14px 0; font-size: 1.05rem; }
 .account-hint { font-size: 0.85rem; line-height: 1.5; margin: 0; text-align: center; }
 .account-error {
   background: var(--bad-soft);
@@ -1451,13 +1451,13 @@ body {
 .account-auth-form .account-error { margin: 0; }
 
 /* 登录后布局：左导航 + 内容 */
-.account-layout { display: grid; grid-template-columns: 220px 1fr; gap: 22px; align-items: start; }
+.account-layout { display: grid; grid-template-columns: 250px 1fr; gap: 28px; align-items: start; }
 @media (max-width: 760px) { .account-layout { grid-template-columns: 1fr; } }
 
-.account-nav { padding: 12px; display: flex; flex-direction: column; gap: 2px; border-radius: 16px; }
+.account-nav { padding: 14px; display: flex; flex-direction: column; gap: 4px; border-radius: 18px; }
 .account-nav button {
   text-align: left;
-  padding: 11px 16px;
+  padding: 14px 20px;
   border: none;
   background: none;
   border-radius: 10px;
@@ -1474,14 +1474,14 @@ body {
 .account-nav button.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
 .account-nav button.active svg { color: var(--accent); }
 
-.account-card { padding: 26px; border-radius: 16px; }
+.account-card { padding: 32px; border-radius: 18px; }
 .account-greeting { font-size: 1.25rem; font-weight: 700; margin: 0 0 6px; }
 
 /* 数据表 */
-.account-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+.account-table { width: 100%; border-collapse: collapse; font-size: 0.96rem; }
 .account-table th {
   text-align: left;
-  padding: 10px 12px;
+  padding: 12px 14px;
   border-bottom: 2px solid var(--border);
   color: var(--text-dim);
   font-size: 0.78rem;
@@ -1490,7 +1490,7 @@ body {
   letter-spacing: 0.04em;
   white-space: nowrap;
 }
-.account-table td { padding: 13px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.account-table td { padding: 16px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
 .account-table tbody tr:last-child td { border-bottom: none; }
 .account-table tbody tr { transition: background 0.12s; }
 .account-table tbody tr:hover { background: var(--bg-soft); }
@@ -1514,11 +1514,11 @@ body {
 /* 地址卡片 */
 .account-addr-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
 .account-addr-head h4 { margin: 0; font-size: 1.05rem; }
-.account-addr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; margin-bottom: 18px; }
+.account-addr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 18px; margin-bottom: 22px; }
 .account-addr-card {
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 16px;
+  border-radius: 16px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 5px;
@@ -1557,17 +1557,17 @@ body {
 .btn-sm.danger:hover { background: var(--bad-soft); }
 
 /* ---------- 查单页 Track ---------- */
-.track-page { max-width: 860px; margin: 0 auto; padding: 12px 16px 56px; }
+.track-page { max-width: 960px; margin: 0 auto; padding: 16px 24px 64px; }
 
 .track-hero {
   text-align: center;
-  padding: 26px 0 22px;
+  padding: 34px 0 28px;
 }
 .track-hero-icon {
-  width: 64px;
-  height: 64px;
-  margin: 0 auto 14px;
-  border-radius: 18px;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 16px;
+  border-radius: 20px;
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
   color: #fff;
   display: flex;
@@ -1575,20 +1575,20 @@ body {
   justify-content: center;
   box-shadow: 0 8px 24px rgba(79, 70, 229, 0.35);
 }
-.track-hero h2 { margin: 0 0 6px; font-size: 1.7rem; font-weight: 700; letter-spacing: -0.01em; }
+.track-hero h2 { margin: 0 0 8px; font-size: 1.85rem; font-weight: 700; letter-spacing: -0.01em; }
 .track-hero p { margin: 0; color: var(--text-dim); font-size: 0.98rem; }
 
-.track-search { padding: 22px 24px; border-radius: 16px; }
+.track-search { padding: 28px 30px; border-radius: 18px; }
 .track-search-fields {
   display: grid;
   grid-template-columns: 1fr 1fr auto;
-  gap: 14px;
+  gap: 18px;
   align-items: end;
 }
 @media (max-width: 680px) { .track-search-fields { grid-template-columns: 1fr; } }
 .track-field { display: flex; flex-direction: column; gap: 6px; }
-.track-input { padding: 11px 14px; font-size: 0.98rem; }
-.track-btn { padding: 11px 26px; font-size: 0.98rem; white-space: nowrap; }
+.track-input { padding: 13px 16px; font-size: 1rem; }
+.track-btn { padding: 13px 30px; font-size: 1rem; white-space: nowrap; }
 .track-error {
   margin-top: 14px;
   background: var(--bad-soft);
@@ -1598,15 +1598,15 @@ body {
   font-size: 0.9rem;
 }
 
-.track-result { margin-top: 24px; display: flex; flex-direction: column; gap: 14px; }
+.track-result { margin-top: 30px; display: flex; flex-direction: column; gap: 18px; }
 
 .track-summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  padding: 20px 24px;
-  border-radius: 16px;
+  padding: 26px 30px;
+  border-radius: 18px;
   background: linear-gradient(135deg, rgba(79, 70, 229, 0.06) 0%, rgba(124, 58, 237, 0.05) 100%);
 }
 @media (max-width: 560px) { .track-summary { flex-direction: column; align-items: flex-start; gap: 10px; } }
@@ -1636,22 +1636,22 @@ body {
   margin: 8px 0 -2px;
 }
 
-.track-items-card { padding: 8px 20px; border-radius: 14px; }
+.track-items-card { padding: 10px 26px; border-radius: 16px; }
 .track-item-row {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 14px;
-  padding: 12px 0;
+  padding: 15px 0;
   border-bottom: 1px solid var(--border);
 }
 .track-item-row:last-child { border-bottom: none; }
 .track-item-title { font-size: 0.94rem; }
 .track-item-meta { color: var(--text-dim); font-size: 0.85rem; white-space: nowrap; }
 
-.track-empty { padding: 26px; text-align: center; color: var(--text-dim); border-radius: 14px; border-style: dashed; }
+.track-empty { padding: 34px; text-align: center; color: var(--text-dim); border-radius: 14px; border-style: dashed; }
 
-.track-parcel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+.track-parcel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 18px; }
 .track-parcel-card {
   display: flex;
   overflow: hidden;
@@ -1659,7 +1659,7 @@ body {
   border-radius: 14px;
 }
 .track-parcel-bar { width: 5px; flex: none; background: linear-gradient(180deg, var(--accent) 0%, var(--accent-2) 100%); }
-.track-parcel-body { padding: 16px 18px; flex: 1; min-width: 0; }
+.track-parcel-body { padding: 20px 22px; flex: 1; min-width: 0; }
 .track-parcel-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .track-tracking-no {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
