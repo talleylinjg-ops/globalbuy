@@ -7,7 +7,7 @@ This is the complete reference for CrossBuy (https://globalbuy.pages.dev/), a cr
 1. Buyer searches once; CrossBuy queries all five marketplaces and merges the same product into one card with best / fastest / recommended rankings.
 2. Every product shows the full landed price: item price + international shipping + customs duty + VAT + service fee + payment fee, computed per destination country.
 3. Buyer picks an international carrier (4PX, Huayuan, SF International and more) with real-time prices and delivery estimates.
-4. Items from the same warehouse combine into one parcel (shipping billed on combined weight); items from different warehouses ship as separate parcels, each billed on its own weight and clearing customs independently.
+4. Multiple items can be combined into one parcel; shipping is billed on combined weight and duty-free thresholds apply to the merged value.
 
 ## Key facts
 
@@ -29,7 +29,7 @@ Landed price = item price + international shipping + customs duty + VAT + servic
 We ship to the United States, United Kingdom, Germany, France, Japan, South Korea, Australia, Canada and more, with multiple carrier options and pre-order price and delivery estimates.
 
 ### Can multiple orders ship together?
-Yes. Items from the same warehouse combine into one parcel — shipping is billed on combined weight and duty-free allowances apply to the merged declared value, usually cheaper than separate shipments. Items stocked in different warehouses ship as separate parcels (Shenzhen for electronics, Yiwu for general goods, Guangzhou for food products), each clearing customs independently. The expected parcel count is shown at checkout, and all tracking numbers are provided at once when parcels ship.
+Yes. Items from different platforms are combined into one parcel, shipping is billed on combined weight, and duty-free allowances apply to the merged declared value — usually cheaper than separate shipments.
 
 ### How long does delivery take?
 Economy lines take about 5-10 business days, express lines about 3-7, depending on destination and carrier. Live estimates are shown before you order.

@@ -3,6 +3,7 @@ import { applySearchSeo, applyBreadcrumbSeo, applyHowToSeo } from './utils/seo.j
 import { useI18n } from './i18n.js';
 import { pickShippingTiers } from './utils/shipping.js';
 import { fetchMeta, searchProducts, parseLink, apiUrl } from './api.js';
+import { useMember, memberLogout } from './authStore.js';
 import ProductCard from './components/ProductCard.jsx';
 import SearchPanel from './components/SearchPanel.jsx';
 import SettingsPanel from './components/SettingsPanel.jsx';
@@ -14,6 +15,7 @@ import OrderModal from './components/OrderModal.jsx';
 // 管理端拆包：仅 #/admin 路由加载，减小主包体积
 const AdminPanel = lazy(() => import('./components/AdminPanel.jsx'));
 const TrackOrder = lazy(() => import('./components/TrackOrder.jsx'));
+const AccountPage = lazy(() => import('./components/AccountPage.jsx'));
 
 const DEFAULT_COUNTRY = 'US';
 const DEFAULT_CURRENCY = 'USD';
@@ -33,11 +35,16 @@ function getTrackRoute() {
   return window.location.hash.startsWith('#/track');
 }
 
+function getAccountRoute() {
+  return window.location.hash.startsWith('#/account');
+}
+
 // 从全部快递报价中挑三档：最快 / 最便宜 / 居中；三档尽量为三个不同报价
 
 export default function App() {
   const { t, lang, setLang, languages } = useI18n();  const [isAdmin, setIsAdmin] = useState(getAdminRoute());
   const [isTrack, setIsTrack] = useState(getTrackRoute());
+  const [isAccount, setIsAccount] = useState(getAccountRoute());
   const [meta, setMeta] = useState(null);
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -63,7 +70,7 @@ export default function App() {
   isDemoModeRef.current = Boolean(results?.demo || meta?.demo);
 
   useEffect(() => {
-    const onHash = () => { setIsAdmin(getAdminRoute()); setIsTrack(getTrackRoute()); };
+    const onHash = () => { setIsAdmin(getAdminRoute()); setIsTrack(getTrackRoute()); setIsAccount(getAccountRoute()); };
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
@@ -260,6 +267,7 @@ export default function App() {
     <div>
       <header className="header">
         <div className="lang-switcher">
+          <AccountMenu t={t} lang={lang} onOpen={() => { setIsAccount(true); setIsTrack(false); }} />
           {!isAdmin && (
             <a
               href="#/track"
@@ -298,6 +306,10 @@ export default function App() {
         ) : isTrack ? (
           <Suspense fallback={<div className="loading">...</div>}>
             <TrackOrder t={t} />
+          </Suspense>
+        ) : isAccount ? (
+          <Suspense fallback={<div className="loading">...</div>}>
+            <AccountPage t={t} lang={lang} />
           </Suspense>
         ) : (
         <>
@@ -452,5 +464,25 @@ export default function App() {
         <p>{t('footer.disclaimer')}</p>
       </footer>
     </div>
+  );
+}
+
+// header 会员入口：未登录 Sign in，登录显示名字（点击进会员中心）
+function AccountMenu({ t, lang, onOpen }) {
+  const session = useMember();
+  const customer = session?.customer || {};
+  const label = session
+    ? (customer.name || customer.email || '').split(' ')[0] || t('account.myAccount')
+    : t('account.signIn');
+  return (
+    <a
+      href="#/account"
+      className="header-account-link"
+      onClick={onOpen}
+      title={session ? t('account.myAccount') : t('account.signIn')}
+    >
+      <span className="account-avatar" aria-hidden="true">{(customer.name || customer.email || '?').charAt(0).toUpperCase()}</span>
+      <span className="account-link-text">{label}</span>
+    </a>
   );
 }

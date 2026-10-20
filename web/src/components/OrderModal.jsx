@@ -1,9 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { apiUrl } from '../api.js';
 import { carrierDisplayName, productNameDisplay } from '../utils/carrier.js';
+import { useMember, memberFetch } from '../authStore.js';
 
 // 游客下单弹窗：商品 + 数量 + 快递渠道 + 收货信息 -> POST /api/orders
+// 会员登录态：自动带出姓名/邮箱/电话与地址簿（选择即填充），下单自动归属会员账号
 export default function OrderModal({ item, country, currency, carrier, quotes, defaultServiceFee, onClose, onPlaced, t, lang }) {
+  const session = useMember();
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState('');
+  const [saveAddress, setSaveAddress] = useState(true);
   const [selCarrier, setSelCarrier] = useState(carrier?.productName || quotes?.find((q) => q.recommended)?.productName || quotes?.[0]?.productName || '');
   // 服务费由买家确定（自愿性质，默认 5%，继承搜索页选择），独立于商品定价中的利润
   const SERVICE_FEE_OPTIONS = [0, 3, 5, 8, 10, 15];
@@ -17,6 +23,39 @@ export default function OrderModal({ item, country, currency, carrier, quotes, d
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
 
+  // 登录态：拉地址簿 + 预填联系人
+  useEffect(() => {
+    if (!session) return;
+    const c = session.customer || {};
+    setForm((f) => ({
+      ...f,
+      name: f.name || c.name || '',
+      email: f.email || c.email || '',
+      phone: f.phone || c.phone || '',
+    }));
+    memberFetch('/api/auth/addresses').then(async (res) => {
+      if (!res.ok) return;
+      const list = await res.json();
+      setSavedAddresses(list);
+      const def = list.find((a) => a.isDefault) || list[0];
+      if (def) applyAddress(def);
+    });
+  }, [session]);
+
+  const applyAddress = (a) => {
+    setSelectedAddressId(a.id || '');
+    setForm((f) => ({
+      ...f,
+      name: a.recipient || f.name,
+      phone: a.phone || f.phone,
+      line1: a.line1 || f.line1,
+      line2: a.line2 || f.line2,
+      city: a.city || f.city,
+      state: a.state || f.state,
+      postal: a.postal || f.postal,
+    }));
+  };
+
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
   const chosen = (quotes || []).find((q) => q.productName === selCarrier) || carrier || null;
 
@@ -25,9 +64,11 @@ export default function OrderModal({ item, country, currency, carrier, quotes, d
     setError('');
     setSubmitting(true);
     try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (session?.token) headers.Authorization = `Bearer ${session.token}`;
       const res = await fetch(apiUrl('/api/orders'), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           items: [{ itemId: item.itemId, quantity: Number(form.quantity) || 1 }],
           contact: { name: form.name, email: form.email, phone: form.phone },
@@ -38,6 +79,7 @@ export default function OrderModal({ item, country, currency, carrier, quotes, d
           currency,
           carrier: selCarrier || undefined,
           serviceFeeRate: serviceFee / 100,
+          saveAddress: Boolean(session && saveAddress),
         }),
       });
       const data = await res.json();
@@ -136,6 +178,31 @@ export default function OrderModal({ item, country, currency, carrier, quotes, d
             </div>
 
             <form onSubmit={submit}>
+              {session && (
+                <div className="order-member-strip">
+                  {t('account.signedInAs', { email: session.customer?.email || '' })}
+                </div>
+              )}
+              {session && savedAddresses.length > 0 && (
+                <div className="order-carrier-row">
+                  <label className="settings-label">{t('account.savedAddresses')}</label>
+                  <select
+                    className="settings-control"
+                    value={selectedAddressId}
+                    onChange={(e) => {
+                      const a = savedAddresses.find((x) => x.id === e.target.value);
+                      if (a) applyAddress(a);
+                    }}
+                  >
+                    <option value="">{t('account.addressNew')}</option>
+                    {savedAddresses.map((a) => (
+                      <option key={a.id} value={a.id}>
+                        {a.recipient} · {a.line1}, {a.city} {a.postal}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
               <div className="order-grid">
                 <div>
                   <label className="settings-label">{t('order.contact')} *</label>
@@ -170,6 +237,16 @@ export default function OrderModal({ item, country, currency, carrier, quotes, d
                   <input className="settings-control" value={form.postal} onChange={(e) => set('postal', e.target.value)} />
                 </div>
               </div>
+              {session && (
+                <label className="order-save-addr">
+                  <input
+                    type="checkbox"
+                    checked={saveAddress}
+                    onChange={(e) => setSaveAddress(e.target.checked)}
+                  />
+                  {t('account.saveAddress')}
+                </label>
+              )}
               {error && <div className="error-text">{error}</div>}
               <button type="submit" className="btn btn-primary order-submit" disabled={submitting}>
                 {submitting ? t('order.submitting') : t('order.submit')}

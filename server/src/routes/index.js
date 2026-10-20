@@ -12,7 +12,9 @@ import adminRouter from './admin.js';
 import carriersRouter from './carriers.js';
 import carrierQuoteRouter from './carrierQuote.js';
 import pddAuthRouter from './pddauth.js';
+import customerAuthRouter from './customerauth.js';
 import { computeCombinedQuote } from '../services/combine.js';
+import { resolveCustomerSession } from '../services/customerAuth.js';
 import { createRecord, genId, genOrderNo, listCollection, getById } from '../services/db.js';
 
 const router = Router();
@@ -23,6 +25,7 @@ router.use('/admin', adminRouter);
 router.use('/admin/carriers', carriersRouter);
 router.use('/carriers', carrierQuoteRouter);
 router.use('/pdd', pddAuthRouter);
+router.use('/auth', customerAuthRouter);
 
 // 健康检查
 router.get('/health', (req, res) => {
@@ -85,11 +88,19 @@ router.post('/combine', async (req, res, next) => {
 });
 
 // 游客下单：商品 + 数量 + 收货信息 -> 统一计价 -> 订单入库（MySQL）
+// 已登录会员下单：自动绑定会员账号；saveAddress=true 时收货地址存入地址簿
 router.post('/orders', async (req, res, next) => {
   try {
-    const { items, contact, address, country, currency, carrier, serviceFeeRate } = req.body || {};
+    const { items, contact, address, country, currency, carrier, serviceFeeRate, saveAddress } = req.body || {};
     if (!Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: 'missing items' });
+    }
+    // 可选会员会话：带有效 Bearer token 则订单归属当前会员
+    let member = null;
+    const authHeader = req.headers.authorization || '';
+    const memberToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+    if (memberToken) {
+      member = resolveCustomerSession(memberToken);
     }
     const name = String(contact?.name || '').trim();
     const email = String(contact?.email || '').trim();
@@ -118,9 +129,15 @@ router.post('/orders', async (req, res, next) => {
     const b = quote.breakdown;
 
     // WooCommerce 行为：结账自动创建/复用客户 + 收货地址
-    let customer = listCollection('customers').find(
-      (c) => (c.email || '').toLowerCase() === email.toLowerCase()
-    );
+    // 会员下单：优先归属登录会员（邮箱不一致时以会员账号为准并回填联系人）
+    let customer = null;
+    if (member) {
+      customer = getById('customers', member.customerId);
+    } else {
+      customer = listCollection('customers').find(
+        (c) => (c.email || '').toLowerCase() === email.toLowerCase()
+      );
+    }
     if (!customer) {
       customer = createRecord('customers', {
         name,
@@ -133,19 +150,46 @@ router.post('/orders', async (req, res, next) => {
         registeredAt: new Date().toISOString(),
       });
     }
-    const addressRecord = createRecord('addresses', {
-      customerId: customer.id,
-      label: 'Default',
-      recipient: name,
-      line1,
-      line2: String(address?.line2 || '').trim(),
-      city,
-      state: String(address?.state || '').trim(),
-      postal: String(address?.postal || '').trim(),
-      country: destCountry,
-      phone: String(contact?.phone || '').trim(),
-      isDefault: true,
-    });
+    // 会员 + saveAddress：复用会员地址簿（默认地址匹配则直接引用，避免重复堆积）
+    let addressRecord = null;
+    if (member && saveAddress) {
+      const existing = (listCollection('addresses') || []).filter((a) => a.customerId === customer.id);
+      const match = existing.find((a) =>
+        String(a.line1 || '').toLowerCase() === line1.toLowerCase()
+        && String(a.city || '').toLowerCase() === city.toLowerCase()
+      );
+      if (match) {
+        addressRecord = match;
+      } else {
+        addressRecord = createRecord('addresses', {
+          customerId: customer.id,
+          label: String(address?.label || 'Home').trim(),
+          recipient: name,
+          line1,
+          line2: String(address?.line2 || '').trim(),
+          city,
+          state: String(address?.state || '').trim(),
+          postal: String(address?.postal || '').trim(),
+          country: destCountry,
+          phone: String(contact?.phone || '').trim(),
+          isDefault: existing.length === 0,
+        });
+      }
+    } else {
+      addressRecord = createRecord('addresses', {
+        customerId: customer.id,
+        label: 'Default',
+        recipient: name,
+        line1,
+        line2: String(address?.line2 || '').trim(),
+        city,
+        state: String(address?.state || '').trim(),
+        postal: String(address?.postal || '').trim(),
+        country: destCountry,
+        phone: String(contact?.phone || '').trim(),
+        isDefault: true,
+      });
+    }
 
     const order = createRecord('orders', {
       customerId: customer.id,
