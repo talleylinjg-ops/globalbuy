@@ -119,6 +119,11 @@ router.get('/product/:itemId', async (req, res, next) => {
       originalPrice: product.originalPrice || product.price,
       sales: product.sales || 0,
       shopName: product.shopName || '',
+      gallery: product.imageUrl ? [product.imageUrl] : [],
+      description: product.description || '',
+      services: ['全场包邮', '七天退换'],
+      category: product.category || '',
+      brand: product.brand || '',
       skus: [{ skuId: 'default', spec: '', price: product.price, thumbUrl: product.imageUrl, stock: 999 }],
     }));
   } catch (err) {

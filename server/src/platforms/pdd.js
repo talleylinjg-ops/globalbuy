@@ -162,6 +162,9 @@ export class PddAdapter extends PlatformAdapter {
         originalPrice: mock.originalPrice,
         gallery: [mock.imageUrl],
         description: '',
+        services: ['全场包邮', '七天退换'],
+        category: mock.category || '',
+        brand: mock.brand || '',
         skus: [{ skuId: 'default', spec: '', price: mock.price, thumbUrl: mock.imageUrl, stock: 999 }],
       };
     }
@@ -182,6 +185,11 @@ export class PddAdapter extends PlatformAdapter {
         };
       })
       .filter((s) => s.skuId && s.price > 0);
+    // 图集 = 轮播图全量 + 素材图（部分商品有 material_list 详情图），去重
+    const gallery = [...new Set([
+      ...(Array.isArray(g.goods_gallery_urls) ? g.goods_gallery_urls : []),
+      ...(Array.isArray(g.material_list) ? g.material_list.filter((x) => typeof x === 'string' && /^https?:/.test(x)) : []),
+    ])];
     return {
       platform: 'pdd',
       itemId,
@@ -191,8 +199,12 @@ export class PddAdapter extends PlatformAdapter {
       originalPrice: base.originalPrice,
       sales: base.sales,
       shopName: base.shopName,
-      gallery: Array.isArray(g.goods_gallery_urls) ? g.goods_gallery_urls.slice(0, 8) : [],
+      gallery,
       description: String(g.goods_desc || g.desc_txt || ''),
+      // 服务承诺（全场包邮/七天退换等，前端查表翻译）
+      services: Array.isArray(g.unified_tags) ? g.unified_tags.filter((t) => typeof t === 'string') : [],
+      category: String(g.category_name || ''),
+      brand: String(g.brand_name || ''),
       // 全部 SKU 的最低价作为起价；无 SKU 数据时回退主价
       skus: skus.length > 0 ? skus : [],
     };

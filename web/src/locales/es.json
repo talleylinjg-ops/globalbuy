@@ -559,5 +559,15 @@
     "specNoteHelp": "Las opciones las proporciona el vendedor; elegiremos según tu nota",
     "orderNow": "Pedir ahora",
     "description": "Descripción"
+  },
+  "service": {
+    "全场包邮": "Envío gratis",
+    "七天退换": "Devolución 7 días",
+    "48小时发货": "Envío en 48h",
+    "极速退款": "Reembolso rápido",
+    "正品保证": "Autenticidad garantizada",
+    "假一赔十": "Compensación 10x",
+    "全国联保": "Garantía nacional",
+    "运费险": "Seguro de envío"
   }
 }

@@ -93,7 +93,21 @@ export default function ProductModal({ itemId, onClose, onOrder, t, lang }) {
                   )}
                   {detail.sales > 0 && <span className="product-detail-sales">{detail.sales.toLocaleString()}+</span>}
                 </div>
-                {detail.shopName && <div className="muted product-detail-shop">{detail.shopName}</div>}
+                {(detail.services || []).length > 0 && (
+                  <div className="product-service-row">
+                    {detail.services.map((s) => {
+                      const k = `service.${s}`;
+                      const v = t(k);
+                      // 非中文界面且服务标签无词条时隐藏（i18n 硬要求：零混排）
+                      if (v === k && lang !== 'zh') return null;
+                      return <span className="product-service-tag" key={s}>✓ {v === k ? s : v}</span>;
+                    })}
+                  </div>
+                )}
+                <div className="product-meta-row muted">
+                  {detail.shopName && <span>{detail.shopName}</span>}
+                  {detail.brand && <span>{detail.brand}</span>}
+                </div>
 
                 {hasSkus ? (
                   <div className="product-sku-block">

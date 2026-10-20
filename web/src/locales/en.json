@@ -564,5 +564,15 @@
     "specNoteHelp": "Options are provided by the seller; our team will pick items per your note",
     "orderNow": "Order now",
     "description": "Description"
+  },
+  "service": {
+    "全场包邮": "Free shipping",
+    "七天退换": "7-day returns",
+    "48小时发货": "48h dispatch",
+    "极速退款": "Fast refund",
+    "正品保证": "Authenticity guaranteed",
+    "假一赔十": "10x compensation",
+    "全国联保": "Nationwide warranty",
+    "运费险": "Shipping insurance"
   }
 }
