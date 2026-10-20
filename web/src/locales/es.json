@@ -558,7 +558,8 @@
     "specNotePlaceholder": "Color, talla, capacidad, autonomía, etc. (opcional)",
     "specNoteHelp": "Las opciones las proporciona el vendedor; elegiremos según tu nota",
     "orderNow": "Pedir ahora",
-    "description": "Descripción"
+    "description": "Descripción",
+    "brandLabel": "Marca: "
   },
   "service": {
     "全场包邮": "Envío gratis",

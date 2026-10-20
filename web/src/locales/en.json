@@ -563,7 +563,8 @@
     "specNotePlaceholder": "Color, size, capacity, range, etc. (optional)",
     "specNoteHelp": "Options are provided by the seller; our team will pick items per your note",
     "orderNow": "Order now",
-    "description": "Description"
+    "description": "Description",
+    "brandLabel": "Brand: "
   },
   "service": {
     "全场包邮": "Free shipping",

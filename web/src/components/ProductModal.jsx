@@ -37,6 +37,16 @@ export default function ProductModal({ itemId, onClose, onOrder, t, lang }) {
   const hasSkus = (detail?.skus || []).length > 1;
   const specGroups = detail ? matchSpecGroups(detail.title) : [];
   const price = hasSkus && selectedSku ? selectedSku.price : detail?.price;
+
+  // 图集左右箭头：循环切换上一张/下一张
+  const stepGallery = (dir) => {
+    const gallery = detail?.gallery || [];
+    if (gallery.length < 2) return;
+    const cur = gallery.indexOf(activeImg);
+    const next = (cur + dir + gallery.length) % gallery.length;
+    setActiveImg(gallery[next]);
+  };
+
   // 属性组选择（当前语种值）+ 自由备注，合并为规格文本随单提交
   const specText = [
     ...specGroups.map((g) => (selections[g.key] ? `${specGroupLabel(g, lang)}: ${specValueLabel(selections[g.key], lang)}` : '')),
@@ -67,17 +77,41 @@ export default function ProductModal({ itemId, onClose, onOrder, t, lang }) {
               <div className="product-detail-media">
                 <img className="product-detail-img" src={activeImg || detail.imageUrl} alt="" />
                 {(detail.gallery || []).length > 1 && (
-                  <div className="product-gallery">
-                    {detail.gallery.map((g, i) => (
-                      <button
-                        key={i}
-                        type="button"
-                        className={`product-gallery-thumb ${activeImg === g ? 'active' : ''}`}
-                        onClick={() => setActiveImg(g)}
-                      >
-                        <img src={g} alt="" loading="lazy" />
-                      </button>
-                    ))}
+                  <div className="product-gallery-wrap">
+                    <button
+                      type="button"
+                      className="product-gallery-arrow"
+                      aria-label="prev"
+                      onClick={() => stepGallery(-1)}
+                    >
+                      ‹
+                    </button>
+                    <div className="product-gallery">
+                      {detail.gallery.map((g, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          className={`product-gallery-thumb ${activeImg === g ? 'active' : ''}`}
+                          onClick={() => setActiveImg(g)}
+                        >
+                          <img src={g} alt="" loading="lazy" />
+                        </button>
+                      ))}
+                    </div>
+                    <button
+                      type="button"
+                      className="product-gallery-arrow"
+                      aria-label="next"
+                      onClick={() => stepGallery(1)}
+                    >
+                      ›
+                    </button>
+                  </div>
+                )}
+                {detail.description && (
+                  <div className="product-detail-desc">
+                    <div className="track-section-title">{t('product.description')}</div>
+                    <p>{lang !== 'zh' && detail.descriptionEn ? detail.descriptionEn : detail.description}</p>
                   </div>
                 )}
               </div>
@@ -93,19 +127,12 @@ export default function ProductModal({ itemId, onClose, onOrder, t, lang }) {
                   )}
                   {detail.sales > 0 && <span className="product-detail-sales">{detail.sales.toLocaleString()}+</span>}
                 </div>
-                {(detail.services || []).length > 0 && (
-                  <div className="product-service-row">
-                    {detail.services.map((s) => {
-                      const k = `service.${s}`;
-                      const v = t(k);
-                      // 非中文界面且服务标签无词条时隐藏（i18n 硬要求：零混排）
-                      if (v === k && lang !== 'zh') return null;
-                      return <span className="product-service-tag" key={s}>✓ {v === k ? s : v}</span>;
-                    })}
+                {/* 店铺名与服务承诺仅后台可见；前台只展示品牌 */}
+                {detail.brand && (
+                  <div className="product-meta-row muted">
+                    <span>{t('product.brandLabel')}{detail.brand}</span>
                   </div>
                 )}
-                {/* 店铺名仅后台可见，前台只展示品牌 */}
-                {detail.brand && <div className="product-meta-row muted"><span>{detail.brand}</span></div>}
 
                 {hasSkus ? (
                   <div className="product-sku-block">
