@@ -267,7 +267,7 @@ export default function App() {
     <div>
       <header className="header">
         <div className="lang-switcher">
-          <AccountMenu t={t} lang={lang} onOpen={() => { setIsAccount(true); setIsTrack(false); }} />
+          <AccountMenu t={t} onOpen={() => { setIsAccount(true); setIsTrack(false); }} />
           {!isAdmin && (
             <a
               href="#/track"
@@ -290,10 +290,15 @@ export default function App() {
         </div>
         <div className="container header-inner">
           <div className="header-nav" style={{ display: 'flex', alignItems: 'baseline', gap: 16, width: '100%' }}>
-            <div>
+            <a
+              href="#/"
+              className="logo-link"
+              onClick={() => { setIsTrack(false); setIsAdmin(false); setIsAccount(false); }}
+              title={t('app.home')}
+            >
               <h1 className="logo">CrossBuy</h1>
               <p className="tagline">Buy More Save More</p>
-            </div>
+            </a>
           </div>
         </div>
       </header>
@@ -468,7 +473,7 @@ export default function App() {
 }
 
 // header 会员入口：未登录 Sign in，登录显示名字（点击进会员中心）
-function AccountMenu({ t, lang, onOpen }) {
+function AccountMenu({ t, onOpen }) {
   const session = useMember();
   const customer = session?.customer || {};
   const label = session
@@ -481,7 +486,6 @@ function AccountMenu({ t, lang, onOpen }) {
       onClick={onOpen}
       title={session ? t('account.myAccount') : t('account.signIn')}
     >
-      <span className="account-avatar" aria-hidden="true">{(customer.name || customer.email || '?').charAt(0).toUpperCase()}</span>
       <span className="account-link-text">{label}</span>
     </a>
   );

@@ -1,6 +1,7 @@
 {
   "app": {
-    "name": "CrossBuy 比价"
+    "name": "CrossBuy 比价",
+    "home": "返回首页"
   },
   "search": {
     "placeholder": "试试：无线蓝牙耳机、瑜伽垫、手机壳…",

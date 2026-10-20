@@ -1,6 +1,7 @@
 {
   "app": {
-    "name": "CrossBuy Compare"
+    "name": "CrossBuy Compare",
+    "home": "Back to home"
   },
   "nav": {
     "home": "Home",

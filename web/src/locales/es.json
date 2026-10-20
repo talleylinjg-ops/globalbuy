@@ -2,7 +2,8 @@
   "app": {
     "name": "CrossBuy Compare",
     "tagline": "Comparador de precios transfronterizo y agente de compra en China",
-    "subtagline": "Busca en Taobao, Tmall, JD, Pinduoduo y 1688 en un solo lugar: ve el coste real de llegada con envío internacional e impuestos incluidos"
+    "subtagline": "Busca en Taobao, Tmall, JD, Pinduoduo y 1688 en un solo lugar: ve el coste real de llegada con envío internacional e impuestos incluidos",
+    "home": "Volver al inicio"
   },
   "search": {
     "placeholder": "Prueba: auriculares inalámbricos, esterilla de yoga, funda móvil…",
