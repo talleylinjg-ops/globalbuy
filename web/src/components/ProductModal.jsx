@@ -208,13 +208,6 @@ export default function ProductModal({ itemId, onClose, onOrder, t, lang }) {
                 </button>
               </div>
             </div>
-
-            {detail.description && (
-              <div className="product-detail-desc">
-                <div className="track-section-title">{t('product.description')}</div>
-                <p>{lang !== 'zh' && detail.descriptionEn ? detail.descriptionEn : detail.description}</p>
-              </div>
-            )}
           </>
         )}
       </div>
