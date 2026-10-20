@@ -1795,3 +1795,15 @@ body {
 }
 .card-title-link { cursor: pointer; transition: color 0.12s; }
 .card-title-link:hover { color: var(--accent); }
+
+/* 规格属性点选 */
+.spec-chip { display: inline-flex; align-items: center; gap: 7px; }
+.spec-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  display: inline-block;
+  flex: none;
+}
+.spec-chip.active .spec-dot { outline: 2px solid var(--accent); outline-offset: 1px; }

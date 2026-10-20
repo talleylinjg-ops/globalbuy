@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { apiUrl } from '../api.js';
-import { productNameDisplay } from '../utils/carrier.js';
+import { matchSpecGroups, specGroupLabel, specValueLabel } from '../utils/specOptions.js';
 
-// 商品详情弹窗：大图 + 图集 + 描述 + 规格选择（SKU）或规格备注（自由填写）
+// 商品详情弹窗：大图 + 图集 + 描述 + 属性点选（类目驱动）或 SKU 选择 + 规格备注
 // 「立即下单」把选中的规格带回 OrderModal
 export default function ProductModal({ itemId, onClose, onOrder, t, lang }) {
   const [detail, setDetail] = useState(null);
   const [error, setError] = useState('');
   const [selectedSku, setSelectedSku] = useState(null);
+  const [selections, setSelections] = useState({}); // 属性组 key -> 选中的值
   const [skuNote, setSkuNote] = useState('');
   const [qty, setQty] = useState(1);
   const [activeImg, setActiveImg] = useState('');
@@ -16,6 +17,9 @@ export default function ProductModal({ itemId, onClose, onOrder, t, lang }) {
     if (!itemId) return;
     setDetail(null);
     setError('');
+    setSelections({});
+    setSkuNote('');
+    setQty(1);
     fetch(apiUrl(`/api/product/${encodeURIComponent(itemId)}`))
       .then(async (res) => {
         const d = await res.json();
@@ -30,15 +34,21 @@ export default function ProductModal({ itemId, onClose, onOrder, t, lang }) {
       .catch((e) => setError(e.message));
   }, [itemId]);
 
-  const hasSkus = (detail?.skus || []).length > 0;
+  const hasSkus = (detail?.skus || []).length > 1;
+  const specGroups = detail ? matchSpecGroups(detail.title) : [];
   const price = hasSkus && selectedSku ? selectedSku.price : detail?.price;
+  // 属性组选择（当前语种值）+ 自由备注，合并为规格文本随单提交
+  const specText = [
+    ...specGroups.map((g) => (selections[g.key] ? `${specGroupLabel(g, lang)}: ${specValueLabel(selections[g.key], lang)}` : '')),
+    skuNote.trim(),
+  ].filter(Boolean).join('; ');
 
   const submit = () => {
     onOrder({
       ...detail,
-      // SKU 模式带 skuId（服务端查价），备注模式带 skuName 文本
+      // SKU 模式带 skuId（服务端查价），属性/备注模式带 skuName 文本
       skuId: hasSkus ? selectedSku?.skuId || '' : '',
-      skuName: hasSkus ? selectedSku?.spec || '' : skuNote.trim(),
+      skuName: hasSkus ? selectedSku?.spec || '' : specText,
       orderPrice: price,
     });
   };
@@ -103,17 +113,41 @@ export default function ProductModal({ itemId, onClose, onOrder, t, lang }) {
                     </div>
                   </div>
                 ) : (
-                  <div className="product-sku-block">
-                    <div className="settings-label" title={t('product.specNoteHelp')}>{t('product.specNote')}</div>
-                    <textarea
-                      className="settings-control product-spec-note"
-                      rows={3}
-                      maxLength={200}
-                      placeholder={t('product.specNotePlaceholder')}
-                      value={skuNote}
-                      onChange={(e) => setSkuNote(e.target.value)}
-                    />
-                  </div>
+                  <>
+                    {specGroups.map((g) => (
+                      <div className="product-sku-block" key={g.key}>
+                        <div className="settings-label">{specGroupLabel(g, lang)}</div>
+                        <div className="product-sku-list">
+                          {g.values.map((v) => {
+                            const active = selections[g.key] === v;
+                            const hex = typeof v === 'object' ? v.hex : null;
+                            return (
+                              <button
+                                key={specValueLabel(v, 'en')}
+                                type="button"
+                                className={`btn-chip spec-chip ${active ? 'active' : ''}`}
+                                onClick={() => setSelections((s) => ({ ...s, [g.key]: active ? null : v }))}
+                              >
+                                {hex && <span className="spec-dot" style={{ background: hex }} aria-hidden="true" />}
+                                {specValueLabel(v, lang)}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                    <div className="product-sku-block">
+                      <div className="settings-label" title={t('product.specNoteHelp')}>{t('product.specNote')}</div>
+                      <textarea
+                        className="settings-control product-spec-note"
+                        rows={2}
+                        maxLength={200}
+                        placeholder={t('product.specNotePlaceholder')}
+                        value={skuNote}
+                        onChange={(e) => setSkuNote(e.target.value)}
+                      />
+                    </div>
+                  </>
                 )}
 
                 <div className="product-qty-block">

@@ -18,6 +18,16 @@ import { resolveCustomerSession } from '../services/customerAuth.js';
 import { createRecord, genId, genOrderNo, listCollection, getById } from '../services/db.js';
 import { createAdapters } from '../platforms/index.js';
 import { MOCK_PRODUCTS } from '../data/mockProducts.js';
+import { translateTitleToEnglish } from '../services/translate.js';
+
+// 商品详情响应统一补英文字段（i18n：非中文界面零混排）
+function withEnFields(d) {
+  return {
+    ...d,
+    titleEn: translateTitleToEnglish(d.title || ''),
+    descriptionEn: d.description ? translateTitleToEnglish(d.description) : '',
+  };
+}
 
 const router = Router();
 
@@ -96,11 +106,11 @@ router.get('/product/:itemId', async (req, res, next) => {
     const itemId = String(req.params.itemId || '');
     if (itemId.startsWith('pdd_')) {
       const detail = await createAdapters().pdd.detail(itemId);
-      return res.json(detail);
+      return res.json(withEnFields(detail));
     }
     const product = MOCK_PRODUCTS.find((p) => p.itemId === itemId);
     if (!product) return res.status(404).json({ error: 'item not found' });
-    res.json({
+    res.json(withEnFields({
       platform: product.platform || 'mock',
       itemId,
       title: product.title,
@@ -110,7 +120,7 @@ router.get('/product/:itemId', async (req, res, next) => {
       sales: product.sales || 0,
       shopName: product.shopName || '',
       skus: [{ skuId: 'default', spec: '', price: product.price, thumbUrl: product.imageUrl, stock: 999 }],
-    });
+    }));
   } catch (err) {
     next(err);
   }
