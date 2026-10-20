@@ -115,5 +115,33 @@ function sortQuotes(quotes) {
   return [...quotes].sort((a, b) => a.priceUsd - b.priceUsd || (a.daysMin + a.daysMax) - (b.daysMin + b.daysMax));
 }
 
+// 报价缓存预热：热门目的国 x 标准重量（0.5kg）定期刷新，
+// 让买家首搜直接命中缓存（外部 API 冷启动实测 4PX ~6s），预热失败静默跳过
+const WARM_COUNTRIES = ['US', 'GB', 'DE', 'FR', 'AU', 'CA', 'JP', 'KR', 'SG'];
+const WARM_INTERVAL_MS = 25 * 60 * 1000; // < 30min TTL，保证缓存始终新鲜
+
+export async function warmQuoteCache() {
+  if (!hasRealCarrier()) return;
+  let warmed = 0;
+  await Promise.allSettled(
+    WARM_COUNTRIES.map(async (country) => {
+      const fresh = await fetchQuotes({ country, weightKg: 0.5, valueUsd: 20, currency: 'USD' });
+      if (fresh.quotes.length > 0) {
+        quoteCache.set(`${country}:500`, { at: Date.now(), value: fresh });
+        warmed += 1;
+      }
+    })
+  );
+  if (warmed > 0) console.log(`[carrier] quote cache warmed for ${warmed}/${WARM_COUNTRIES.length} countries`);
+}
+
+export function startQuoteCacheWarmer() {
+  // 启动 5s 后先刷一轮（错开启动高峰），之后每 25 分钟刷新
+  setTimeout(() => {
+    warmQuoteCache().catch((e) => console.error('[carrier] warm failed:', e.message));
+    setInterval(() => warmQuoteCache().catch((e) => console.error('[carrier] warm failed:', e.message)), WARM_INTERVAL_MS);
+  }, 5000);
+}
+
 // 导出给外部使用的便捷判断
 export { hasRealCarrier };

@@ -1,12 +1,15 @@
 import express from 'express';
 import cors from 'cors';
+import compression from 'compression';
 import { existsSync } from 'node:fs';
 import { config } from './config.js';
 import { loadDb } from './services/db.js';
+import { startQuoteCacheWarmer } from './services/carrierService.js';
 import apiRouter from './routes/index.js';
 
 const app = express();
 app.use(cors());
+app.use(compression());
 app.use(express.json());
 
 // 启动前先完成 MySQL 初始化（建表 + 数据迁移），失败则终止
@@ -38,6 +41,8 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: err.message || 'Internal Server Error' });
 });
 
-app.listen(config.port, "0.0.0.0", () => { console.log(`[server] running on 0.0.0.0:${config.port}`); });
-app.get('/hide',(req,res)=>{console.log('visited hide page');res.status(204).end()});
-app.get('/',(req,res)=>{console.log('visit root');res.status(204).end()});
+app.listen(config.port, "0.0.0.0", () => {
+  console.log(`[server] running on 0.0.0.0:${config.port}`);
+  // 热门目的国报价预热：买家首搜命中缓存，消除外部 API 冷启动延迟
+  startQuoteCacheWarmer();
+});
