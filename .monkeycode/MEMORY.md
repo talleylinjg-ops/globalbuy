@@ -139,8 +139,10 @@ Entries discovered by the Agent during task execution should follow this format:
   - 后端 node --watch 的热重载有假象：touch 后日志可能仍打旧进程输出，确认方式是看进程 PID 是否变化或直接 kill+重启（后台终端 npm run dev:server）
   - curl 计时定位慢源分段：`-w 'connect:%{time_connect} start:%{time_starttransfer} total:%{time_total}'`；localhost connect 慢 3s 属 curl/DNS 层假象，换 127.0.0.1 复测
   - er-api.com 汇率接口 node fetch 直连 ~300ms 可达；curl 直测 5s 是 curl 层差异，勿据 curl 结论判定外呼慢
-  - 后端搜索提速已落地：searchService 询价与平台搜索并行；carrierService per-channel 3s 硬超时；currency.js fx 失败 10 分钟冷却（否则外呼失败 updatedAt 不更新导致每次搜索重试）；warm 搜索应 <20ms，首搜冷启动含 fx+4PX 询价约 1-3s
+  - 后端搜索提速已落地：searchService 询价与平台搜索并行；carrierService per-channel 3s 硬超时（后放宽 12s）；currency.js fx 失败 10 分钟冷却（否则外呼失败 updatedAt 不更新导致每次搜索重试）；2026-10-20 起报价缓存定时预热（9 热门目的国 x 0.5kg，25 分钟/轮 < 30min TTL），首搜 6.1s -> 1.3s
   - 前端 api.js 降级层提速：GET 超时 2.5s 快速失败 → 全局 backendDown 标记（后续 0ms 走快照）→ 60s 一次 probeBackend 探活恢复；模块加载即预热 meta+默认快照
+  - 「网页打不开」排查顺序：先查 5173 监听（dev:web 终端易死，重启 npm run dev:web），vite dev 必须 host: true（vite.config.js server 段）才能被 *.monkeycode-ai.online 预览域名访问，否则只监听 localhost
+  - server 是 ESM：NODE_PATH 对 ESM import 无效，全局 npm 包解析不到——workspace 依赖必须 `npm install <pkg> -w server` 局部安装
 
 [渠道真实凭据缺失现状与快照降级链]
 - Date: 2026-10-07
