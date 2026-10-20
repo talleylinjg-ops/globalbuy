@@ -17,6 +17,8 @@ import ProductModal from './components/ProductModal.jsx';
 const AdminPanel = lazy(() => import('./components/AdminPanel.jsx'));
 const TrackOrder = lazy(() => import('./components/TrackOrder.jsx'));
 const AccountPage = lazy(() => import('./components/AccountPage.jsx'));
+// 简易展示版（#/simple）：纯中文、隐藏快递信息，用于对外分享
+const SimpleApp = lazy(() => import('./components/SimpleApp.jsx'));
 
 const DEFAULT_COUNTRY = 'US';
 const DEFAULT_CURRENCY = 'USD';
@@ -40,12 +42,17 @@ function getAccountRoute() {
   return window.location.hash.startsWith('#/account');
 }
 
+function getSimpleRoute() {
+  return window.location.hash.startsWith('#/simple');
+}
+
 // 从全部快递报价中挑三档：最快 / 最便宜 / 居中；三档尽量为三个不同报价
 
 export default function App() {
   const { t, lang, setLang, languages } = useI18n();  const [isAdmin, setIsAdmin] = useState(getAdminRoute());
   const [isTrack, setIsTrack] = useState(getTrackRoute());
   const [isAccount, setIsAccount] = useState(getAccountRoute());
+  const [isSimple, setIsSimple] = useState(getSimpleRoute());
   const [meta, setMeta] = useState(null);
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -72,7 +79,7 @@ export default function App() {
   isDemoModeRef.current = Boolean(results?.demo || meta?.demo);
 
   useEffect(() => {
-    const onHash = () => { setIsAdmin(getAdminRoute()); setIsTrack(getTrackRoute()); setIsAccount(getAccountRoute()); };
+    const onHash = () => { setIsAdmin(getAdminRoute()); setIsTrack(getTrackRoute()); setIsAccount(getAccountRoute()); setIsSimple(getSimpleRoute()); };
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
@@ -91,7 +98,7 @@ export default function App() {
   // 首访自动预搜索默认热搜：访客打开即看到价格与快递选项，无需先输入
   const autoSearchedRef = useRef(false);
   useEffect(() => {
-    if (!meta || autoSearchedRef.current || isAdmin || lastSearch || loading) return;
+    if (!meta || autoSearchedRef.current || isAdmin || isSimple || lastSearch || loading) return;
     autoSearchedRef.current = true;
     // 落地页/外链带 ?q= 进入时优先用户关键词，否则默认热搜
     const urlQ = new URLSearchParams(window.location.search).get('q');
@@ -267,6 +274,7 @@ export default function App() {
 
   return (
     <div>
+      {!isSimple && (
       <header className="header">
         <div className="lang-switcher">
           <AccountMenu t={t} onOpen={() => { setIsAccount(true); setIsTrack(false); }} />
@@ -304,8 +312,9 @@ export default function App() {
           </div>
         </div>
       </header>
+      )}
 
-      <main className="container">
+      <main className={isSimple ? 'simple-page' : 'container'}>
         {isAdmin ? (
           <Suspense fallback={<div className="loading">...</div>}>
             <AdminPanel t={t} />
@@ -317,6 +326,10 @@ export default function App() {
         ) : isAccount ? (
           <Suspense fallback={<div className="loading">...</div>}>
             <AccountPage t={t} lang={lang} />
+          </Suspense>
+        ) : isSimple ? (
+          <Suspense fallback={<div className="loading">...</div>}>
+            <SimpleApp />
           </Suspense>
         ) : (
         <>

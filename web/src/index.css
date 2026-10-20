@@ -907,6 +907,45 @@ body {
 }
 .wc-empty { text-align: center; color: var(--text-dim); padding: 28px 0 !important; }
 
+/* ===== 简易展示版（#/simple）：纯中文、无快递信息 ===== */
+.simple-page { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+.simple-header { display: flex; align-items: center; gap: 24px; padding: 20px 0; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.simple-logo { font-size: 1.5rem; font-weight: 800; color: var(--accent); text-decoration: none; letter-spacing: -0.5px; }
+.simple-search { display: flex; gap: 10px; flex: 1; min-width: 260px; }
+.simple-search .settings-control { flex: 1; max-width: 560px; }
+.simple-main { padding: 22px 0 40px; }
+.simple-hot { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; color: var(--text-dim); font-size: 0.9rem; margin-bottom: 18px; }
+.simple-hot-tag {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 14px;
+  font-size: 0.85rem;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.12s, color 0.12s;
+}
+.simple-hot-tag:hover { border-color: var(--accent); color: var(--accent); }
+.simple-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+.simple-card { cursor: pointer; padding: 0; overflow: hidden; }
+.simple-empty { text-align: center; color: var(--text-dim); padding: 60px 0; }
+.simple-desc-title { font-weight: 700; font-size: 1rem; }
+.simple-footer { text-align: center; color: var(--text-dim); font-size: 0.85rem; padding: 24px 0 40px; border-top: 1px solid var(--border); }
+.simple-order-modal { max-width: 640px; width: 94vw; max-height: 88vh; overflow-y: auto; padding: 28px; }
+.simple-order-title { margin: 0 0 16px; }
+.simple-order-item { display: flex; gap: 14px; align-items: center; padding: 12px; background: var(--bg-soft); border-radius: 12px; }
+.simple-order-item img { width: 64px; height: 64px; border-radius: 10px; object-fit: cover; flex: none; }
+.simple-order-item-info { min-width: 0; }
+.simple-order-item-name { font-weight: 600; font-size: 0.92rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.simple-order-item-price { margin-top: 4px; color: var(--accent); font-weight: 700; }
+.simple-order-total { margin: 14px 0 18px; font-size: 1rem; }
+.simple-order-total b { color: var(--accent); font-size: 1.25rem; }
+.simple-order-total .muted { font-size: 0.82rem; margin-left: 6px; }
+.simple-order-btn { width: 100%; margin-top: 16px; }
+.simple-order-done { text-align: center; padding: 30px 10px; }
+.simple-order-done h3 { margin: 0 0 12px; font-size: 1.3rem; }
+.simple-order-done .btn { margin-top: 18px; }
+
 /* 状态 pill 扩展色（WooCommerce 配色） */
 .status-pill.info { background: #dbeafe; color: #1d4ed8; }
 .status-pill.muted { background: #e2e8f0; color: #475569; }
