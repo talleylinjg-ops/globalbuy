@@ -4,13 +4,21 @@ import { useMember, memberFetch, memberLogin, memberRegister, memberLogout } fro
 // 会员中心（WooCommerce My Account 对齐）
 // 未登录：Login / Register 两栏；登录后：Dashboard / Orders / Addresses / Account details / Logout
 const NAV = [
-  ['dashboard', 'account.dashboard'],
-  ['orders', 'account.orders'],
-  ['addresses', 'account.addresses'],
-  ['details', 'account.details'],
+  ['dashboard', 'account.dashboard', 'M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10'],
+  ['orders', 'account.orders', 'M6 2h9l5 5v15H6zM14 2v6h6M9 13h8M9 17h8'],
+  ['addresses', 'account.addresses', 'M12 21s-7-5.5-7-11a7 7 0 0114 0c0 5.5-7 11-7 11zM12 12a2 2 0 100-4 2 2 0 000 4z'],
+  ['details', 'account.details', 'M12 12a4 4 0 100-8 4 4 0 000 8zM4 21a8 8 0 0116 0'],
 ];
 
 const emptyAddress = { label: '', recipient: '', line1: '', line2: '', city: '', state: '', postal: '', country: '', phone: '', isDefault: false };
+
+function NavIcon({ d }) {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d={d} />
+    </svg>
+  );
+}
 
 function statusPill(status, t) {
   const cls = { shipped: 'pill good', completed: 'pill good', processing: 'pill warn', pending: 'pill warn', cancelled: 'pill' }[status] || 'pill';
@@ -137,6 +145,15 @@ export default function AccountPage({ t, lang }) {
   if (!session) {
     return (
       <div className="account-wrap">
+        <div className="account-hero account-hero-guest">
+          <div className="track-hero-icon" aria-hidden="true">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 12a4 4 0 100-8 4 4 0 000 8zM4 21a8 8 0 0116 0" />
+            </svg>
+          </div>
+          <h2>{t('account.title')}</h2>
+          <p>{t('account.loginHint')}</p>
+        </div>
         <div className="card account-auth-card">
           <div className="account-auth-tabs">
             <button type="button" className={mode === 'login' ? 'active' : ''} onClick={() => { setMode('login'); setError(''); }}>{t('account.signIn')}</button>
@@ -161,7 +178,7 @@ export default function AccountPage({ t, lang }) {
             <button className="btn btn-primary" disabled={busy}>
               {busy ? t('account.working') : mode === 'login' ? t('account.signIn') : t('account.register')}
             </button>
-            <p className="muted account-hint">{mode === 'login' ? t('account.loginHint') : t('account.registerHint')}</p>
+            {mode === 'register' && <p className="muted account-hint">{t('account.registerHint')}</p>}
           </form>
         </div>
       </div>
@@ -170,33 +187,51 @@ export default function AccountPage({ t, lang }) {
 
   const customer = session.customer || {};
   const shownOrders = (orders || []).slice(0, tab === 'dashboard' ? 3 : undefined);
+  const displayName = customer.name || customer.email || '';
+  const initial = (customer.name || customer.email || '?').charAt(0).toUpperCase();
 
   // ---------- 登录后：My Account ----------
   return (
     <div className="account-wrap">
-      <h3 className="account-title">{t('account.title')}</h3>
+      <div className="account-hero-banner">
+        <div className="account-hero-avatar" aria-hidden="true">{initial}</div>
+        <div className="account-hero-info">
+          <h2>{t('account.greeting', { name: displayName })}</h2>
+          <p>{customer.email}</p>
+        </div>
+        <button type="button" className="btn btn-ghost btn-sm account-hero-logout" onClick={async () => { await memberLogout(); setTab('dashboard'); }}>
+          {t('account.logout')}
+        </button>
+      </div>
+
       <div className="account-layout">
         <nav className="account-nav card">
-          {NAV.map(([key, label]) => (
+          {NAV.map(([key, label, icon]) => (
             <button key={key} type="button" className={tab === key ? 'active' : ''} onClick={() => { setTab(key); setOpenOrder(null); setError(''); }}>
-              {t(label)}
+              <NavIcon d={icon} />
+              <span>{t(label)}</span>
             </button>
           ))}
-          <button type="button" className="account-logout" onClick={async () => { await memberLogout(); setTab('dashboard'); }}>
-            {t('account.logout')}
-          </button>
         </nav>
 
         <div className="account-content">
           {error && <div className="account-error">{error}</div>}
 
           {tab === 'dashboard' && (
-            <div className="card account-card">
-              <p className="account-greeting">
-                {t('account.greeting', { name: customer.name || customer.email || '' })}
-              </p>
-              <p className="muted">{t('account.dashboardHint')}</p>
-              <h4>{t('account.recentOrders')}</h4>
+            <div className="account-dash">
+              <div className="account-stat-grid">
+                <div className="card account-stat-card">
+                  <span className="account-stat-value">{orders ? orders.length : '—'}</span>
+                  <span className="account-stat-label">{t('account.orders')}</span>
+                </div>
+                <div className="card account-stat-card">
+                  <span className="account-stat-value">{addresses ? addresses.length : '—'}</span>
+                  <span className="account-stat-label">{t('account.addresses')}</span>
+                </div>
+              </div>
+              <div className="card account-card">
+                <p className="muted">{t('account.dashboardHint')}</p>
+                <h4>{t('account.recentOrders')}</h4>
               {orders && orders.length === 0 && <p className="muted">{t('account.noOrders')}</p>}
               {shownOrders && shownOrders.length > 0 && (
                 <table className="account-table">
@@ -216,6 +251,7 @@ export default function AccountPage({ t, lang }) {
                   </tbody>
                 </table>
               )}
+              </div>
             </div>
           )}
 
@@ -224,8 +260,15 @@ export default function AccountPage({ t, lang }) {
               {openOrder && orderDetail ? (
                 <>
                   <button type="button" className="btn btn-ghost btn-sm" onClick={() => setOpenOrder(null)}>← {t('account.backToOrders')}</button>
-                  <h4 className="account-order-no">{orderDetail.orderNo} {statusPill(orderDetail.status, t)}</h4>
-                  <p className="muted">{orderDetail.createdAt && String(orderDetail.createdAt).slice(0, 10)} · {orderDetail.carrier ? `${orderDetail.carrier} · ${orderDetail.daysMin}-${orderDetail.daysMax} ${t('result.days')}` : ''}</p>
+                  <div className="account-order-summary">
+                    <div>
+                      <div className="account-order-no">{orderDetail.orderNo} {statusPill(orderDetail.status, t)}</div>
+                      <p className="muted">{orderDetail.createdAt && String(orderDetail.createdAt).slice(0, 10)}{orderDetail.carrier ? ` · ${orderDetail.carrier} · ${orderDetail.daysMin}-${orderDetail.daysMax} ${t('result.days')}` : ''}</p>
+                    </div>
+                    <div className="account-order-total">
+                      <span className="account-order-total-value">{orderDetail.currency} {fmt(orderDetail.breakdown?.total, '', '')}</span>
+                    </div>
+                  </div>
                   <table className="account-table">
                     <thead><tr><th>{t('account.item')}</th><th>{t('order.quantity')}</th><th>{t('account.total')}</th></tr></thead>
                     <tbody>

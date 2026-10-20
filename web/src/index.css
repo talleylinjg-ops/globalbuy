@@ -1331,8 +1331,81 @@ body {
 .header-account-link:hover { background: rgba(255, 255, 255, 0.24); }
 
 /* ---------- 会员中心 Account ---------- */
-.account-wrap { max-width: 1080px; margin: 0 auto; padding: 28px 16px 56px; }
+.account-wrap { max-width: 1080px; margin: 0 auto; padding: 12px 16px 56px; }
 .account-title { margin: 2px 0 20px; font-size: 1.65rem; font-weight: 700; letter-spacing: -0.01em; }
+
+/* 未登录 hero（与 Track 页同款设计语言） */
+.account-hero { text-align: center; padding: 26px 0 22px; }
+.account-hero h2 { margin: 0 0 6px; font-size: 1.7rem; font-weight: 700; letter-spacing: -0.01em; }
+.account-hero p { margin: 0 auto; color: var(--text-dim); font-size: 0.98rem; max-width: 460px; line-height: 1.5; }
+.account-hero-guest + .account-auth-card { margin-top: 6px; }
+
+/* 登录后渐变问候横幅 */
+.account-hero-banner {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 24px 28px;
+  margin-bottom: 22px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+  color: #fff;
+  box-shadow: 0 10px 28px rgba(79, 70, 229, 0.3);
+}
+.account-hero-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  flex: none;
+}
+.account-hero-info { flex: 1; min-width: 0; }
+.account-hero-info h2 { margin: 0 0 3px; font-size: 1.3rem; font-weight: 700; }
+.account-hero-info p { margin: 0; font-size: 0.88rem; opacity: 0.85; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.account-hero-logout {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.14);
+  flex: none;
+}
+.account-hero-logout:hover { color: #fff; border-color: #fff; background: rgba(255, 255, 255, 0.26); }
+
+/* Dashboard 统计卡 */
+.account-dash { display: flex; flex-direction: column; gap: 14px; }
+.account-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 560px) { .account-stat-grid { grid-template-columns: 1fr; } }
+.account-stat-card {
+  padding: 20px 24px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.06) 0%, rgba(124, 58, 237, 0.05) 100%);
+}
+.account-stat-value { font-size: 1.9rem; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; line-height: 1.1; }
+.account-stat-label { font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* 订单详情摘要头（与 Track summary 同款） */
+.account-order-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px 20px;
+  margin: 14px 0 18px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.06) 0%, rgba(124, 58, 237, 0.05) 100%);
+}
+@media (max-width: 560px) { .account-order-summary { flex-direction: column; align-items: flex-start; gap: 8px; } }
+.account-order-summary p { margin: 4px 0 0; font-size: 0.86rem; }
+.account-order-total { text-align: right; }
+.account-order-total-value { font-size: 1.3rem; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
 
 /* 未登录：登录/注册分段卡 */
 .account-auth-card {
@@ -1392,17 +1465,14 @@ body {
   color: var(--text);
   cursor: pointer;
   transition: background 0.12s, color 0.12s;
+  display: flex;
+  align-items: center;
+  gap: 11px;
 }
+.account-nav button svg { color: var(--text-dim); transition: color 0.12s; flex: none; }
 .account-nav button:hover { background: var(--accent-soft); }
 .account-nav button.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-.account-nav .account-logout {
-  color: var(--bad);
-  margin-top: 10px;
-  padding-top: 14px;
-  border-top: 1px solid var(--border);
-  border-radius: 0;
-}
-.account-nav .account-logout:hover { background: var(--bad-soft); }
+.account-nav button.active svg { color: var(--accent); }
 
 .account-card { padding: 26px; border-radius: 16px; }
 .account-greeting { font-size: 1.25rem; font-weight: 700; margin: 0 0 6px; }
