@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { apiUrl, fetchMeta, searchProducts } from '../api.js';
 import { matchSpecGroups, specGroupLabel, specValueLabel } from '../utils/specOptions.js';
-import { useMember, memberFetch } from '../authStore.js';
-import AccountMenu from './AccountMenu.jsx';
+import { useMember, memberFetch, memberLogin, memberRegister, memberLogout } from '../authStore.js';
 
 // 简易展示版（根路径）：中英双语、会员系统、后台入口；隐藏全部快递信息（渠道/运费/时效/清关）
 // 商品价人民币展示，下单由服务端自动选渠道；用于对外分享
@@ -32,6 +31,11 @@ const STR = {
     submitting: '提交中...', submitOrder: '提交订单',
     doneTitle: '下单成功', orderNo: '订单号：', doneNote: '我们会尽快为您安排，请留意邮箱通知。', done: '完成',
     admin: '管理', footer: 'CrossBuy · 精选中国好物',
+    authLogin: '登录', authRegister: '注册', authEmail: '邮箱', authPassword: '密码', authName: '姓名',
+    authLoginTitle: '登录账户', authRegisterTitle: '创建账户',
+    authToRegister: '没有账户？注册', authToLogin: '已有账户？登录',
+    authLogout: '退出登录', authMyOrders: '我的订单', authNoOrders: '暂无订单', authWelcome: '欢迎回来',
+    authErr: '操作失败', authOk: '成功',
   },
   en: {
     'account.signIn': 'Sign In', 'account.myAccount': 'My Account',
@@ -51,6 +55,11 @@ const STR = {
     submitting: 'Submitting...', submitOrder: 'Submit Order',
     doneTitle: 'Order Placed', orderNo: 'Order No.: ', doneNote: 'We will process your order shortly, please check your email.', done: 'Done',
     admin: 'Admin', footer: 'CrossBuy · Selected products from China',
+    authLogin: 'Sign In', authRegister: 'Register', authEmail: 'Email', authPassword: 'Password', authName: 'Name',
+    authLoginTitle: 'Sign in to your account', authRegisterTitle: 'Create your account',
+    authToRegister: 'No account? Register', authToLogin: 'Already have an account? Sign in',
+    authLogout: 'Sign Out', authMyOrders: 'My Orders', authNoOrders: 'No orders yet', authWelcome: 'Welcome back',
+    authErr: 'Request failed', authOk: 'Success',
   },
 };
 
@@ -62,11 +71,13 @@ function useSimpleLang() {
 
 export default function SimpleApp() {
   const { lang, setLang, t } = useSimpleLang();
+  const session = useMember();
   const [query, setQuery] = useState('');
   const [hot, setHot] = useState([]);
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [detailItemId, setDetailItemId] = useState(null);
+  const [authView, setAuthView] = useState(null); // null | 'auth' | 'account'
   const pzh = lang === 'zh' ? PLATFORM_ZH : PLATFORM_EN;
 
   useEffect(() => {
@@ -108,7 +119,13 @@ export default function SimpleApp() {
           <button type="submit" className="btn btn-primary">{t('search')}</button>
         </form>
         <div className="simple-header-tools">
-          <AccountMenu t={t} />
+          <button
+            type="button"
+            className="header-account-link"
+            onClick={() => setAuthView(session ? 'account' : 'auth')}
+          >
+            <span>{session ? (session.customer?.name || session.customer?.email || '').split(' ')[0] || t('authMyOrders') : t('authLogin')}</span>
+          </button>
           <select
             className="lang-select"
             value={lang}
@@ -163,6 +180,123 @@ export default function SimpleApp() {
       {detailItemId && (
         <SimpleDetail itemId={detailItemId} lang={lang} t={t} onClose={() => setDetailItemId(null)} />
       )}
+
+      {authView === 'auth' && (
+        <SimpleAuthModal lang={lang} t={t} onClose={() => setAuthView(null)} />
+      )}
+      {authView === 'account' && (
+        <SimpleAccountPanel lang={lang} t={t} onClose={() => setAuthView(null)} />
+      )}
+    </div>
+  );
+}
+
+// 简版登录/注册弹窗：站点内完成，跳转完整版
+function SimpleAuthModal({ lang, t, onClose }) {
+  const [mode, setMode] = useState('login'); // login | register
+  const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setBusy(true);
+    try {
+      if (mode === 'login') await memberLogin(form.email, form.password);
+      else await memberRegister(form.name, form.email, form.password);
+      onClose();
+    } catch (err) {
+      setError(err.message || t('authErr'));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="order-modal-mask" onClick={onClose}>
+      <div className="product-modal simple-auth-modal" onClick={(e) => e.stopPropagation()}>
+        <button className="order-modal-close" onClick={onClose}>×</button>
+        <h3 className="simple-order-title">{mode === 'login' ? t('authLoginTitle') : t('authRegisterTitle')}</h3>
+        <form onSubmit={submit}>
+          {mode === 'register' && (
+            <div className="settings-field">
+              <label className="settings-label">{t('authName')}</label>
+              <input className="settings-control" value={form.name} onChange={(e) => set('name', e.target.value)} required />
+            </div>
+          )}
+          <div className="settings-field">
+            <label className="settings-label">{t('authEmail')}</label>
+            <input className="settings-control" type="email" value={form.email} onChange={(e) => set('email', e.target.value)} required />
+          </div>
+          <div className="settings-field">
+            <label className="settings-label">{t('authPassword')}</label>
+            <input className="settings-control" type="password" minLength={6} value={form.password} onChange={(e) => set('password', e.target.value)} required />
+          </div>
+          {error && <div className="track-error">{error}</div>}
+          <button type="submit" className="btn btn-primary simple-order-btn" disabled={busy}>
+            {busy ? '...' : (mode === 'login' ? t('authLogin') : t('authRegister'))}
+          </button>
+        </form>
+        <button type="button" className="simple-auth-switch" onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(''); }}>
+          {mode === 'login' ? t('authToRegister') : t('authToLogin')}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// 简版会员中心弹窗：资料 + 订单列表 + 退出，站点内完成
+function SimpleAccountPanel({ lang, t, onClose }) {
+  const session = useMember();
+  const [orders, setOrders] = useState(null);
+  const customer = session?.customer || {};
+
+  useEffect(() => {
+    memberFetch('/api/auth/orders')
+      .then(async (res) => (res.ok ? res.json() : []))
+      .then((list) => setOrders(Array.isArray(list) ? list : []))
+      .catch(() => setOrders([]));
+  }, []);
+
+  const fmtDate = (iso) => (iso ? String(iso).slice(0, 10) : '—');
+
+  return (
+    <div className="order-modal-mask" onClick={onClose}>
+      <div className="product-modal simple-auth-modal" onClick={(e) => e.stopPropagation()}>
+        <button className="order-modal-close" onClick={onClose}>×</button>
+        <h3 className="simple-order-title">{t('authWelcome')}，{customer.name || customer.email}</h3>
+        <div className="simple-account-email muted">{customer.email}</div>
+
+        <div className="simple-account-orders">
+          <div className="simple-desc-title">{t('authMyOrders')}</div>
+          {orders === null && <div className="loading">{t('loading')}</div>}
+          {Array.isArray(orders) && orders.length === 0 && (
+            <div className="simple-empty" style={{ padding: '20px 0' }}>{t('authNoOrders')}</div>
+          )}
+          {Array.isArray(orders) && orders.length > 0 && (
+            <div className="simple-order-list">
+              {orders.map((o) => (
+                <div className="simple-order-row" key={o.id || o.orderNo}>
+                  <div className="simple-order-row-main">
+                    <b>{o.orderNo}</b>
+                    <span className="muted">{fmtDate(o.createdAt)}</span>
+                  </div>
+                  <div className="simple-order-row-side">
+                    <span className="product-price">¥{(Number(o.totalCny) || Number(o.total) || 0).toLocaleString()}</span>
+                    <span className="muted">{o.status || ''}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <button type="button" className="btn btn-ghost simple-order-btn" onClick={async () => { await memberLogout(); onClose(); }}>
+          {t('authLogout')}
+        </button>
+      </div>
     </div>
   );
 }
