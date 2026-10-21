@@ -64,6 +64,13 @@ router.get('/search', async (req, res, next) => {
     const translatedKeyword = isMostlyAscii(q) ? translateKeywordToChinese(q) : q;
 
     const result = await searchAndCompare(q, { ...opts, translatedKeyword });
+    // 英文界面商品标题：搜索结果统一补英文翻译（detail 接口同源词典）
+    if (Array.isArray(result.results)) {
+      result.results = result.results.map((item) => ({
+        ...item,
+        titleEn: item.titleEn || translateTitleToEnglish(item.title || ''),
+      }));
+    }
     res.json({
       ...result,
       inputKeyword: q,

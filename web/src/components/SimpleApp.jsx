@@ -10,6 +10,8 @@ const PLATFORM_ZH = { pdd: '拼多多', taobao: '淘宝', tmall: '天猫', '1688
 const PLATFORM_EN = { pdd: 'PDD', taobao: 'Taobao', tmall: 'Tmall', '1688': '1688', jd: 'JD', ali: 'AliExpress' };
 const LANGS = [{ code: 'zh', label: '中文' }, { code: 'en', label: 'English' }];
 const LANG_KEY = 'crossbuy_lang';
+// 英文界面热搜词：后端会把英文关键词翻译为中文再搜平台商品库
+const HOT_EN = ['phone case', 'wireless earbuds', 'data cable', 'power bank', 'smart watch', 'bluetooth speaker', 'LED light', 'toy'];
 
 const STR = {
   zh: {
@@ -34,7 +36,7 @@ const STR = {
   en: {
     'account.signIn': 'Sign In', 'account.myAccount': 'My Account',
     searchPlaceholder: 'Search products, e.g. phone case / cable',
-    search: 'Search', hot: 'Hot: ', sold: 'Sold', buyers: ' buyers',
+    search: 'Search', hot: 'Hot: ', sold: 'Sold ', buyers: ' buyers',
     noResults: 'No products found, try another keyword',
     serviceDown: 'Search service unavailable, please try later',
     loading: 'Loading...', searching: 'Searching...',
@@ -121,7 +123,7 @@ export default function SimpleApp() {
       <main className="simple-main">
         <div className="simple-hot">
           {t('hot')}
-          {(hot.length ? hot : (lang === 'zh' ? ['手机壳', '数据线', '蓝牙耳机'] : ['phone case', 'cable', 'earbuds'])).map((k) => (
+          {(lang === 'en' ? HOT_EN : (hot.length ? hot : ['手机壳', '数据线', '蓝牙耳机'])).map((k) => (
             <button key={k} type="button" className="simple-hot-tag" onClick={() => doSearch(k)}>{k}</button>
           ))}
         </div>
@@ -139,7 +141,7 @@ export default function SimpleApp() {
                 <img className="product-img" src={p.imageUrl} alt="" loading="lazy" />
               </div>
               <div className="product-info">
-                <div className="product-title">{p.title}</div>
+                <div className="product-title">{lang !== 'zh' && p.titleEn ? p.titleEn : p.title}</div>
                 <div className="product-stats">
                   <span className="product-price">¥{p.price.toLocaleString()}</span>
                   <span className="muted">
