@@ -1,7 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { apiUrl, fetchMeta, searchProducts } from '../api.js';
 import { matchSpecGroups, specGroupLabel, specValueLabel } from '../utils/specOptions.js';
 import { useMember, memberFetch, memberLogin, memberRegister, memberLogout } from '../authStore.js';
+import { useI18n } from '../i18n.js';
+
+// 管理后台复用完整版 AdminPanel，但以全屏覆盖层方式在简版内打开（不跳路由）
+const AdminPanel = lazy(() => import('./AdminPanel.jsx'));
 
 // 简易展示版（根路径）：中英双语、会员系统、后台入口；隐藏全部快递信息（渠道/运费/时效/清关）
 // 商品价人民币展示，下单由服务端自动选渠道；用于对外分享
@@ -71,6 +75,7 @@ function useSimpleLang() {
 
 export default function SimpleApp() {
   const { lang, setLang, t } = useSimpleLang();
+  const { t: tFull } = useI18n(); // 管理后台复用完整版多语言词条
   const session = useMember();
   const [query, setQuery] = useState('');
   const [hot, setHot] = useState([]);
@@ -78,6 +83,7 @@ export default function SimpleApp() {
   const [loading, setLoading] = useState(false);
   const [detailItemId, setDetailItemId] = useState(null);
   const [authView, setAuthView] = useState(null); // null | 'auth' | 'account'
+  const [adminOpen, setAdminOpen] = useState(false);
   const pzh = lang === 'zh' ? PLATFORM_ZH : PLATFORM_EN;
 
   useEffect(() => {
@@ -174,7 +180,7 @@ export default function SimpleApp() {
 
       <footer className="simple-footer">
         {t('footer')}
-        <a className="simple-admin-link" href="#/admin">{t('admin')}</a>
+        <button type="button" className="simple-admin-link" onClick={() => setAdminOpen(true)}>{t('admin')}</button>
       </footer>
 
       {detailItemId && (
@@ -186,6 +192,15 @@ export default function SimpleApp() {
       )}
       {authView === 'account' && (
         <SimpleAccountPanel lang={lang} t={t} onClose={() => setAuthView(null)} />
+      )}
+
+      {adminOpen && (
+        <div className="simple-admin-overlay">
+          <button type="button" className="simple-admin-close" onClick={() => setAdminOpen(false)}>×</button>
+          <Suspense fallback={<div className="loading">{t('loading')}</div>}>
+            <AdminPanel t={tFull} />
+          </Suspense>
+        </div>
       )}
     </div>
   );
