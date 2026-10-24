@@ -56,6 +56,7 @@ async function fetchQuotes(p) {
         }));
       } catch (e) {
         // 真实 API 失败：该渠道标记错误并标记不可用，不回退估算
+        console.error(`[carrier] ${cfg.code} quote failed:`, e.message);
         return [{
           status: 'error',
           error: e.message,
