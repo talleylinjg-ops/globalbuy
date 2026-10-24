@@ -194,3 +194,17 @@ Entries discovered by the Agent during task execution should follow this format:
   - 拆单依据：按「仓库」拆，不同发货仓的商品分属不同包裹（商品数据需新增 warehouse 字段）
   - 提示时机两处都要：下单成功页即提示「可能分多个包裹」（预告语义）+ 仓库实际拆单后/发货前显示确定包裹数与追踪号
   - 实施顺序：顺丰生产估价接口关联通过 → 先打通报价开闸 → 再实施多包裹 v2
+
+[阿里云 VPS 生产部署知识]
+- Date: 2026-10-24
+- Context: 首次部署 CrossBuy 到阿里云 VPS（47.85.202.149，宝塔面板生产机）
+- Category: Operations & Deployment
+- Instructions:
+  - 部署位置：/opt/globalbuy（部署包 releases/crossbuy-vps-*.tar.gz 解压）；pm2 应用名 crossbuy-server；nginx vhost 47.85.202.149.conf 反代 80->3001（原 kvisa.cloud 空壳站点已替换，备份 .bak-crossbuy-1024）
+  - 该服务器为多站点生产机（sweetdate/xluxury/daqi 等宝塔 vhost），禁止动 0.default.conf/default_server
+  - MySQL root 密码用宝塔 bt 7 强制重设；crossbuy 库账号密码 Cb2026Cross9z（写 /opt/globalbuy/server/.env）
+  - server/.env 组装方式：VPS 基础段（MYSQL_PASSWORD=Cb2026Cross9z）+ 本地 PDD_*/CARRIER_* 凭据段合并；整份覆盖本地 .env 会导致库密码错→崩溃循环（pm2 errored）
+  - SSH 防爆破冷却规律：连接间隔必须 >=15-20 分钟（成功连接后也一样），并行/短间隔立即触发封禁；被封时让用户在宝塔终端跑 deploy/vps/vps-fix.sh（curl raw.githubusercontent 拉取）可全自动修复+解封
+  - 部署脚本一键通道：curl -fsSL https://raw.githubusercontent.com/talleylinjg-ops/globalbuy/master/deploy/vps/vps-fix.sh | bash
+  - /api/search 响应键为 results（sourceInfo[].count 为平台 raw 数）；PDD 真实数据走 DDK goods.search（需 pid 备案，失败回退推荐池）
+  - 遗留：EMS 需把 47.85.202.149 加入 IP 白名单；顺丰在 VPS 报价 0 条（本地直测正常，疑出口 IP 风控）待查
