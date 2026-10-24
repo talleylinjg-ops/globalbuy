@@ -17,20 +17,39 @@ sudo apt-get install -y mariadb-server
 ## 2. 拉取代码与配置
 
 ```bash
+# 方式 A：git 拉取
 git clone https://github.com/talleylinjg-ops/globalbuy.git
 cd globalbuy
+
+# 方式 B：离线包（推荐，无需 git）
+# scp crossbuy-vps-*.tar.gz root@<VPS公网IP>:/opt/ && ssh root@<VPS公网IP>
+mkdir -p /opt/globalbuy && tar xzf /opt/crossbuy-vps-*.tar.gz -C /opt/globalbuy
+cd /opt/globalbuy
 ```
+
+## 2.1 初始化数据库（首次部署）
+
+```bash
+mysql -e "CREATE DATABASE IF NOT EXISTS crossbuy CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -e "CREATE USER IF NOT EXISTS 'crossbuy'@'localhost' IDENTIFIED BY '你的强密码';"
+mysql -e "GRANT ALL PRIVILEGES ON crossbuy.* TO 'crossbuy'@'localhost'; FLUSH PRIVILEGES;"
+```
+
+建表由后端启动时自动完成（ensureSchema），无需手工导入 SQL。
+
+## 2.2 配置 server/.env
 
 创建 `server/.env`（参考 `server/.env.example`），必填项：
 
 ```ini
 PORT=3001
-DB_HOST=127.0.0.1
-DB_USER=crossbuy
-DB_PASSWORD=你的数据库密码
-DB_NAME=crossbuy
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+MYSQL_USER=crossbuy
+MYSQL_PASSWORD=你的数据库密码
+MYSQL_DATABASE=crossbuy
 
-# 渠道凭据（顺丰/EMS/4PX 等，按需填写）
+# 渠道凭据（顺丰/EMS/4PX 等，按需填写；也可部署后在后台"渠道管理"里配置）
 CARRIER_EMS_SENDER_NO=C1100296646500
 CARRIER_EMS_AUTHORIZATION=...
 CARRIER_EMS_BASE_URL=https://api.ems.com.cn/amp-prod-api/f/amp/api/open

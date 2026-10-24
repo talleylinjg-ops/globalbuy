@@ -4,11 +4,19 @@
 set -e
 cd "$(dirname "$0")/../.."
 
-echo "==> 拉取最新代码"
-git pull --ff-only origin master
+echo "==> 拉取最新代码（离线包部署时无 git 仓库，自动跳过）"
+git pull --ff-only origin master 2>/dev/null || echo "（非 git 环境，跳过拉取）"
 
 echo "==> 安装后端依赖"
 (cd server && npm install --omit=dev)
+
+echo "==> 首次部署：导入渠道配置等初始数据"
+SETTINGS_COUNT=$(mysql -N -e "SELECT COUNT(*) FROM ${MYSQL_DATABASE:-crossbuy}.settings" 2>/dev/null || echo 0)
+if [ "$SETTINGS_COUNT" = "0" ] && [ -f deploy/vps/init-settings.sql ]; then
+  mysql "${MYSQL_DATABASE:-crossbuy}" < deploy/vps/init-settings.sql && echo "已导入 init-settings.sql（渠道凭据/后台账号/费率）"
+else
+  echo "（settings 表已有 $SETTINGS_COUNT 条配置，跳过导入）"
+fi
 
 echo "==> 安装前端依赖并构建"
 (cd web && npm install && npm run build)
