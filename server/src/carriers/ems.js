@@ -7,8 +7,34 @@
 import { CarrierAdapter, CarrierError } from './base.js';
 import { httpRequest } from './http.js';
 import { cnyToCurrency } from '../services/currency.js';
+import pkg from 'sm-crypto';
+
+const { sm4 } = pkg;
 
 const API_FREIGHT_ESTIMATE = '050005';
+
+// 鉴权规范：logitcsInterface = "|$4|" + Base64(SM4/ECB/PKCS5(业务JSON + SK 拼接))
+// SK 为 Base64 编码的 16 字节 SM4 密钥（页面"签名钥匙"）
+function sm4KeyHex(signKey) {
+  return Buffer.from(signKey, 'base64').toString('hex');
+}
+
+function sm4EncryptEnvelope(jsonText, signKey) {
+  const content = jsonText + signKey;
+  const cipherHex = sm4.encrypt(content, sm4KeyHex(signKey), { padding: 'pkcs#7' });
+  return '|$4|' + Buffer.from(cipherHex, 'hex').toString('base64');
+}
+
+function sm4DecryptEnvelope(cipherText, signKey) {
+  if (typeof cipherText !== 'string' || !cipherText.startsWith('|$4|')) return null;
+  try {
+    const hex = Buffer.from(cipherText.slice(4), 'base64').toString('hex');
+    const plain = sm4.decrypt(hex, sm4KeyHex(signKey), { padding: 'pkcs#7' });
+    return plain || null;
+  } catch {
+    return null;
+  }
+}
 
 // 默认产品代码：电商标快（V2.7 5.24 产品代码表）
 const DEFAULT_PRODUCT_CODE = '115104300000691';
@@ -29,8 +55,8 @@ export class EMSAdapter extends CarrierAdapter {
     return !!(this.baseUrl && this.cfg.senderNo && this.cfg.authorization);
   }
 
-  // V2.7 4.1 公共请求信封
-  envelope(apiCode, bizBody) {
+  // V2.7 4.1 公共请求信封（logitcsInterface 由 call() 按 SM4 规范加密后填充）
+  envelope(apiCode) {
     const env = {
       apiCode,
       senderNo: this.cfg.senderNo,
@@ -38,7 +64,6 @@ export class EMSAdapter extends CarrierAdapter {
       msgType: '0',
       timeStamp: timeStamp(),
       version: 'V1.0.0',
-      logitcsInterface: bizBody,
     };
     if (this.cfg.userCode) env.userCode = this.cfg.userCode;
     return env;
@@ -50,8 +75,12 @@ export class EMSAdapter extends CarrierAdapter {
     }
     let data;
     try {
-      // 网关要求 x-www-form-urlencoded 表单提交，logitcsInterface 为 JSON 字符串
-      const form = new URLSearchParams(this.envelope(apiCode, bizBody));
+      // 网关要求 x-www-form-urlencoded 表单提交；logitcsInterface 为 SM4 加密串（|$4|+Base64）
+      const jsonText = JSON.stringify(bizBody ?? {});
+      const payload = this.cfg.signKey
+        ? sm4EncryptEnvelope(jsonText, this.cfg.signKey)
+        : jsonText;
+      const form = new URLSearchParams({ ...this.envelope(apiCode), logitcsInterface: payload });
       data = await httpRequest(this.baseUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -65,7 +94,16 @@ export class EMSAdapter extends CarrierAdapter {
     if (retCode !== '00000') {
       throw new CarrierError(`EMS ${apiCode} 返回 ${retCode || '无 retCode'}：${data?.retMsg || '未知错误'}`, 'NO_QUOTE', data);
     }
-    return data.retBody ?? data;
+    // 生产返回可能同样为 |$4| SM4 密文，解密后使用；明文则直接透传
+    let ret = data.retBody ?? data;
+    if (this.cfg.signKey && typeof ret === 'string') {
+      const plain = sm4DecryptEnvelope(ret, this.cfg.signKey);
+      if (plain) ret = plain;
+    }
+    if (typeof ret === 'string') {
+      try { ret = JSON.parse(ret); } catch { /* 保持字符串 */ }
+    }
+    return ret ?? data;
   }
 
   // V2.7 5.24 预估邮费接口（productCode / weight克 / senderInfo / receiveInfo）
