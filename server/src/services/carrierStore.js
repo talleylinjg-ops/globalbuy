@@ -11,6 +11,15 @@ function seedFromEnv() {
   const map = {
     yuntrack: { appId: process.env.CARRIER_YUNTRACK_APP_ID, appToken: process.env.CARRIER_YUNTRACK_APP_TOKEN },
     '4px': { appKey: process.env.CARRIER_4PX_APP_KEY, appSecret: process.env.CARRIER_4PX_APP_SECRET },
+    sfintl: {
+      appKey: process.env.CARRIER_SFINTL_APP_KEY,
+      appSecret: process.env.CARRIER_SFINTL_APP_SECRET,
+      aesKey: process.env.CARRIER_SFINTL_AES_KEY,
+      customerCode: process.env.CARRIER_SFINTL_CUSTOMER_CODE,
+      customerType: process.env.CARRIER_SFINTL_CUSTOMER_TYPE,
+      interProductCode: process.env.CARRIER_SFINTL_PRODUCT_CODES,
+      baseUrl: process.env.CARRIER_SFINTL_BASE_URL,
+    },
     dhl: { apiKey: process.env.CARRIER_DHL_API_KEY, apiSecret: process.env.CARRIER_DHL_API_SECRET },
     ups: { clientId: process.env.CARRIER_UPS_CLIENT_ID, clientSecret: process.env.CARRIER_UPS_CLIENT_SECRET },
     fedex: { apiKey: process.env.CARRIER_FEDEX_API_KEY, apiSecret: process.env.CARRIER_FEDEX_API_SECRET },
@@ -50,7 +59,12 @@ function ensureSeeded() {
   let changed = false;
   for (const seed of seedFromEnv()) {
     const rec = db[DB_KEY].find((r) => r.id === seed.id);
-    if (!rec) continue;
+    if (!rec) {
+      // 旧数据文件里缺失的新渠道条目，补插进去
+      db[DB_KEY].push(seed);
+      changed = true;
+      continue;
+    }
     for (const [k, v] of Object.entries(seed)) {
       if (v && (rec[k] === undefined || rec[k] === null || rec[k] === '')) {
         rec[k] = v;
@@ -74,7 +88,9 @@ export function upsertCarrier(data) {
   ensureSeeded();
   const db = getDb();
   const list = db[DB_KEY];
-  const idx = list.findIndex((c) => c.id === data.id);
+  let idx = list.findIndex((c) => c.id === data.id);
+  // 未带 id 时按 code 匹配，避免同渠道被写成重复条目
+  if (idx === -1 && data.code) idx = list.findIndex((c) => c.code === data.code);
   if (idx === -1) {
     const record = { ...data, id: `carrier_${data.code}_${Date.now().toString(36)}` };
     list.push(record);
