@@ -18,10 +18,12 @@ function seedFromEnv() {
       senderNo: process.env.CARRIER_EMS_SENDER_NO,
       authorization: process.env.CARRIER_EMS_AUTHORIZATION,
       userCode: process.env.CARRIER_EMS_USER_CODE,
+      userId: process.env.CARRIER_EMS_USER_ID,
       baseUrl: process.env.CARRIER_EMS_BASE_URL,
       productCode: process.env.CARRIER_EMS_PRODUCT_CODE,
       senderAddress: process.env.CARRIER_EMS_SENDER_ADDRESS,
       defaultReceiveInfo: process.env.CARRIER_EMS_DEFAULT_RECEIVE_INFO,
+      signKey: process.env.CARRIER_EMS_SIGN_KEY,
     },
     ptdsgj: { token: process.env.CARRIER_PTDSGJ_TOKEN, pickupZone: process.env.CARRIER_PTDSGJ_PICKUP_ZONE },
     zjhygj: {

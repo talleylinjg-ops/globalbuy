@@ -114,6 +114,12 @@ export class EMSAdapter extends CarrierAdapter {
     if (!this.cfg.senderAddress || !receiveInfo) {
       throw new CarrierError('EMS 预估邮费需配置寄件地址(senderAddress)', 'NOT_CONFIGURED');
     }
+    // 防错价：国际询价且缺少目的国收件地址时，回退寄件地址会算出国内同城价冒充国际价，直接拒绝报价
+    const isDomesticQuote = (p.country || '').toUpperCase() === 'CN';
+    const fallbackDomestic = !p.receiveInfo && !this.cfg.defaultReceiveInfo;
+    if (!isDomesticQuote && fallbackDomestic) {
+      throw new CarrierError('EMS 缺少目的国收件地址配置(defaultReceiveInfo)，暂不能提供国际报价', 'NOT_CONFIGURED');
+    }
     const bizBody = {
       productCode: this.cfg.productCode || DEFAULT_PRODUCT_CODE,
       weight: String(Math.round(chargedKg * 1000)),
