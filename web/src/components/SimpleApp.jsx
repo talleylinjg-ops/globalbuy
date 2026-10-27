@@ -219,7 +219,13 @@ export default function SimpleApp() {
       </footer>
 
       {detailItemId && (
-        <SimpleDetail itemId={detailItemId} lang={lang} t={t} onClose={() => setDetailItemId(null)} />
+        <SimpleDetail
+          item={list.find((x) => x.itemId === detailItemId)}
+          itemId={detailItemId}
+          lang={lang}
+          t={t}
+          onClose={() => setDetailItemId(null)}
+        />
       )}
 
       {authView === 'auth' && (
@@ -352,27 +358,42 @@ function SimpleAccountPanel({ lang, t, onClose }) {
 }
 
 // 简版详情弹窗：图集 + 属性点选 + 数量 + 下单（无任何物流信息）
-function SimpleDetail({ itemId, lang, t, onClose }) {
-  const [detail, setDetail] = useState(null);
+function SimpleDetail({ item, itemId, lang, t, onClose }) {
+  // 列表已有商品数据：先本地渲染，后端可用时再补全（静态托管下后端可能不在）
+  const [detail, setDetail] = useState(item || null);
   const [error, setError] = useState('');
-  const [activeImg, setActiveImg] = useState('');
+  const [activeImg, setActiveImg] = useState(item?.imageUrl || '');
   const [selections, setSelections] = useState({});
   const [skuNote, setSkuNote] = useState('');
   const [qty, setQty] = useState(1);
   const [showOrder, setShowOrder] = useState(false);
 
   useEffect(() => {
+    let alive = true;
+    setError('');
+    setDetail(item || null);
+    setActiveImg(item?.imageUrl || '');
     fetch(apiUrl(`/api/product/${encodeURIComponent(itemId)}`))
       .then(async (res) => {
+        const ct = res.headers.get('content-type') || '';
+        // 后端不可达时静态站会回退到 index.html，不能当 JSON 解析
+        if (!ct.includes('application/json')) throw new Error('backend-unavailable');
         const d = await res.json();
         if (!res.ok) throw new Error(d.error || 'load failed');
         return d;
       })
       .then((d) => {
-        setDetail(d);
+        if (!alive) return;
+        setDetail((prev) => ({ ...prev, ...d }));
         setActiveImg(d.imageUrl || (d.gallery || [])[0] || '');
       })
-      .catch((e) => setError(e.message));
+      .catch(() => {
+        // 保留列表数据，不打断浏览
+        if (!alive) return;
+        if (!item) setError(t('serviceDown'));
+      });
+    return () => { alive = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [itemId]);
 
   const specGroups = detail ? matchSpecGroups(detail.title) : [];
