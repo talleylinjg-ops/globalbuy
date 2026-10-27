@@ -14,6 +14,7 @@ import { sfEncrypt, sfDecrypt, sfSignature } from './sfcrypto.js';
 const DEFAULT_BASE = 'https://api-ifsp.sf.global';
 const DEFAULT_MSGTYPE = 'IUOP_ESTIMATE_FEE';
 const tokenCache = new Map();
+const tokenInflight = new Map();
 
 export class SFIntlAdapter extends CarrierAdapter {
   constructor(cfg = {}) {
@@ -35,20 +36,32 @@ export class SFIntlAdapter extends CarrierAdapter {
   async getToken(force = false) {
     const cached = tokenCache.get(this.appKey);
     if (!force && cached && cached.expireAt > Date.now() + 5 * 60 * 1000) return cached.token;
-    const url = `${this.baseUrl}/openapi/api/token?appKey=${encodeURIComponent(this.appKey)}&appSecret=${encodeURIComponent(this.appSecret)}`;
-    const res = await httpRequest(url, { method: 'GET', timeout: 15000 });
-    const j = typeof res === 'object' && res !== null ? res : (() => { try { return JSON.parse(res); } catch { return null; } })();
-    if (!j || typeof j !== 'object') {
-      throw new CarrierError(`token 响应无法解析: ${String(res).slice(0, 120)}`, 'API_ERROR');
+    // 并发去重：生产 token 为单活跃策略（新 token 使旧 token 失效），
+    // 多产品码并行询价时必须共用同一次 token 请求，否则先发出的请求会被判 invalid
+    const inflight = tokenInflight.get(this.appKey);
+    if (inflight) return inflight;
+    const p = (async () => {
+      const url = `${this.baseUrl}/openapi/api/token?appKey=${encodeURIComponent(this.appKey)}&appSecret=${encodeURIComponent(this.appSecret)}`;
+      const res = await httpRequest(url, { method: 'GET', timeout: 15000 });
+      const j = typeof res === 'object' && res !== null ? res : (() => { try { return JSON.parse(res); } catch { return null; } })();
+      if (!j || typeof j !== 'object') {
+        throw new CarrierError(`token 响应无法解析: ${String(res).slice(0, 120)}`, 'API_ERROR');
+      }
+      if (j.apiResultCode !== 0) {
+        throw new CarrierError(`获取 token 失败: ${j.apiErrorMsg || '未知'}（code=${j.apiResultCode}）`, 'AUTH_ERROR', j);
+      }
+      const token = j.apiResultData?.accessToken;
+      const expireIn = Number(j.apiResultData?.expireIn || 7200);
+      if (!token) throw new CarrierError('token 响应缺少 accessToken', 'API_ERROR', j);
+      tokenCache.set(this.appKey, { token, expireAt: Date.now() + expireIn * 1000 });
+      return token;
+    })();
+    tokenInflight.set(this.appKey, p);
+    try {
+      return await p;
+    } finally {
+      tokenInflight.delete(this.appKey);
     }
-    if (j.apiResultCode !== 0) {
-      throw new CarrierError(`获取 token 失败: ${j.apiErrorMsg || '未知'}（code=${j.apiResultCode}）`, 'AUTH_ERROR', j);
-    }
-    const token = j.apiResultData?.accessToken;
-    const expireIn = Number(j.apiResultData?.expireIn || 7200);
-    if (!token) throw new CarrierError('token 响应缺少 accessToken', 'API_ERROR', j);
-    tokenCache.set(this.appKey, { token, expireAt: Date.now() + expireIn * 1000 });
-    return token;
   }
 
   async callApi(msgType, biz, { retried = false } = {}) {

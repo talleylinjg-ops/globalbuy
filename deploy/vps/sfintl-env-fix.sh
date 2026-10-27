@@ -4,10 +4,12 @@
 exec 2>&1
 BASE='https://raw.githubusercontent.com/talleylinjg-ops/globalbuy/master'
 
-echo '===== [1] 同步最新 carrierStore.js（sfintl seed 映射） ====='
+echo '===== [1] 同步最新 carrierStore.js 与 sfinternational.js（sfintl seed 映射+token 并发修复） ====='
 cd /opt/globalbuy/server
 curl -fsSL "$BASE/server/src/services/carrierStore.js" -o src/services/carrierStore.js
+curl -fsSL "$BASE/server/src/carriers/sfinternational.js" -o src/carriers/sfinternational.js
 grep -q 'CARRIER_SFINTL_APP_KEY' src/services/carrierStore.js && echo 'carrierStore.js: sfintl seed 映射 OK'
+grep -q 'tokenInflight' src/carriers/sfinternational.js && echo 'sfinternational.js: token 并发去重 OK'
 
 echo '===== [2] .env 追加顺丰国际凭据（幂等） ====='
 if grep -q 'CARRIER_SFINTL_APP_KEY' .env; then
