@@ -997,6 +997,14 @@ body {
 .simple-order-item-info { min-width: 0; }
 .simple-order-item-name { font-weight: 600; font-size: 0.92rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .simple-order-item-price { margin-top: 4px; color: var(--accent); font-weight: 700; }
+.simple-order-breakdown { display: flex; flex-direction: column; gap: 6px; margin: 14px 0; padding: 14px; background: var(--bg-soft); border-radius: 12px; font-size: 0.9rem; }
+.simple-order-breakdown > div { display: flex; justify-content: space-between; gap: 12px; color: var(--text-dim); }
+.simple-order-breakdown .total { border-top: 1px dashed var(--border); padding-top: 8px; margin-top: 2px; color: var(--text); }
+.simple-order-breakdown .total b { color: #e4393c; font-size: 1.15rem; }
+.simple-order-breakdown .note { font-size: 0.78rem; line-height: 1.5; }
+.product-tier-pick { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 4px; }
+.product-detail-landed { margin-top: 8px; font-size: 0.9rem; color: var(--text-dim); }
+.product-detail-landed b { color: #e4393c; font-size: 1.1rem; }
 .simple-order-total { margin: 14px 0 18px; font-size: 1rem; }
 .simple-order-total b { color: var(--accent); font-size: 1.25rem; }
 .simple-order-total .muted { font-size: 0.82rem; margin-left: 6px; }

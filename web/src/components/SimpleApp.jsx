@@ -23,6 +23,7 @@ const STR = {
     searchPlaceholder: '搜索想买的商品，如：手机壳 / 数据线',
     search: '搜索', hot: '热搜：', sold: '已售', buyers: '人已买',
     itemPrice: '商品价', origPrice: '原价', shipFastest: '最快', shipCheapest: '最省', shipMiddle: '均衡',
+    goodsPrice: '商品价', intlShippingFee: '国际运费', dutyFee: '关税', vatFee: '增值税', feesFee: '服务费及其他', landedTotal: '到手合计', landedNote: '含商品、国际运费、关税、增值税及服务费',
     noResults: '没有找到相关商品，换个关键词试试',
     serviceDown: '搜索服务暂时不可用，请稍后再试',
     loading: '加载中...', searching: '正在搜索...',
@@ -48,6 +49,7 @@ const STR = {
     searchPlaceholder: 'Search products, e.g. phone case / cable',
     search: 'Search', hot: 'Hot: ', sold: 'Sold ', buyers: ' buyers',
     itemPrice: 'Item price', origPrice: 'Original', shipFastest: 'Fastest', shipCheapest: 'Cheapest', shipMiddle: 'Balanced',
+    goodsPrice: 'Item price', intlShippingFee: 'Intl shipping', dutyFee: 'Duty', vatFee: 'VAT', feesFee: 'Service & fees', landedTotal: 'Landed total', landedNote: 'Includes item, intl shipping, duty, VAT and service fees',
     noResults: 'No products found, try another keyword',
     serviceDown: 'Search service unavailable, please try later',
     loading: 'Loading...', searching: 'Searching...',
@@ -70,6 +72,27 @@ const STR = {
   },
 };
 
+// 到手价拆解：按某一档运费重算，并统一换算为人民币
+function landedForTier(landed, quote) {
+  const b = landed?.breakdown;
+  const sh = landed?.shipping;
+  if (!b || !b.total) return null;
+  const rate = sh?.quoteUsd ? b.intlShipping / sh.quoteUsd : 1;
+  const isCny = !b.totalCny || Math.abs(b.totalCny - b.total) < 0.01;
+  const k = isCny ? 1 : b.totalCny / b.total;
+  const goods = (b.goodsValue || 0) * k;
+  const shipping = (quote ? quote.priceUsd * rate : b.intlShipping || 0) * k;
+  const duty = (b.duty || 0) * k;
+  const vat = (b.vat || 0) * k;
+  const total = (quote ? b.total - b.intlShipping + quote.priceUsd * rate : b.total) * k;
+  const fees = Math.max(0, total - goods - shipping - duty - vat);
+  return { goods, shipping, duty, vat, fees, total };
+}
+
+function landedCny(landed) {
+  return landedForTier(landed, null);
+}
+
 function useSimpleLang() {
   const [lang, setLangState] = useState(() => localStorage.getItem(LANG_KEY) || 'zh');
   const setLang = (l) => { setLangState(l); localStorage.setItem(LANG_KEY, l); };
@@ -85,6 +108,7 @@ export default function SimpleApp() {
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [detailItemId, setDetailItemId] = useState(null);
+  const [detailTier, setDetailTier] = useState(null);
   const [authView, setAuthView] = useState(null); // null | 'auth' | 'account'
   const [adminOpen, setAdminOpen] = useState(false);
   const pzh = lang === 'zh' ? PLATFORM_ZH : PLATFORM_EN;
@@ -114,15 +138,17 @@ export default function SimpleApp() {
   // 三个到手价档位（最快/最省/均衡）：仅显示价格，不显示快递公司名称
   const tiers = pickShippingTiers(results?.carrierQuotes);
   const tierPrices = (p) => {
-    const b = p.landed?.breakdown;
-    const sh = p.landed?.shipping;
-    if (!b || !sh || !tiers.length || !b.total) return [];
-    const rate = sh.quoteUsd ? b.intlShipping / sh.quoteUsd : 1;
-    const cnyPerUsd = b.totalCny ? b.totalCny / b.total : 7.2;
+    if (!tiers.length || !p.landed) return [];
     const seen = new Set();
     return tiers
-      .map((tr) => ({ label: tr.labels[0], price: (b.total - b.intlShipping + tr.quote.priceUsd * rate) * cnyPerUsd }))
-      .filter((x) => { const r = Math.round(x.price); if (seen.has(r)) return false; seen.add(r); return true; });
+      .map((tr) => ({ label: tr.labels[0], price: landedForTier(p.landed, tr.quote)?.total }))
+      .filter((x) => {
+        if (x.price == null) return false;
+        const r = Math.round(x.price);
+        if (seen.has(r)) return false;
+        seen.add(r);
+        return true;
+      });
   };
 
   return (
@@ -176,7 +202,7 @@ export default function SimpleApp() {
 
         <div className="simple-grid">
           {list.map((p) => (
-            <div className="card product-card simple-card" key={p.itemId} onClick={() => setDetailItemId(p.itemId)}>
+            <div className="card product-card simple-card" key={p.itemId} onClick={() => { setDetailTier(null); setDetailItemId(p.itemId); }}>
               <div className="product-img-wrap">
                 <img className="product-img" src={p.imageUrl} alt="" loading="lazy" />
               </div>
@@ -195,7 +221,15 @@ export default function SimpleApp() {
                 </div>
                 <div className="product-prices">
                   {(tierPrices(p).length ? tierPrices(p) : [{ label: 'itemPrice', price: p.price }]).map((x) => (
-                    <div className="prod-price" key={x.label}>
+                    <div
+                      className="prod-price"
+                      key={x.label}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDetailTier(x.label);
+                        setDetailItemId(p.itemId);
+                      }}
+                    >
                       <em>{t(x.label)}</em>
                       <b>¥{Math.round(x.price).toLocaleString()}</b>
                     </div>
@@ -222,6 +256,8 @@ export default function SimpleApp() {
         <SimpleDetail
           item={list.find((x) => x.itemId === detailItemId)}
           itemId={detailItemId}
+          tiers={tiers}
+          initialTier={detailTier}
           lang={lang}
           t={t}
           onClose={() => setDetailItemId(null)}
@@ -358,7 +394,7 @@ function SimpleAccountPanel({ lang, t, onClose }) {
 }
 
 // 简版详情弹窗：图集 + 属性点选 + 数量 + 下单（无任何物流信息）
-function SimpleDetail({ item, itemId, lang, t, onClose }) {
+function SimpleDetail({ item, itemId, tiers = [], initialTier = null, lang, t, onClose }) {
   // 列表已有商品数据：先本地渲染，后端可用时再补全（静态托管下后端可能不在）
   const [detail, setDetail] = useState(item || null);
   const [error, setError] = useState('');
@@ -367,6 +403,7 @@ function SimpleDetail({ item, itemId, lang, t, onClose }) {
   const [skuNote, setSkuNote] = useState('');
   const [qty, setQty] = useState(1);
   const [showOrder, setShowOrder] = useState(false);
+  const [pickedTier, setPickedTier] = useState(null);
 
   useEffect(() => {
     let alive = true;
@@ -396,6 +433,24 @@ function SimpleDetail({ item, itemId, lang, t, onClose }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [itemId]);
 
+  const landed = landedCny(detail?.landed);
+  const tierOptions = tiers
+    .map((tr) => ({ label: tr.labels[0], quote: tr.quote, ...landedForTier(detail?.landed, tr.quote) }))
+    .filter((x) => x.total != null);
+  const defaultTier = (() => {
+    if (!tierOptions.length) return null;
+    if (initialTier) {
+      const want = tierOptions.findIndex((x) => x.label === initialTier);
+      if (want >= 0) return want;
+    }
+    const matched = tierOptions.findIndex((x) => x.quote?.carrier === detail?.landed?.shipping?.carrier);
+    if (matched >= 0) return matched;
+    const cheap = tierOptions.findIndex((x) => x.label === 'shipCheapest');
+    return cheap >= 0 ? cheap : 0;
+  })();
+  const tierIdx = pickedTier ?? defaultTier;
+  const selected = tierOptions[tierIdx] || landed;
+  const landedTotal = selected?.total;
   const specGroups = detail ? matchSpecGroups(detail.title) : [];
   const stepGallery = (dir) => {
     const gallery = detail?.gallery || [];
@@ -456,6 +511,26 @@ function SimpleDetail({ item, itemId, lang, t, onClose }) {
                   <span className="product-detail-sales">{detail.sales.toLocaleString()}+{t('buyers')}</span>
                 )}
               </div>
+              {tierOptions.length > 0 && (
+                <div className="product-tier-pick">
+                  {tierOptions.map((o, i) => (
+                    <button
+                      key={`${o.label}-${i}`}
+                      type="button"
+                      className={`btn-chip spec-chip ${i === tierIdx ? 'active' : ''}`}
+                      onClick={() => setPickedTier(i)}
+                    >
+                      {t(o.label)} ¥{Math.round(o.total).toLocaleString()}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {landedTotal != null && (
+                <div className="product-detail-landed">
+                  {t('landedTotal')} <b>¥{Math.round(landedTotal).toLocaleString()}</b>
+                  <span className="muted"> · {t('landedNote')}</span>
+                </div>
+              )}
 
               {specGroups.map((g) => (
                 <div className="product-sku-block" key={g.key}>
@@ -518,6 +593,7 @@ function SimpleDetail({ item, itemId, lang, t, onClose }) {
               title: lang !== 'zh' && detail.titleEn ? detail.titleEn : detail.title,
               imageUrl: detail.imageUrl,
               price: detail.price,
+              landed: selected,
               qty,
               skuName: specText,
             }}
@@ -541,7 +617,9 @@ function SimpleOrder({ item, lang, t, onClose, onDone }) {
   const [error, setError] = useState('');
   const [orderNo, setOrderNo] = useState('');
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
-  const total = item.price * item.qty;
+  const unit = item.landed || null;
+  const perUnit = (v) => (v || 0) * item.qty;
+  const total = (unit ? unit.total : item.price) * item.qty;
 
   // 会员登录态：预填资料 + 拉取地址簿
   useEffect(() => {
@@ -581,7 +659,6 @@ function SimpleOrder({ item, lang, t, onClose, onDone }) {
           contact: { name: form.name, phone: form.phone, email: form.email },
           address: { line1: form.line1, line2: form.line2, city: form.city, state: form.state, postal: form.postal, country: form.country || 'US' },
           currency: 'CNY',
-          serviceFeeRate: 0,
           saveAddress: Boolean(session && saveAddress),
         }),
       });
@@ -624,7 +701,19 @@ function SimpleOrder({ item, lang, t, onClose, onDone }) {
             <div className="simple-order-item-price">¥{item.price.toLocaleString()} × {item.qty}</div>
           </div>
         </div>
-        <div className="simple-order-total">{t('total')}<b>¥{total.toLocaleString()}</b><span className="muted">{t('totalNote')}</span></div>
+        {unit ? (
+          <div className="simple-order-breakdown">
+            <div><span>{t('goodsPrice')}</span><span>¥{perUnit(unit.goods).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span></div>
+            <div><span>{t('intlShippingFee')}</span><span>¥{perUnit(unit.shipping).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span></div>
+            <div><span>{t('dutyFee')}</span><span>¥{perUnit(unit.duty).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span></div>
+            <div><span>{t('vatFee')}</span><span>¥{perUnit(unit.vat).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span></div>
+            <div><span>{t('feesFee')}</span><span>¥{perUnit(unit.fees).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span></div>
+            <div className="total"><span>{t('landedTotal')}</span><b>¥{Math.round(total).toLocaleString()}</b></div>
+            <div className="note muted">{t('landedNote')}</div>
+          </div>
+        ) : (
+          <div className="simple-order-total">{t('total')}<b>¥{total.toLocaleString()}</b><span className="muted">{t('totalNote')}</span></div>
+        )}
 
         <form onSubmit={submit}>
           {session && addresses.length > 0 && (
