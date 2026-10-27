@@ -254,4 +254,95 @@ export class SFIntlAdapter extends CarrierAdapter {
       return { ok: false, message: msg, latencyMs: Date.now() - t0, source: 'api' };
     }
   }
+
+  // IECS_CREATE_ORDER 创建电商订单（下单取号）
+  // p: { orderNo, items:[{name,cName,unit,amount,currency,quantity,weightKg,hsCode,url}],
+  //      totalWeightKg, declaredValue, declaredCurrency, interProductCode,
+  //      receiver:{company,contact,country,postCode,regionFirst,regionSecond,regionThird,address,email,telNo,phoneNo},
+  //      sender:{company,contact,country,postCode,regionFirst,regionSecond,regionThird,address,telNo,phoneNo,email} }
+  buildOrderBiz(p) {
+    const sender = p.sender || {};
+    const receiver = p.receiver || {};
+    const items = Array.isArray(p.items) && p.items.length ? p.items : [];
+    if (!p.orderNo) throw new CarrierError('顺丰下单缺少订单号', 'INVALID_INPUT');
+    if (!receiver.country || !receiver.address || !receiver.contact) throw new CarrierError('顺丰下单缺少收件人信息', 'INVALID_INPUT');
+    if (!items.length) throw new CarrierError('顺丰下单缺少商品明细', 'INVALID_INPUT');
+    const biz = {
+      apiUsername: this.cfg.apiUsername || this.customerCode,
+      customerOrderNo: String(p.orderNo),
+      platformOrderId: String(p.orderNo),
+      platformCode: 'CrossBuy',
+      erpCode: '0000',
+      interProductCode: p.interProductCode || String(this.cfg.interProductCode || 'INT0014').split(',')[0].trim(),
+      parcelQuantity: 1,
+      parcelTotalWeight: Number(Number(p.totalWeightKg || 0).toFixed(3)),
+      declaredValue: Number(Number(p.declaredValue || 0).toFixed(2)),
+      declaredCurrency: p.declaredCurrency || 'USD',
+      isBat: p.isBat ? 1 : 0,
+      createOrderType: '1',
+      senderInfo: {
+        company: sender.company || sender.contact || 'CrossBuy',
+        contact: sender.contact || 'CrossBuy',
+        country: sender.country || 'CN',
+        postCode: sender.postCode || '518000',
+        regionFirst: sender.regionFirst || 'Guangdong',
+        regionSecond: sender.regionSecond || 'Shenzhen',
+        regionThird: sender.regionThird || '',
+        address: sender.address || '',
+        telNo: sender.telNo || sender.phoneNo || '',
+        phoneNo: sender.phoneNo || sender.telNo || '',
+        email: sender.email || '',
+      },
+      receiverInfo: {
+        company: receiver.company || receiver.contact || '',
+        contact: receiver.contact || '',
+        country: receiver.country,
+        postCode: receiver.postCode || '',
+        regionFirst: receiver.regionFirst || '',
+        regionSecond: receiver.regionSecond || '',
+        regionThird: receiver.regionThird || '',
+        address: receiver.address,
+        email: receiver.email || '',
+        telNo: receiver.telNo || receiver.phoneNo || '',
+        phoneNo: receiver.phoneNo || receiver.telNo || '',
+      },
+      parcelInfoList: items.map((it) => ({
+        name: String(it.name || 'Goods').slice(0, 30),
+        cName: String(it.cName || it.name || '商品').slice(0, 30),
+        unit: it.unit || 'piece',
+        amount: Number(Number(it.amount || 0).toFixed(2)),
+        currency: it.currency || 'USD',
+        quantity: Number(it.quantity || 1),
+        weight: Number(Number(it.weightKg || 0).toFixed(3)),
+        hsCode: it.hsCode || '42029290',
+        originCountry: it.originCountry || 'CN',
+        goodsUrl: it.url ? String(it.url).slice(0, 2000) : undefined,
+      })),
+    };
+    if (!biz.senderInfo.address) throw new CarrierError('顺丰下单缺少寄件地址（后台配置顺丰寄件信息）', 'NOT_CONFIGURED');
+    if (!biz.parcelTotalWeight) throw new CarrierError('顺丰下单缺少包裹重量', 'INVALID_INPUT');
+    return biz;
+  }
+
+  async createOrder(p) {
+    if (!this.configured) {
+      throw new CarrierError('顺丰国际未配置 appKey/appSecret/aesKey/customerCode', 'NOT_CONFIGURED');
+    }
+    const data = await this.callApi('IECS_CREATE_ORDER', this.buildOrderBiz(p));
+    if (data && data.success === false) {
+      throw new CarrierError(`顺丰下单失败: ${data.msg || '未知'}（code=${data.code}）`, 'API_ERROR', data);
+    }
+    const d = data?.data || {};
+    if (!d.sfWaybillNo) {
+      throw new CarrierError('顺丰下单未返回运单号', 'NO_QUOTE', data);
+    }
+    return {
+      customerOrderNo: d.customerOrderNo || p.orderNo,
+      sfWaybillNo: d.sfWaybillNo,
+      agentWaybillNo: d.agentWaybillNo || '',
+      agentCode: d.agentCode || '',
+      directionCode: d.directionCode || '',
+      agentLabelBase64: d.agentLabelBase64 || '',
+    };
+  }
 }
