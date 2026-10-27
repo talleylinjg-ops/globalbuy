@@ -273,7 +273,7 @@ export class SFIntlAdapter extends CarrierAdapter {
       platformOrderId: String(p.orderNo),
       platformCode: 'CrossBuy',
       erpCode: '0000',
-      interProductCode: p.interProductCode || String(this.cfg.interProductCode || 'INT0014').split(',')[0].trim(),
+      interProductCode: p.interProductCode || this.cfg.orderProductCode || String(this.cfg.interProductCode || 'INT0014').split(',')[0].trim(),
       parcelQuantity: 1,
       parcelTotalWeight: Number(Number(p.totalWeightKg || 0).toFixed(3)),
       declaredValue: Number(Number(p.declaredValue || 0).toFixed(2)),

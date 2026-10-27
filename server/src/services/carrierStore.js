@@ -18,6 +18,8 @@ function seedFromEnv() {
       customerCode: process.env.CARRIER_SFINTL_CUSTOMER_CODE,
       customerType: process.env.CARRIER_SFINTL_CUSTOMER_TYPE,
       interProductCode: process.env.CARRIER_SFINTL_PRODUCT_CODES,
+      apiUsername: process.env.CARRIER_SFINTL_API_USERNAME,
+      orderProductCode: process.env.CARRIER_SFINTL_ORDER_PRODUCT_CODE,
       baseUrl: process.env.CARRIER_SFINTL_BASE_URL,
     },
     dhl: { apiKey: process.env.CARRIER_DHL_API_KEY, apiSecret: process.env.CARRIER_DHL_API_SECRET },
