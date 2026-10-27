@@ -22,7 +22,7 @@ const STR = {
     'account.signIn': '登录', 'account.myAccount': '我的账户',
     searchPlaceholder: '搜索想买的商品，如：手机壳 / 数据线',
     search: '搜索', hot: '热搜：', sold: '已售', buyers: '人已买',
-    itemPrice: '商品价', shipFastest: '最快', shipCheapest: '最省', shipMiddle: '均衡',
+    itemPrice: '商品价', origPrice: '原价', shipFastest: '最快', shipCheapest: '最省', shipMiddle: '均衡',
     noResults: '没有找到相关商品，换个关键词试试',
     serviceDown: '搜索服务暂时不可用，请稍后再试',
     loading: '加载中...', searching: '正在搜索...',
@@ -47,7 +47,7 @@ const STR = {
     'account.signIn': 'Sign In', 'account.myAccount': 'My Account',
     searchPlaceholder: 'Search products, e.g. phone case / cable',
     search: 'Search', hot: 'Hot: ', sold: 'Sold ', buyers: ' buyers',
-    itemPrice: 'Item price', shipFastest: 'Fastest', shipCheapest: 'Cheapest', shipMiddle: 'Balanced',
+    itemPrice: 'Item price', origPrice: 'Original', shipFastest: 'Fastest', shipCheapest: 'Cheapest', shipMiddle: 'Balanced',
     noResults: 'No products found, try another keyword',
     serviceDown: 'Search service unavailable, please try later',
     loading: 'Loading...', searching: 'Searching...',
@@ -182,6 +182,10 @@ export default function SimpleApp() {
               </div>
               <div className="product-info">
                 <div className="product-title">{lang !== 'zh' && p.titleEn ? p.titleEn : p.title}</div>
+                <div className="product-orig">
+                  <em>{t('origPrice')}</em>
+                  <span className="orig-val">¥{p.price.toLocaleString()}</span>
+                </div>
                 <div className="product-prices">
                   {(tierPrices(p).length ? tierPrices(p) : [{ label: 'itemPrice', price: p.price }]).map((x) => (
                     <div className="prod-price" key={x.label}>
