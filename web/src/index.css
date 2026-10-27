@@ -979,6 +979,8 @@ body {
 .product-orig { display: flex; align-items: baseline; gap: 6px; font-size: 12px; }
 .product-orig em { font-style: normal; color: var(--text-dim); }
 .product-orig .orig-val { color: var(--text-dim); }
+.product-orig s { color: var(--text-dim); text-decoration: line-through; }
+.product-orig b { color: #e4393c; font-weight: 700; }
 .product-prices { display: flex; flex-direction: column; gap: 4px; padding-top: 6px; border-top: 1px dashed var(--border); }
 .prod-price { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font-size: 12px; }
 .prod-price em { font-style: normal; color: var(--text-dim); }

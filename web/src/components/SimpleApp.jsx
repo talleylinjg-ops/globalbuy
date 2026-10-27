@@ -184,7 +184,14 @@ export default function SimpleApp() {
                 <div className="product-title">{lang !== 'zh' && p.titleEn ? p.titleEn : p.title}</div>
                 <div className="product-orig">
                   <em>{t('origPrice')}</em>
-                  <span className="orig-val">¥{p.price.toLocaleString()}</span>
+                  {p.originalPrice && p.originalPrice > p.price ? (
+                    <>
+                      <s>¥{p.originalPrice.toLocaleString()}</s>
+                      <b>¥{p.price.toLocaleString()}</b>
+                    </>
+                  ) : (
+                    <span className="orig-val">¥{p.price.toLocaleString()}</span>
+                  )}
                 </div>
                 <div className="product-prices">
                   {(tierPrices(p).length ? tierPrices(p) : [{ label: 'itemPrice', price: p.price }]).map((x) => (
