@@ -1,6 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { apiUrl, fetchMeta, searchProducts } from '../api.js';
 import { matchSpecGroups, specGroupLabel, specValueLabel } from '../utils/specOptions.js';
+import { pickShippingTiers } from '../utils/shipping.js';
 import { useMember, memberFetch, memberLogin, memberRegister, memberLogout } from '../authStore.js';
 import { useI18n } from '../i18n.js';
 
@@ -21,6 +22,7 @@ const STR = {
     'account.signIn': '登录', 'account.myAccount': '我的账户',
     searchPlaceholder: '搜索想买的商品，如：手机壳 / 数据线',
     search: '搜索', hot: '热搜：', sold: '已售', buyers: '人已买',
+    itemPrice: '商品价', shipFastest: '最快', shipCheapest: '最省', shipMiddle: '均衡',
     noResults: '没有找到相关商品，换个关键词试试',
     serviceDown: '搜索服务暂时不可用，请稍后再试',
     loading: '加载中...', searching: '正在搜索...',
@@ -45,6 +47,7 @@ const STR = {
     'account.signIn': 'Sign In', 'account.myAccount': 'My Account',
     searchPlaceholder: 'Search products, e.g. phone case / cable',
     search: 'Search', hot: 'Hot: ', sold: 'Sold ', buyers: ' buyers',
+    itemPrice: 'Item price', shipFastest: 'Fastest', shipCheapest: 'Cheapest', shipMiddle: 'Balanced',
     noResults: 'No products found, try another keyword',
     serviceDown: 'Search service unavailable, please try later',
     loading: 'Loading...', searching: 'Searching...',
@@ -108,6 +111,20 @@ export default function SimpleApp() {
 
   const list = (results?.results || []).filter((p) => p.price > 0);
 
+  // 三个到手价档位（最快/最省/均衡）：仅显示价格，不显示快递公司名称
+  const tiers = pickShippingTiers(results?.carrierQuotes);
+  const tierPrices = (p) => {
+    const b = p.landed?.breakdown;
+    const sh = p.landed?.shipping;
+    if (!b || !sh || !tiers.length || !b.total) return [];
+    const rate = sh.quoteUsd ? b.intlShipping / sh.quoteUsd : 1;
+    const cnyPerUsd = b.totalCny ? b.totalCny / b.total : 7.2;
+    const seen = new Set();
+    return tiers
+      .map((tr) => ({ label: tr.labels[0], price: (b.total - b.intlShipping + tr.quote.priceUsd * rate) * cnyPerUsd }))
+      .filter((x) => { const r = Math.round(x.price); if (seen.has(r)) return false; seen.add(r); return true; });
+  };
+
   return (
     <div className="simple-app">
       <header className="simple-header">
@@ -165,11 +182,18 @@ export default function SimpleApp() {
               </div>
               <div className="product-info">
                 <div className="product-title">{lang !== 'zh' && p.titleEn ? p.titleEn : p.title}</div>
+                <div className="product-prices">
+                  {(tierPrices(p).length ? tierPrices(p) : [{ label: 'itemPrice', price: p.price }]).map((x) => (
+                    <div className="prod-price" key={x.label}>
+                      <em>{t(x.label)}</em>
+                      <b>¥{Math.round(x.price).toLocaleString()}</b>
+                    </div>
+                  ))}
+                </div>
                 <div className="product-stats">
-                  <span className="product-price">¥{p.price.toLocaleString()}</span>
                   <span className="muted">
-                    {pzh[p.platform] ? ` · ${pzh[p.platform]}` : ''}
-                    {p.sales > 0 ? ` · ${t('sold')}${p.sales.toLocaleString()}` : ''}
+                    {pzh[p.platform] || ''}
+                    {p.sales > 0 ? `${pzh[p.platform] ? ' · ' : ''}${t('sold')}${p.sales.toLocaleString()}` : ''}
                   </span>
                 </div>
               </div>

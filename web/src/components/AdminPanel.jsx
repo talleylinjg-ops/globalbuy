@@ -912,7 +912,7 @@ function AdminsTab({ username: currentUsername, showNotice, t }) {
           </tbody>
         </table>
       </div>
-      <div className="admin-notice" style={{ background: 'var(--bg-soft)', color: 'var(--text-dim)', marginTop: 12 }}>
+      <div className="admin-hint" style={{ background: 'var(--bg-soft)', color: 'var(--text-dim)', marginTop: 12 }}>
         {t('admin.roleHelp')}
       </div>
     </div>
