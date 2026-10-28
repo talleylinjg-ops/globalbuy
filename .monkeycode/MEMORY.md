@@ -208,3 +208,16 @@ Entries discovered by the Agent during task execution should follow this format:
   - 部署脚本一键通道：curl -fsSL https://raw.githubusercontent.com/talleylinjg-ops/globalbuy/master/deploy/vps/vps-fix.sh | bash
   - /api/search 响应键为 results（sourceInfo[].count 为平台 raw 数）；PDD 真实数据走 DDK goods.search（需 pid 备案，失败回退推荐池）
   - 遗留：EMS 需把 47.85.202.149 加入 IP 白名单；顺丰在 VPS 报价 0 条（本地直测正常，疑出口 IP 风控）待查
+
+[顺丰国际 OpenAPI 对接知识（openapi.sf.global）]
+- Date: 2026-10-28
+- Context: 顺丰国际运费试算+下单取号全链路打通（测试环境验证）
+- Category: Environment Configuration
+- Instructions:
+  - 测试环境网关 http://api-ifsp-sit.sf.global，生产 https://api-ifsp.sf.global；dispatch 协议：GET /openapi/api/token 取 token + POST /openapi/api/dispatch（公共参数在 HTTP 头，body=AES 密文，签名=SHA256([token,timestamp,nonce,密文].sort().join())）
+  - 生产 token 是单活跃策略：新 token 使旧 token 失效——多产品码并行询价必须共用一次 token 请求（getToken 已加 in-flight 去重），否则并发请求互相顶掉报 token invalid；沙箱允许多 token 并存无此问题
+  - IECS_CREATE_ORDER 下单：apiUsername 填「小包用户名」（沙箱 popsandBox，生产在 IUOP 管理中心获取），填客户编码会报 401 用户越权；erpCode 自建系统固定 '0000'；createOrderType='1'
+  - 下单产品码与报价产品码拆分：沙箱下单用 INT0255（INT0014 报 5020 产品类型有误）；报价并行询价用 INT0014,INT0020,INT0263,INT0131
+  - parcelInfoList[].cName（商品中文名）必须含中文，纯英文被拒报 126010「托寄物内容不允许填写纯数字」（文案误导，实为非中文校验）；沙箱对相同请求有幂等缓存会返回同一运单号，对照实验需换参
+  - 生产权限缺口：IUOP_ESTIMATE_FEE/IPE_QUERY_PRODUCT_FREIGHT 待用户在开放平台申请（报 1004 无权限）；IECS 系列（下单/打单/取消）生产应用 crossWorld 已关联可用
+  - 渠道配置经 .env seed 链路生效（CARRIER_SFINTL_*），VPS 上 node 直跑脚本连 MySQL 报 Access denied 是一贯坑，落库类操作一律改走 .env + 应用重启
