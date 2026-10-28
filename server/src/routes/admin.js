@@ -308,8 +308,13 @@ router.post('/orders/:id/ship', auth, async (req, res, next) => {
     if (!cfg || !cfg.appKey || !cfg.aesKey) {
       return res.status(400).json({ error: '顺丰国际未配置，无法自动取号' });
     }
-    let sender = {};
-    try { sender = typeof cfg.senderInfo === 'string' ? JSON.parse(cfg.senderInfo) : (cfg.senderInfo || {}); } catch { sender = {}; }
+    // 缺省寄件仓（后台渠道配置 senderInfo JSON 可覆盖）
+    let sender = {
+      company: 'CrossBuy', contact: 'Talley', country: 'CN', postCode: '518009',
+      regionFirst: 'Guangdong', regionSecond: 'Shenzhen',
+      address: 'Huating Road 7# DaLang Street', phoneNo: '13800000000', telNo: '13800000000',
+    };
+    try { sender = { ...sender, ...(typeof cfg.senderInfo === 'string' ? JSON.parse(cfg.senderInfo) : (cfg.senderInfo || {})) }; } catch { /* 保持缺省 */ }
 
     const items = Array.isArray(o.items) ? o.items : [];
     const weightKg = Number(req.body?.weightKg) || Math.max(0.3 * Math.max(items.length, 1), 0.5);
