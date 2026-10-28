@@ -1,0 +1,14 @@
+{
+  "name": "CrossBuy 全球购 - 中国电商一站式比价代购",
+  "short_name": "CrossBuy",
+  "description": "一次搜索淘宝、京东、拼多多、1688，实时计算含国际运费与关税的到手总价，直邮全球。",
+  "lang": "zh-CN",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#4f46e5",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

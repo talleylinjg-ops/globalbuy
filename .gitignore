@@ -54,7 +54,8 @@
 **/.Python
 **/build/
 **/develop-eggs/
-**/dist/
+# web/dist 构建产物保留入库（VPS 全量部署走 codeload tarball 拉取）
+!web/dist/
 **/downloads/
 **/eggs/
 **/.eggs/
