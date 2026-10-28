@@ -294,6 +294,78 @@ router.put('/orders/:id', auth, (req, res) => {
   res.json(o);
 });
 
+// 一键发货：调顺丰国际下单取号，回填运单号（weightKg 由管理员按实际称重传入）
+router.post('/orders/:id/ship', auth, async (req, res, next) => {
+  try {
+    const o = getById('orders', req.params.id);
+    if (!o) return res.status(404).json({ error: 'order not found' });
+    if (o.trackingNo) return res.status(409).json({ error: `already shipped: ${o.trackingNo}` });
+
+    const { getCarrierConfigs } = await import('../services/carrierStore.js');
+    const { createCarrierAdapter } = await import('../carriers/index.js');
+    const { cnyToCurrency } = await import('../services/currency.js');
+    const cfg = getCarrierConfigs().find((c) => c.code === 'sfintl');
+    if (!cfg || !cfg.appKey || !cfg.aesKey) {
+      return res.status(400).json({ error: '顺丰国际未配置，无法自动取号' });
+    }
+    let sender = {};
+    try { sender = typeof cfg.senderInfo === 'string' ? JSON.parse(cfg.senderInfo) : (cfg.senderInfo || {}); } catch { sender = {}; }
+
+    const items = Array.isArray(o.items) ? o.items : [];
+    const weightKg = Number(req.body?.weightKg) || Math.max(0.3 * Math.max(items.length, 1), 0.5);
+    // 申报价值按 USD 换算（订单金额以 CNY 记账，顺丰申报币种独立）
+    const declaredValue = Number(req.body?.declaredValue) || Number(cnyToCurrency(
+      items.reduce((s, it) => s + (Number(it.priceCny) || 0) * (Number(it.quantity) || 1), 0), 'USD'
+    ).toFixed(2));
+    const r = await createCarrierAdapter(cfg).createOrder({
+      orderNo: o.orderNo,
+      totalWeightKg: weightKg,
+      declaredValue,
+      declaredCurrency: 'USD',
+      interProductCode: req.body?.interProductCode,
+      items: items.map((it) => ({
+        name: String(it.titleEn || it.title || 'Goods').slice(0, 30),
+        cName: String(it.title || '').slice(0, 30),
+        unit: 'piece',
+        amount: Number((cnyToCurrency((Number(it.priceCny) || 0) * (Number(it.quantity) || 1), 'USD')).toFixed(2)),
+        currency: 'USD',
+        quantity: Number(it.quantity) || 1,
+        weightKg: Number((weightKg / Math.max(items.length, 1)).toFixed(3)),
+      })),
+      sender,
+      receiver: {
+        company: o.contact?.name || o.address?.line1 || '',
+        contact: o.contact?.name || '',
+        country: o.address?.country || 'US',
+        postCode: o.address?.postal || '',
+        regionFirst: o.address?.state || '',
+        regionSecond: o.address?.city || '',
+        address: [o.address?.line1, o.address?.line2].filter(Boolean).join(' '),
+        email: o.contact?.email || '',
+        phoneNo: o.contact?.phone || '',
+        telNo: o.contact?.phone || '',
+      },
+    });
+
+    const timeline = Array.isArray(o.timeline) ? o.timeline : [];
+    timeline.push({
+      at: new Date().toISOString(),
+      author: req.admin?.username || 'admin',
+      type: 'note',
+      content: `顺丰国际取号成功：${r.sfWaybillNo}（${r.directionCode || r.agentCode || ''}）`,
+    });
+    const updated = updateRecord('orders', o.id, {
+      trackingNo: r.sfWaybillNo,
+      status: 'shipped',
+      shippingMeta: { sfWaybillNo: r.sfWaybillNo, agentCode: r.agentCode, directionCode: r.directionCode, weightKg, declaredValue },
+      timeline,
+    });
+    res.json({ ok: true, trackingNo: r.sfWaybillNo, directionCode: r.directionCode, order: updated });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // 订单备注：追加到时间线（WooCommerce order notes 风格）
 router.post('/orders/:id/notes', auth, (req, res) => {
   const { content, type } = req.body || {};

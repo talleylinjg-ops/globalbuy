@@ -308,7 +308,8 @@ export class SFIntlAdapter extends CarrierAdapter {
       },
       parcelInfoList: items.map((it) => ({
         name: String(it.name || 'Goods').slice(0, 30),
-        cName: String(it.cName || it.name || '商品').slice(0, 30),
+        // cName（商品中文名称）必须含中文，纯英文会被顺丰 126010「托寄物内容不允许填写纯数字」拒绝
+        cName: /[\u4e00-\u9fff]/.test(String(it.cName || '')) ? String(it.cName).slice(0, 30) : '跨境商品',
         unit: it.unit || 'piece',
         amount: Number(Number(it.amount || 0).toFixed(2)),
         currency: it.currency || 'USD',
