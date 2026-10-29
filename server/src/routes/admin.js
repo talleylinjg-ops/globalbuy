@@ -282,6 +282,9 @@ router.post('/orders', auth, (req, res) => {
     tipCny: req.body.tipCny || 0,
     totalCny: req.body.totalCny || 0,
     totalCurrency: req.body.totalCurrency || 0,
+    contact: req.body.contact || {},
+    address: req.body.address || {},
+    warehouses: req.body.warehouses || [],
     createdAt: now,
     updatedAt: now,
   });
@@ -317,55 +320,84 @@ router.post('/orders/:id/ship', auth, async (req, res, next) => {
     try { sender = { ...sender, ...(typeof cfg.senderInfo === 'string' ? JSON.parse(cfg.senderInfo) : (cfg.senderInfo || {})) }; } catch { /* 保持缺省 */ }
 
     const items = Array.isArray(o.items) ? o.items : [];
-    const weightKg = Number(req.body?.weightKg) || Math.max(0.3 * Math.max(items.length, 1), 0.5);
-    // 申报价值按 USD 换算（订单金额以 CNY 记账，顺丰申报币种独立）
-    const declaredValue = Number(req.body?.declaredValue) || Number(cnyToCurrency(
-      items.reduce((s, it) => s + (Number(it.priceCny) || 0) * (Number(it.quantity) || 1), 0), 'USD'
-    ).toFixed(2));
-    const r = await createCarrierAdapter(cfg).createOrder({
-      orderNo: o.orderNo,
-      totalWeightKg: weightKg,
-      declaredValue,
-      declaredCurrency: 'USD',
-      interProductCode: req.body?.interProductCode,
-      items: items.map((it) => ({
-        name: String(it.titleEn || it.title || 'Goods').slice(0, 30),
-        cName: String(it.title || '').slice(0, 30),
-        unit: 'piece',
-        amount: Number((cnyToCurrency((Number(it.priceCny) || 0) * (Number(it.quantity) || 1), 'USD')).toFixed(2)),
-        currency: 'USD',
-        quantity: Number(it.quantity) || 1,
-        weightKg: Number((weightKg / Math.max(items.length, 1)).toFixed(3)),
-      })),
-      sender,
-      receiver: {
-        company: o.contact?.name || o.address?.line1 || '',
-        contact: o.contact?.name || '',
-        country: o.address?.country || 'US',
-        postCode: o.address?.postal || '',
-        regionFirst: o.address?.state || '',
-        regionSecond: o.address?.city || '',
-        address: [o.address?.line1, o.address?.line2].filter(Boolean).join(' '),
-        email: o.contact?.email || '',
-        phoneNo: o.contact?.phone || '',
-        telNo: o.contact?.phone || '',
-      },
-    });
-
+    const totalWeight = Number(req.body?.weightKg) || Math.max(0.3 * Math.max(items.length, 1), 0.5);
+    const receiver = {
+      company: o.contact?.name || o.address?.line1 || '',
+      contact: o.contact?.name || '',
+      country: o.address?.country || 'US',
+      postCode: o.address?.postal || '',
+      regionFirst: o.address?.state || '',
+      regionSecond: o.address?.city || '',
+      address: [o.address?.line1, o.address?.line2].filter(Boolean).join(' '),
+      email: o.contact?.email || '',
+      phoneNo: o.contact?.phone || '',
+      telNo: o.contact?.phone || '',
+    };
+    const adapter = createCarrierAdapter(cfg);
+    // 按发货仓拆票：多仓订单每仓一票顺丰单（订单号加 -W{n} 后缀保证唯一）
+    const groups = new Map();
+    for (const it of items) {
+      const wh = String(it.warehouse || '').trim() || 'default';
+      if (!groups.has(wh)) groups.set(wh, []);
+      groups.get(wh).push(it);
+    }
+    const groupList = [...groups.entries()];
+    const perItemWeight = totalWeight / Math.max(items.length, 1);
+    const tickets = [];
+    const parcelRows = [];
     const timeline = Array.isArray(o.timeline) ? o.timeline : [];
-    timeline.push({
-      at: new Date().toISOString(),
-      author: req.admin?.username || 'admin',
-      type: 'note',
-      content: `顺丰国际取号成功：${r.sfWaybillNo}（${r.directionCode || r.agentCode || ''}）`,
-    });
+    for (let i = 0; i < groupList.length; i++) {
+      const [wh, groupItems] = groupList[i];
+      const suffix = groupList.length > 1 ? `-W${i + 1}` : '';
+      const groupWeight = Number(groupItems.reduce((s, it) => s + perItemWeight * (Number(it.quantity) || 1), 0).toFixed(3)) || perItemWeight;
+      const declaredValue = Number(cnyToCurrency(
+        groupItems.reduce((s, it) => s + (Number(it.priceCny) || 0) * (Number(it.quantity) || 1), 0), 'USD'
+      ).toFixed(2));
+      const r = await adapter.createOrder({
+        orderNo: `${o.orderNo}${suffix}`,
+        totalWeightKg: groupWeight,
+        declaredValue,
+        declaredCurrency: 'USD',
+        interProductCode: req.body?.interProductCode,
+        items: groupItems.map((it) => ({
+          name: String(it.titleEn || it.title || 'Goods').slice(0, 30),
+          cName: String(it.title || '').slice(0, 30),
+          unit: 'piece',
+          amount: Number((cnyToCurrency((Number(it.priceCny) || 0) * (Number(it.quantity) || 1), 'USD')).toFixed(2)),
+          currency: 'USD',
+          quantity: Number(it.quantity) || 1,
+          weightKg: Number(perItemWeight.toFixed(3)),
+        })),
+        sender,
+        receiver,
+      });
+      tickets.push(r);
+      parcelRows.push({
+        carrier: 'sfintl',
+        productName: r.directionCode || '',
+        trackingNo: r.sfWaybillNo,
+        itemsDesc: groupItems.map((it) => it.title).filter(Boolean).join(', '),
+        warehouse: wh,
+      });
+      timeline.push({
+        at: new Date().toISOString(),
+        author: req.admin?.username || 'admin',
+        type: 'note',
+        content: `顺丰国际取号成功：${r.sfWaybillNo}（${r.directionCode || r.agentCode || ''}）${suffix ? ` 仓库:${wh}` : ''}`,
+      });
+    }
+    const primary = tickets[0] || {};
     const updated = updateRecord('orders', o.id, {
-      trackingNo: r.sfWaybillNo,
+      trackingNo: tickets.length === 1 ? primary.sfWaybillNo : '',
       status: 'shipped',
-      shippingMeta: { sfWaybillNo: r.sfWaybillNo, agentCode: r.agentCode, directionCode: r.directionCode, weightKg, declaredValue },
+      parcels: parcelRows,
+      shippingMeta: {
+        sfWaybillNo: primary.sfWaybillNo, agentCode: primary.agentCode, directionCode: primary.directionCode,
+        weightKg: totalWeight, tickets,
+      },
       timeline,
     });
-    res.json({ ok: true, trackingNo: r.sfWaybillNo, directionCode: r.directionCode, order: updated });
+    res.json({ ok: true, trackingNo: primary.sfWaybillNo, directionCode: primary.directionCode, parcelCount: tickets.length, order: updated });
   } catch (err) {
     next(err);
   }
