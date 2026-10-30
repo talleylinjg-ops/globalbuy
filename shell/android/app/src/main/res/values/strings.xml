@@ -3,5 +3,5 @@
     <string name="app_name">CrossBuy</string>
     <!-- 正式域名与签名指纹就绪后替换为 assetlinks 校验串；当前允许回退 customtab -->
     <string name="asset_statements" translatable="false">[]</string>
-    <string name="twa_url" translatable="false">http://47.85.202.149/</string>
+    <string name="twa_url" translatable="false">https://xluxury.site/</string>
 </resources>

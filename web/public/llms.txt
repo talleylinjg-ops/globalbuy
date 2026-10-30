@@ -12,23 +12,23 @@
 
 ## Key facts
 
-- Site: https://globalbuy.pages.dev/
+- Site: https://xluxury.site/
 - Languages: Simplified Chinese (zh-CN), English (en), Spanish (es)
-- Search URL pattern: https://globalbuy.pages.dev/?q={keyword}
+- Search URL pattern: https://xluxury.site/?q={keyword}
 - Pre-rendered landing pages (static, crawler-friendly, fully mirrored from live data):
-  - Wireless earbuds: https://globalbuy.pages.dev/p/wireless-earbuds/
-  - Phone cases: https://globalbuy.pages.dev/p/phone-case/
-  - Smart watches: https://globalbuy.pages.dev/p/smart-watch/
-  - Luggage: https://globalbuy.pages.dev/p/luggage/
-  - Keyboards: https://globalbuy.pages.dev/p/keyboard/
-  - Sneakers: https://globalbuy.pages.dev/p/sneakers/
-  - Wireless chargers: https://globalbuy.pages.dev/p/wireless-charger/
-  - Thermos & tumblers: https://globalbuy.pages.dev/p/thermos/
-  - LED lamps: https://globalbuy.pages.dev/p/led-lamp/
-  - Yoga mats: https://globalbuy.pages.dev/p/yoga-mat/
-  - Cat toys: https://globalbuy.pages.dev/p/cat-toys/
-  - Chinese snacks: https://globalbuy.pages.dev/p/snacks/
-- Full reference for LLMs: https://globalbuy.pages.dev/llms-full.txt
+  - Wireless earbuds: https://xluxury.site/p/wireless-earbuds/
+  - Phone cases: https://xluxury.site/p/phone-case/
+  - Smart watches: https://xluxury.site/p/smart-watch/
+  - Luggage: https://xluxury.site/p/luggage/
+  - Keyboards: https://xluxury.site/p/keyboard/
+  - Sneakers: https://xluxury.site/p/sneakers/
+  - Wireless chargers: https://xluxury.site/p/wireless-charger/
+  - Thermos & tumblers: https://xluxury.site/p/thermos/
+  - LED lamps: https://xluxury.site/p/led-lamp/
+  - Yoga mats: https://xluxury.site/p/yoga-mat/
+  - Cat toys: https://xluxury.site/p/cat-toys/
+  - Chinese snacks: https://xluxury.site/p/snacks/
+- Full reference for LLMs: https://xluxury.site/llms-full.txt
 - Currency display: buyer-selectable (USD, EUR, GBP, JPY, and 20+ more); prices auto-converted from CNY.
 - Typical delivery: 5-10 business days by economical lines, 3-7 by express lines (varies by destination).
 - Service fee: buyer-selected, default 5%, range 0-30%; shown as a separate line item.

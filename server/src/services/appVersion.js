@@ -30,3 +30,11 @@ export function appVersionInfo(baseUrl = '') {
     downloads,
   };
 }
+
+// 下载基地址：正式域名强制 https（反代/CDN 场景），本地调试保留原始协议
+export function appVersionBaseUrl(req) {
+  const proto = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+  const host = req.headers['x-forwarded-host'] || req.headers.host || '';
+  const isLocal = /^(localhost|127\.)/.test(host);
+  return isLocal ? `${proto}://${host}` : `https://${host}`;
+}

@@ -59,4 +59,4 @@ Allow: /
 User-agent: Diffbot
 Allow: /
 
-Sitemap: https://globalbuy.pages.dev/sitemap.xml
+Sitemap: https://xluxury.site/sitemap.xml

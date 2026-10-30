@@ -3,7 +3,7 @@ const https = require('https');
 const http = require('http');
 
 // 站点地址：打包前可改；也可用环境变量 CROSSBUY_APP_URL 覆盖
-const APP_URL = process.env.CROSSBUY_APP_URL || 'http://47.85.202.149/';
+const APP_URL = process.env.CROSSBUY_APP_URL || 'https://xluxury.site/';
 const VERSION = app.getVersion();
 
 let mainWindow = null;

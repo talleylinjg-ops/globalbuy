@@ -41,7 +41,7 @@ export default function ProductCard({ item, currency, currencySymbol, shippingTi
 
   // GEO: 结构化商品数据，供 AI 购物引擎与 Google 抓取
   const imgPath = item.imageUrl || placeholderUrl(item);
-  const absImg = /^https?:\/\//.test(imgPath) ? imgPath : `https://globalbuy.pages.dev${imgPath}`;
+  const absImg = /^https?:\/\//.test(imgPath) ? imgPath : `https://xluxury.site${imgPath}`;
   const productLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -52,7 +52,7 @@ export default function ProductCard({ item, currency, currencySymbol, shippingTi
       price: b.goodsValue != null ? Number(b.goodsValue).toFixed(2) : undefined,
       priceCurrency: currency,
       availability: 'https://schema.org/InStock',
-      url: 'https://globalbuy.pages.dev/',
+      url: 'https://xluxury.site/',
       seller: { '@type': 'Organization', name: platformName },
     },
     description: `${title} - landed price ${b.total != null ? Number(b.total).toFixed(2) : ''} ${currency} (international shipping, duty and VAT included) from ${platformName} via CrossBuy.`,

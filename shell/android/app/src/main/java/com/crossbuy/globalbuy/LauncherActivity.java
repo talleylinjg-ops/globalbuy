@@ -17,7 +17,7 @@ public class LauncherActivity extends AppCompatActivity {
     private static final String START_URL =
         System.getenv("CROSSBUY_START_URL") != null
             ? System.getenv("CROSSBUY_START_URL")
-            : "http://47.85.202.149/";
+            : "https://xluxury.site/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

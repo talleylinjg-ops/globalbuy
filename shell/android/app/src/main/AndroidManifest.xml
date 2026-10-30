@@ -23,8 +23,8 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="http" android:host="47.85.202.149" />
-                <data android:scheme="https" android:host="47.85.202.149" />
+                <data android:scheme="http" android:host="xluxury.site" />
+                <data android:scheme="https" android:host="xluxury.site" />
             </intent-filter>
         </activity>
 

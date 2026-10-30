@@ -1,6 +1,6 @@
 // SEO/GEO 动态注入：标题、meta 描述、canonical、OpenGraph、JSON-LD 结构化数据
 // GEO（生成式引擎优化）：向 AI 爬虫输出结构化、语义清晰的商品与业务数据
-const SITE = 'https://globalbuy.pages.dev';
+const SITE = 'https://xluxury.site';
 
 function upsertMeta(attr, key, content) {
   let el = document.head.querySelector(`meta[${attr}="${key}"]`);

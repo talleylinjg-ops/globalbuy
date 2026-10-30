@@ -8,7 +8,7 @@ import { pickShippingTiers } from '../src/utils/shipping.js';
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const DIST = join(ROOT, 'dist');
 const PUBLIC = join(ROOT, 'public');
-const SITE = 'https://globalbuy.pages.dev';
+const SITE = 'https://xluxury.site';
 
 const CARRIER_EN = { '顺丰国际': 'SF International', '华源': 'Huayuan', '4PX 递四方': '4PX', '4PX': '4PX', 'sfintl': 'SF International', 'huayuan': 'Huayuan', '4px': '4PX' };
 // 渠道名模式匹配（兼容全名/别名：华源国际专线、顺丰国际、4PX 递四方等）
@@ -444,7 +444,7 @@ const catalogSections = allPages.map(({ slug, kw }) => {
 
 const llmsFull = `# CrossBuy Global — full reference (LLMs-full)
 
-This is the complete reference for CrossBuy (https://globalbuy.pages.dev/), a cross-border price comparison and shopping agent platform for China's major e-commerce marketplaces (Taobao, Tmall, JD.com, Pinduoduo, 1688). Slogan: Buy More Save More.
+This is the complete reference for CrossBuy (https://xluxury.site/), a cross-border price comparison and shopping agent platform for China's major e-commerce marketplaces (Taobao, Tmall, JD.com, Pinduoduo, 1688). Slogan: Buy More Save More.
 
 ## How it works
 
