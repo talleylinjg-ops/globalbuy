@@ -8,7 +8,11 @@ WORK=/tmp/gbdeploy-$$
 
 echo '===== [1] 拉取 master 全量包 ====='
 mkdir -p "$WORK" && cd "$WORK"
-curl -fsSL "https://codeload.github.com/talleylinjg-ops/globalbuy/tar.gz/refs/heads/master" -o gb.tgz
+# 按精确 commit SHA 拉取，避开 GitHub codeload 的 CDN 缓存（曾导致旧版本回退）
+SHA=$(curl -fsSL -H 'Accept: application/vnd.github+json' "https://api.github.com/repos/talleylinjg-ops/globalbuy/commits/master" | grep -o '"sha": *"[a-f0-9]*"' | head -1 | cut -d'"' -f4)
+[ -n "$SHA" ] || { echo '获取 master SHA 失败'; exit 1; }
+echo "commit: $SHA"
+curl -fsSL "https://codeload.github.com/talleylinjg-ops/globalbuy/tar.gz/$SHA" -o gb.tgz
 tar xzf gb.tgz
 SRC=$(ls -d globalbuy-master | head -1)
 [ -d "$SRC/server/src" ] || { echo '包结构异常'; exit 1; }
@@ -21,10 +25,11 @@ cp "$SRC/server"/*.mjs "$APP/server/" 2>/dev/null || true
 grep -q 'adminShipOrder\|orders/:id/ship' "$APP/server/src/routes/admin.js" && echo 'admin.js: 发货接口 OK'
 grep -q 'tokenInflight' "$APP/server/src/carriers/sfinternational.js" && echo 'sfintl: token 并发修复 OK'
 
-echo '===== [3] 同步 web/dist（顺丰发货按钮版前端） ====='
+echo '===== [3] 同步 web/dist（PWA + 下载中心版前端） ====='
 rm -rf "$APP/web/dist"
 cp -r "$SRC/web/dist" "$APP/web/dist"
-grep -o 'AdminPanel-[A-Za-z0-9_-]*\.js' "$APP/web/dist/index.html" | head -1
+if ls "$APP/web/dist/assets/" | grep -q 'DownloadPage'; then echo 'dist: DownloadPage chunk OK'; else echo '警告: 未发现 DownloadPage chunk'; fi
+grep -o 'index-[A-Za-z0-9_-]*\.js' "$APP/web/dist/index.html" | head -1 || true
 
 echo '===== [4] .env 幂等补顺丰下单两行 ====='
 cd "$APP/server"
