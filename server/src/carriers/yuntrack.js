@@ -100,11 +100,17 @@ export class YunTrackAdapter extends CarrierAdapter {
     if (p.dims?.widthCm) params.set('width', Number(p.dims.widthCm).toFixed(3));
     if (p.dims?.heightCm) params.set('height', Number(p.dims.heightCm).toFixed(3));
 
-    const resp = await this.apiCall('GET', `/v1/price-trial/get?${params.toString()}`);
+    let resp = await this.apiCall('GET', `/v1/price-trial/get?${params.toString()}`);
     if (resp?.success === false) {
       throw new CarrierError(`云途运费试算失败: ${resp?.msg || '未知错误'}（${resp?.code || ''}）`, 'API_ERROR', resp);
     }
-    const rows = Array.isArray(resp?.result) ? resp.result : [];
+    let rows = Array.isArray(resp?.result) ? resp.result : [];
+    // 部分国家（如 AU）仅开通普货线路：带电(E)空返回时自动回退普货(C)重试
+    if (!rows.length && params.get('package_type') === 'E') {
+      params.set('package_type', 'C');
+      resp = await this.apiCall('GET', `/v1/price-trial/get?${params.toString()}`);
+      if (resp?.success !== false) rows = Array.isArray(resp?.result) ? resp.result : [];
+    }
     if (!rows.length) throw new CarrierError('云途未返回可用报价', 'NO_QUOTE', resp);
 
     // 同一产品多条费用项（首重/续重/附加费），按 product_code+price_name 聚合求和
