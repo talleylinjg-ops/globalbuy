@@ -15,6 +15,7 @@ import pddAuthRouter from './pddauth.js';
 import customerAuthRouter from './customerauth.js';
 import { computeCombinedQuote } from '../services/combine.js';
 import { resolveCustomerSession } from '../services/customerAuth.js';
+import { appVersionInfo } from '../services/appVersion.js';
 import { createRecord, genId, genOrderNo, listCollection, getById } from '../services/db.js';
 import { createAdapters } from '../platforms/index.js';
 import { MOCK_PRODUCTS } from '../data/mockProducts.js';
@@ -42,6 +43,13 @@ router.use('/auth', customerAuthRouter);
 // 健康检查
 router.get('/health', (req, res) => {
   res.json({ ok: true, ts: Date.now() });
+});
+
+// 应用版本与各平台安装包下载地址（APK / 桌面客户端在线升级提示数据源）
+router.get('/app/version', (req, res) => {
+  const proto = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+  const host = req.headers['x-forwarded-host'] || req.headers.host || '';
+  res.json(appVersionInfo(`${proto}://${host}`));
 });
 
 // 主搜索接口：/api/search?q=wireless+earbuds&country=US&currency=USD&platforms=taobao,jd

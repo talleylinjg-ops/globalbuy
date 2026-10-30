@@ -18,6 +18,8 @@ import ProductModal from './components/ProductModal.jsx';
 const AdminPanel = lazy(() => import('./components/AdminPanel.jsx'));
 const TrackOrder = lazy(() => import('./components/TrackOrder.jsx'));
 const AccountPage = lazy(() => import('./components/AccountPage.jsx'));
+// 下载中心：Android APK / iOS / Windows / Mac 版本下载与安装引导
+const DownloadPage = lazy(() => import('./components/DownloadPage.jsx'));
 // 简易展示版（#/simple）：纯中文、隐藏快递信息，用于对外分享
 const SimpleApp = lazy(() => import('./components/SimpleApp.jsx'));
 
@@ -31,9 +33,9 @@ const DEFAULT_HOT_KEYWORDS = [
   '降噪',
 ];
 
-// 完整版（多语言主站）路由：#/simple 与其子页 #/track #/account #/admin
+// 完整版（多语言主站）路由：#/simple 与其子页 #/track #/account #/admin #/download
 // 其余地址（根路径 #/ 等）= 纯中文简易版（对外展示默认入口）
-const FULL_ROUTE_PREFIXES = ['#/simple', '#/track', '#/account', '#/admin'];
+const FULL_ROUTE_PREFIXES = ['#/simple', '#/track', '#/account', '#/admin', '#/download'];
 
 function getAdminRoute() {
   return window.location.hash.startsWith('#/admin');
@@ -47,6 +49,10 @@ function getAccountRoute() {
   return window.location.hash.startsWith('#/account');
 }
 
+function getDownloadRoute() {
+  return window.location.hash.startsWith('#/download');
+}
+
 function getFullRoute() {
   return FULL_ROUTE_PREFIXES.some((p) => window.location.hash.startsWith(p));
 }
@@ -57,6 +63,7 @@ export default function App() {
   const { t, lang, setLang, languages } = useI18n();  const [isAdmin, setIsAdmin] = useState(getAdminRoute());
   const [isTrack, setIsTrack] = useState(getTrackRoute());
   const [isAccount, setIsAccount] = useState(getAccountRoute());
+  const [isDownload, setIsDownload] = useState(getDownloadRoute());
   const [isFull, setIsFull] = useState(getFullRoute());
   const [meta, setMeta] = useState(null);
   const [results, setResults] = useState(null);
@@ -84,7 +91,7 @@ export default function App() {
   isDemoModeRef.current = Boolean(results?.demo || meta?.demo);
 
   useEffect(() => {
-    const onHash = () => { setIsAdmin(getAdminRoute()); setIsTrack(getTrackRoute()); setIsAccount(getAccountRoute()); setIsFull(getFullRoute()); };
+    const onHash = () => { setIsAdmin(getAdminRoute()); setIsTrack(getTrackRoute()); setIsAccount(getAccountRoute()); setIsDownload(getDownloadRoute()); setIsFull(getFullRoute()); };
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
@@ -331,6 +338,10 @@ export default function App() {
         ) : isAccount ? (
           <Suspense fallback={<div className="loading">...</div>}>
             <AccountPage t={t} lang={lang} />
+          </Suspense>
+        ) : isDownload ? (
+          <Suspense fallback={<div className="loading">...</div>}>
+            <DownloadPage t={t} lang={lang} />
           </Suspense>
         ) : isFull ? (
           <>

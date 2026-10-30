@@ -1,0 +1,10 @@
+{
+  "version": "1.1.0",
+  "build": "20261030",
+  "channel": "stable",
+  "notes": {
+    "zh": "新增 PWA 应用支持：可安装到手机主屏幕，支持离线打开与在线升级提醒。",
+    "en": "New PWA support: install to home screen, offline launch and in-app update prompts.",
+    "es": "Nuevo soporte PWA: instalación en pantalla de inicio, apertura sin conexión y avisos de actualización."
+  }
+}

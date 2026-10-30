@@ -577,5 +577,50 @@
     "假一赔十": "Compensación 10x",
     "全国联保": "Garantía nacional",
     "运费险": "Seguro de envío"
+  },
+  "download": {
+    "title": "Descarga la app CrossBuy",
+    "subtitle": "Instala en tu móvil o escritorio: experiencia a pantalla completa y arranque instantáneo",
+    "currentPlatform": "Tu plataforma",
+    "howto": "Guía de instalación",
+    "comingSoon": "Próximamente; la app te avisará de la actualización",
+    "android": {
+      "title": "App Android",
+      "desc": "Instalación directa por APK, Android 8.0 o superior",
+      "download": "Descargar",
+      "step1": "Toca el botón de descarga para obtener el APK.",
+      "step2": "Abre el archivo y permite la instalación de esta fuente si se solicita.",
+      "step3": "Toca Instalar; el icono de CrossBuy aparecerá en tu pantalla de inicio.",
+      "step4": "Cuando haya una versión nueva, la app mostrará un aviso; tócalo para descargar el APK más reciente."
+    },
+    "ios": {
+      "title": "iPhone / iPad",
+      "desc": "Añade a la pantalla de inicio con Safari: experiencia tipo app, se actualiza con la web",
+      "guideTitle": "Añadir a la pantalla de inicio en 4 pasos",
+      "step1": "Abre este sitio en Safari (iPhone / iPad).",
+      "step2": "Toca el botón Compartir en la parte inferior.",
+      "step3": "Desplázate y elige \"Añadir a pantalla de inicio\".",
+      "step4": "Toca Añadir; CrossBuy se ejecuta a pantalla completa y se actualiza automáticamente con la web."
+    },
+    "windows": {
+      "title": "App Windows",
+      "desc": "Para Windows 10/11, acceso directo y aviso de actualización",
+      "download": "Descargar",
+      "step1": "Descarga el instalador y ejecútalo (SmartScreen: Más información → Ejecutar igualmente).",
+      "step2": "CrossBuy se abre como ventana de aplicación de escritorio.",
+      "step3": ""
+    },
+    "mac": {
+      "title": "App macOS",
+      "desc": "Para Mac con Apple Silicon e Intel",
+      "download": "Descargar",
+      "step1": "Descomprime el archivo y arrastra CrossBuy.app a Aplicaciones.",
+      "step2": "Primer inicio: clic derecho en la app → Abrir para pasar Gatekeeper.",
+      "step3": ""
+    },
+    "upgrade": {
+      "intro": "Todas las apps de Android y escritorio incluyen comprobación de actualizaciones: al publicarse una versión nueva recibirás un aviso con descarga de un toque. La app de pantalla de inicio de iOS se actualiza junto con la web.",
+      "note": "Cuando haya una versión nueva, la app mostrará un aviso de actualización; síguelo para actualizar."
+    }
   }
 }

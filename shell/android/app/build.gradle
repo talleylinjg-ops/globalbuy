@@ -1,0 +1,40 @@
+// CrossBuy Android 壳（TWA）：全屏加载站点，网页内升级提示自动生效
+buildscript {
+    repositories { google(); mavenCentral() }
+    dependencies { classpath 'com.android.tools.build:gradle:8.5.2' }
+}
+allprojects { repositories { google(); mavenCentral() } }
+
+apply plugin: 'com.android.application'
+
+android {
+    namespace 'com.crossbuy.globalbuy'
+    compileSdk 34
+    defaultConfig {
+        applicationId 'com.crossbuy.globalbuy'
+        minSdk 24
+        targetSdk 34
+        versionCode 110
+        versionName '1.1.0'
+    }
+    signingConfigs {
+        release {
+            // CI 注入：无正式 keystore 时自动生成演示签名（可安装）
+            storeFile file(System.getenv('KEYSTORE_FILE') ?: 'release.keystore')
+            storePassword System.getenv('KEYSTORE_PASSWORD') ?: 'crossbuy2026'
+            keyAlias System.getenv('KEY_ALIAS') ?: 'crossbuy'
+            keyPassword System.getenv('KEY_PASSWORD') ?: 'crossbuy2026'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.browser:browser:1.8.0'
+}

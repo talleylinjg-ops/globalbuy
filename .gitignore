@@ -56,7 +56,11 @@
 **/develop-eggs/
 # web/dist 构建产物保留入库（VPS 全量部署走 codeload tarball 拉取）
 !web/dist/
+# 客户端安装包不入库，但 TWA 域名校验文件保留
 **/downloads/
+!server/downloads/
+!server/downloads/.well-known/
+!server/downloads/.well-known/assetlinks.json
 **/eggs/
 **/.eggs/
 **/parts/

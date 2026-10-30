@@ -571,5 +571,50 @@
     "假一赔十": "假一赔十",
     "全国联保": "全国联保",
     "运费险": "运费险"
+  },
+  "download": {
+    "title": "下载 CrossBuy 应用",
+    "subtitle": "安装到手机或电脑，全屏体验、秒级启动",
+    "currentPlatform": "当前平台",
+    "howto": "安装步骤",
+    "comingSoon": "即将发布，发布后应用内会自动提示更新",
+    "android": {
+      "title": "安卓版",
+      "desc": "APK 直接安装，支持 Android 8.0 及以上",
+      "download": "下载安装",
+      "step1": "点击上方「下载安装」获取 APK 文件。",
+      "step2": "打开文件，按提示允许「来自此来源的应用」安装。",
+      "step3": "点击安装，桌面出现 CrossBuy 图标。",
+      "step4": "新版本发布时应用内会弹出升级提示，点击即可下载最新 APK。"
+    },
+    "ios": {
+      "title": "iPhone / iPad",
+      "desc": "通过 Safari 添加到主屏幕，体验与原生 App 一致，随网站自动更新",
+      "guideTitle": "四步添加到主屏幕",
+      "step1": "用 iPhone / iPad 上的 Safari 打开本站。",
+      "step2": "点击 Safari 底部的「分享」按钮。",
+      "step3": "滑动找到并选择「添加到主屏幕」。",
+      "step4": "点击「添加」，主屏幕出现 CrossBuy 图标，全屏运行；网站更新即自动生效。"
+    },
+    "windows": {
+      "title": "Windows 版",
+      "desc": "支持 Windows 10/11，桌面快捷方式 + 更新提示",
+      "download": "下载安装",
+      "step1": "下载安装包并运行（SmartScreen 提示时点「仍要运行」）。",
+      "step2": "CrossBuy 将以桌面应用窗口打开。",
+      "step3": ""
+    },
+    "mac": {
+      "title": "macOS 版",
+      "desc": "支持 Apple 芯片与 Intel 芯片 Mac",
+      "download": "下载",
+      "step1": "解压下载文件，将 CrossBuy.app 拖入「应用程序」。",
+      "step2": "首次打开：右键点击应用 → 「打开」以通过 Gatekeeper 校验。",
+      "step3": ""
+    },
+    "upgrade": {
+      "intro": "所有安卓与桌面客户端内置在线升级检查：新版本发布后应用内自动弹出提示，一键获取最新版；iOS 主屏幕应用随网站自动更新。",
+      "note": "新版本可用时应用内会弹出升级提示，按提示操作即可更新。"
+    }
   }
 }

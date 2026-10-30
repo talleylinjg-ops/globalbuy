@@ -1,0 +1,46 @@
+{
+  "name": "crossbuy-desktop",
+  "productName": "CrossBuy",
+  "version": "1.1.0",
+  "description": "CrossBuy - China cross-border price comparison & shopping agent",
+  "main": "main.js",
+  "author": "CrossBuy",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "electron .",
+    "dist:win": "electron-builder --win --x64",
+    "dist:mac": "electron-builder --mac --universal",
+    "dist:linux": "electron-builder --linux"
+  },
+  "devDependencies": {
+    "electron": "^31.3.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.crossbuy.globalbuy",
+    "productName": "CrossBuy",
+    "asar": true,
+    "directories": { "output": "dist" },
+    "files": ["main.js", "package.json"],
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "artifactName": "crossbuy-win.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    },
+    "mac": {
+      "target": [{ "target": "zip", "arch": ["universal"] }],
+      "artifactName": "crossbuy-mac.${ext}",
+      "identity": null,
+      "category": "public.app-category.shopping"
+    },
+    "linux": {
+      "target": ["AppImage"],
+      "artifactName": "crossbuy-linux.${ext}",
+      "category": "Network"
+    }
+  }
+}

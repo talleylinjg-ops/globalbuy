@@ -5,6 +5,7 @@ import { existsSync } from 'node:fs';
 import { config } from './config.js';
 import { loadDb } from './services/db.js';
 import { startQuoteCacheWarmer } from './services/carrierService.js';
+import { DOWNLOADS_DIR } from './services/appVersion.js';
 import apiRouter from './routes/index.js';
 
 const app = express();
@@ -22,6 +23,17 @@ await loadDb().then(() => console.log('[db] MySQL ready')).catch((e) => {
 app.use(express.static(new URL('../public', import.meta.url).pathname, { maxAge: '7d' }));
 
 app.use('/api', apiRouter);
+
+// 客户端安装包下载目录（APK / Windows / Mac 构建产物），存在才启用
+if (existsSync(DOWNLOADS_DIR)) {
+  app.use('/downloads', express.static(DOWNLOADS_DIR, { maxAge: '1h' }));
+}
+
+// TWA 域名校验：Android APK 与网站的数字资产链接（包名+签名指纹由构建产物回填）
+const assetLinks = new URL('../downloads/.well-known/assetlinks.json', import.meta.url).pathname;
+if (existsSync(assetLinks)) {
+  app.get('/.well-known/assetlinks.json', (req, res) => res.sendFile(assetLinks));
+}
 
 // VPS 单端口部署：伺服前端构建产物（web/dist），API 路由以上已优先注册
 const webDist = new URL('../../web/dist', import.meta.url).pathname;

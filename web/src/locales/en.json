@@ -582,5 +582,50 @@
     "假一赔十": "10x compensation",
     "全国联保": "Nationwide warranty",
     "运费险": "Shipping insurance"
+  },
+  "download": {
+    "title": "Get CrossBuy App",
+    "subtitle": "Install on your phone or desktop for a full-screen, instant-launch experience",
+    "currentPlatform": "Your platform",
+    "howto": "Installation guide",
+    "comingSoon": "Coming soon — in-app update will notify you",
+    "android": {
+      "title": "Android App",
+      "desc": "APK direct install, works on Android 8.0+",
+      "download": "Download",
+      "step1": "Tap the Download button above to get the APK file.",
+      "step2": "Open the file; when asked, allow installs from this source.",
+      "step3": "Tap Install — the CrossBuy icon appears on your home screen.",
+      "step4": "When a new version ships, the app shows an update prompt; tap it to download the new APK."
+    },
+    "ios": {
+      "title": "iPhone / iPad",
+      "desc": "Add to Home Screen via Safari — full App-like experience, auto-updated with the website",
+      "guideTitle": "Add to Home Screen in 4 steps",
+      "step1": "Open this site in Safari (iPhone / iPad).",
+      "step2": "Tap the Share button at the bottom of Safari.",
+      "step3": "Scroll and choose \"Add to Home Screen\".",
+      "step4": "Tap Add — CrossBuy runs full-screen from your home screen; updates arrive automatically with the website."
+    },
+    "windows": {
+      "title": "Windows App",
+      "desc": "For Windows 10/11, desktop shortcut with auto update prompt",
+      "download": "Download",
+      "step1": "Download the installer and run it (SmartScreen: click More info → Run anyway).",
+      "step2": "CrossBuy opens as a desktop app window.",
+      "step3": ""
+    },
+    "mac": {
+      "title": "macOS App",
+      "desc": "For Apple Silicon & Intel Macs",
+      "download": "Download",
+      "step1": "Unzip the download, then drag CrossBuy.app into Applications.",
+      "step2": "First launch: right-click the app → Open to bypass Gatekeeper.",
+      "step3": ""
+    },
+    "upgrade": {
+      "intro": "All desktop and Android app builds include an in-app update check: when a new version ships, you get a prompt with one-tap download. The iOS home-screen app updates itself together with the website.",
+      "note": "When a new version is available, the app shows an update prompt — follow it to get the latest build."
+    }
   }
 }
