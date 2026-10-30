@@ -14,7 +14,7 @@ SHA=$(curl -fsSL -H 'Accept: application/vnd.github+json' "https://api.github.co
 echo "commit: $SHA"
 curl -fsSL "https://codeload.github.com/talleylinjg-ops/globalbuy/tar.gz/$SHA" -o gb.tgz
 tar xzf gb.tgz
-SRC=$(ls -d globalbuy-master | head -1)
+SRC=$(ls -d globalbuy-* | head -1)
 [ -d "$SRC/server/src" ] || { echo '包结构异常'; exit 1; }
 
 echo '===== [2] 同步 server 源码 ====='
