@@ -598,10 +598,10 @@
     },
     "windows": {
       "title": "Windows 版",
-      "desc": "支持 Windows 10/11，桌面快捷方式 + 更新提示",
+      "desc": "支持 Windows 10/11，便携版解压即用 + 更新提示",
       "download": "下载安装",
-      "step1": "下载安装包并运行（SmartScreen 提示时点「仍要运行」）。",
-      "step2": "CrossBuy 将以桌面应用窗口打开。",
+      "step1": "下载 ZIP 压缩包，右键「全部解压缩」。",
+      "step2": "打开解压后的文件夹，双击 CrossBuy.exe 运行（SmartScreen 提示时点「仍要运行」）。",
       "step3": ""
     },
     "mac": {

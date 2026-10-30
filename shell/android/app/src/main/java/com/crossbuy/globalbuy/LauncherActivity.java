@@ -4,16 +4,16 @@ import android.net.Uri;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.browser.customtabs.CustomTabsIntent;
-import androidx.browser.trusted.TrustedWebActivityIntentBuilder;
 
 /**
- * TWA 启动页：优先以 Trusted Web Activity（全屏无地址栏）打开站点；
- * 站点校验未通过或 TWA 会话失败时回退 Custom Tab（带地址栏，功能一致）。
- * 网页内 pwa.js 的在线升级提示与下载中心在两种模式下均自动生效。
+ * 站点启动页：以 Custom Tab 打开（Chrome 内核渲染，可隐藏地址栏）。
+ * 当前为 IP 站点，TWA 数字资产校验需 https + 正式域名；
+ * 域名就绪后可切 TrustedWebActivityIntentBuilder 全屏模式。
+ * 网页内 pwa.js 的在线升级提示与下载中心在此模式下自动生效。
  */
 public class LauncherActivity extends AppCompatActivity {
 
-    // 站点地址：CI 可通过 -PappUrl 或环境变量覆盖，正式域名切换只改这里
+    // 站点地址：CI 可通过环境变量覆盖，正式域名切换只改这里
     private static final String START_URL =
         System.getenv("CROSSBUY_START_URL") != null
             ? System.getenv("CROSSBUY_START_URL")
@@ -28,16 +28,12 @@ public class LauncherActivity extends AppCompatActivity {
             url = getIntent().getData();
         }
 
-        try {
-            new TrustedWebActivityIntentBuilder(url)
-                .build(this)
-                .run(this, null);
-        } catch (Exception e) {
-            CustomTabsIntent intent = new CustomTabsIntent.Builder()
-                .setShowTitle(true)
-                .build();
-            intent.launchUrl(this, url);
-        }
+        CustomTabsIntent intent = new CustomTabsIntent.Builder()
+            .setShowTitle(true)
+            .setUrlBarHidingEnabled(true)
+            .setShareState(CustomTabsIntent.SHARE_STATE_OFF)
+            .build();
+        intent.launchUrl(this, url);
         finish();
     }
 }

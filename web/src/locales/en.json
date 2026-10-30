@@ -609,10 +609,10 @@
     },
     "windows": {
       "title": "Windows App",
-      "desc": "For Windows 10/11, desktop shortcut with auto update prompt",
+      "desc": "For Windows 10/11, portable ZIP: extract and run, auto update prompt",
       "download": "Download",
-      "step1": "Download the installer and run it (SmartScreen: click More info → Run anyway).",
-      "step2": "CrossBuy opens as a desktop app window.",
+      "step1": "Download the ZIP, right-click → Extract All.",
+      "step2": "Open the folder and double-click CrossBuy.exe (SmartScreen: More info → Run anyway).",
       "step3": ""
     },
     "mac": {

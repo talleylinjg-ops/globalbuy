@@ -37,4 +37,12 @@ android {
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'androidx.browser:browser:1.8.0'
+    constraints {
+        implementation('org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22') {
+            because 'androidx 传递依赖 kotlin 版本冲突对齐'
+        }
+        implementation('org.jetbrains.kotlin:kotlin-stdlib:1.8.22') {
+            because 'androidx 传递依赖 kotlin 版本冲突对齐'
+        }
+    }
 }

@@ -12,7 +12,7 @@ export const DOWNLOADS_DIR = path.resolve(__dirname, '../../downloads');
 
 const DOWNLOAD_FILES = {
   android: 'crossbuy-android.apk',
-  windows: 'crossbuy-win.exe',
+  windows: 'crossbuy-win.zip',
   mac: 'crossbuy-mac.zip',
 };
 

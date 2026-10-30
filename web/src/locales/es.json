@@ -604,10 +604,10 @@
     },
     "windows": {
       "title": "App Windows",
-      "desc": "Para Windows 10/11, acceso directo y aviso de actualización",
+      "desc": "Para Windows 10/11, versión portable: descomprimir y ejecutar, con aviso de actualización",
       "download": "Descargar",
-      "step1": "Descarga el instalador y ejecútalo (SmartScreen: Más información → Ejecutar igualmente).",
-      "step2": "CrossBuy se abre como ventana de aplicación de escritorio.",
+      "step1": "Descarga el ZIP, clic derecho → Extraer todo.",
+      "step2": "Abre la carpeta y ejecuta CrossBuy.exe (SmartScreen: Más información → Ejecutar igualmente).",
       "step3": ""
     },
     "mac": {

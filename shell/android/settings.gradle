@@ -1,3 +1,2 @@
-rootProject.buildDir = '../build'
 rootProject.name = 'CrossBuy'
 include ':app'
