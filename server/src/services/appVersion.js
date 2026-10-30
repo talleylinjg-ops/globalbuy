@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 // 应用版本单一来源：发版时同步更新 web/public/app-version.json 与 sw.js 的 SW_VERSION
-export const APP_VERSION = '1.1.0';
+export const APP_VERSION = '1.1.1';
 export const APP_BUILD = '20261030';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

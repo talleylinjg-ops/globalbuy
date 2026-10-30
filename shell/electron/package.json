@@ -1,7 +1,7 @@
 {
   "name": "crossbuy-desktop",
   "productName": "CrossBuy",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "CrossBuy - China cross-border price comparison & shopping agent",
   "main": "main.js",
   "author": "CrossBuy",
@@ -20,10 +20,22 @@
     "appId": "com.crossbuy.globalbuy",
     "productName": "CrossBuy",
     "asar": true,
-    "directories": { "output": "dist" },
-    "files": ["main.js", "package.json"],
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "package.json"
+    ],
     "win": {
-      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
       "artifactName": "crossbuy-win.${ext}"
     },
     "nsis": {
@@ -32,13 +44,22 @@
       "createDesktopShortcut": true
     },
     "mac": {
-      "target": [{ "target": "zip", "arch": ["universal"] }],
+      "target": [
+        {
+          "target": "zip",
+          "arch": [
+            "universal"
+          ]
+        }
+      ],
       "artifactName": "crossbuy-mac.${ext}",
       "identity": null,
       "category": "public.app-category.shopping"
     },
     "linux": {
-      "target": ["AppImage"],
+      "target": [
+        "AppImage"
+      ],
       "artifactName": "crossbuy-linux.${ext}",
       "category": "Network"
     }

@@ -3,7 +3,7 @@
  * API 请求直连不缓存（报价实时性优先）；静态资源 cache-first。
  * 版本号写入 CACHE 前缀，activate 时清理旧缓存实现全量刷新。
  */
-const SW_VERSION = 'v1.1.0';
+const SW_VERSION = 'v1.1.1';
 const CACHE_NAME = `crossbuy-${SW_VERSION}`;
 const SHELL_ASSETS = [
   '/',

@@ -38,10 +38,19 @@ if (existsSync(assetLinks)) {
 // VPS 单端口部署：伺服前端构建产物（web/dist），API 路由以上已优先注册
 const webDist = new URL('../../web/dist', import.meta.url).pathname;
 if (existsSync(webDist)) {
-  app.use(express.static(webDist, { maxAge: '1d', index: ['index.html'] }));
+  app.use(express.static(webDist, {
+    index: ['index.html'],
+    setHeaders: (res, filePath) => {
+      // 入口 html 必须每次校验（SPA 引用带 hash 的 chunk，部署后旧引用会 404）
+      if (filePath.endsWith('.html')) res.setHeader('Cache-Control', 'no-cache');
+      else if (filePath.includes(`${webDist}/assets/`)) res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      else res.setHeader('Cache-Control', 'public, max-age=300');
+    },
+  }));
   // SPA / 落地页兜底：非 /api 请求返回 index.html（/p/* 为真实文件，静态中间件已命中）
   app.get('*', (req, res, next) => {
     if (req.path.startsWith('/api/')) return next();
+    res.setHeader('Cache-Control', 'no-cache');
     res.sendFile(`${webDist}/index.html`);
   });
   console.log('[server] serving web/dist static files');
