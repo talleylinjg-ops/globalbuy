@@ -1,34 +1,62 @@
 package com.crossbuy.globalbuy;
 
+import android.content.ComponentName;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.browser.customtabs.CustomTabsClient;
 import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.browser.customtabs.CustomTabsServiceConnection;
+import androidx.browser.customtabs.CustomTabsSession;
 
-/**
- * 站点启动页：以 Custom Tab 打开（Chrome 内核渲染，可隐藏地址栏）。
- * 当前为 IP 站点，TWA 数字资产校验需 https + 正式域名；
- * 域名就绪后可切 TrustedWebActivityIntentBuilder 全屏模式。
- * 网页内 pwa.js 的在线升级提示与下载中心在此模式下自动生效。
- */
+// CrossBuy Android 壳入口：CustomTabs 会话隐藏地址栏（准全屏）。
+// assetlinks.json 已按 release.keystore 指纹预置，后续升级 TWA 全屏可直接使用。
 public class LauncherActivity extends AppCompatActivity {
 
-    // 站点地址：CI 可通过环境变量覆盖，正式域名切换只改这里
     private static final String START_URL =
         System.getenv("CROSSBUY_START_URL") != null
             ? System.getenv("CROSSBUY_START_URL")
             : "https://xluxury.site/";
 
+    private CustomTabsSession mSession;
+    private boolean mLaunched = false;
+
+    private final CustomTabsServiceConnection mConnection = new CustomTabsServiceConnection() {
+        @Override
+        public void onCustomTabsServiceConnected(ComponentName name, CustomTabsClient client) {
+            client.warmup(0);
+            mSession = client.newSession(null);
+            launch();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mSession = null;
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        String pkg = CustomTabsClient.getPackageName(this, null);
+        if (pkg != null) {
+            try {
+                CustomTabsClient.bindCustomTabsService(this, pkg, mConnection);
+                return;
+            } catch (SecurityException ignored) {
+            }
+        }
+        launch();
+    }
 
+    private void launch() {
+        if (mLaunched) return;
+        mLaunched = true;
         Uri url = Uri.parse(START_URL);
         if (getIntent() != null && getIntent().getData() != null) {
             url = getIntent().getData();
         }
-
-        CustomTabsIntent intent = new CustomTabsIntent.Builder()
+        CustomTabsIntent intent = new CustomTabsIntent.Builder(mSession)
             .setShowTitle(true)
             .setUrlBarHidingEnabled(true)
             .setShareState(CustomTabsIntent.SHARE_STATE_OFF)

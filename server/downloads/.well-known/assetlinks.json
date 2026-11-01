@@ -1,1 +1,10 @@
-[]
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.crossbuy.globalbuy",
+    "sha256_cert_fingerprints": [
+      "E6:39:FC:D4:09:DD:84:63:A5:EF:5C:79:A9:EC:A2:EA:0E:9C:C4:45:FB:DD:DD:3F:27:0C:F5:59:F4:A3:58:FE"
+    ]
+  }
+}]
