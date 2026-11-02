@@ -1,7 +1,7 @@
 name: release
 
 # 一键构建全平台安装包：推送 v* 标签或手动触发
-# 产物：Android APK / Windows EXE / macOS ZIP，并自动创建 GitHub Release
+# 产物：Android APK / Windows EXE / macOS ZIP / Linux AppImage，并自动创建 GitHub Release
 on:
   push:
     tags: ['v*']
@@ -59,6 +59,8 @@ jobs:
             args: --win --x64
           - os: macos-latest
             args: --mac --universal
+          - os: ubuntu-latest
+            args: --linux --x64
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -79,6 +81,7 @@ jobs:
           path: |
             shell/electron/dist/crossbuy-win.*
             shell/electron/dist/crossbuy-mac.*
+            shell/electron/dist/crossbuy-linux.*
 
   publish:
     needs: [android, desktop]

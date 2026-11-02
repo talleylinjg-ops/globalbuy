@@ -77,7 +77,7 @@ async function checkForUpdate(silent = true) {
       defaultId: 0,
     });
     if (response === 0) {
-      const platform = process.platform === 'darwin' ? 'mac' : process.platform.startsWith('win') ? 'windows' : null;
+      const platform = process.platform === 'darwin' ? 'mac' : process.platform.startsWith('win') ? 'windows' : process.platform === 'linux' ? 'linux' : null;
       const target = platform && info.downloads?.[platform]
         ? info.downloads[platform]
         : `${APP_URL}#/download`;

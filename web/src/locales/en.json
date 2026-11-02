@@ -623,6 +623,14 @@
       "step2": "First launch: right-click the app → Open to bypass Gatekeeper.",
       "step3": ""
     },
+    "linux": {
+      "title": "Linux App",
+      "desc": "AppImage for x64 desktops (Ubuntu, Debian, Fedora, etc.)",
+      "download": "Download",
+      "step1": "Make it executable: chmod +x crossbuy-linux.AppImage (or right-click → Properties → Allow executing).",
+      "step2": "Double-click to run — no installation needed.",
+      "step3": ""
+    },
     "upgrade": {
       "intro": "All desktop and Android app builds include an in-app update check: when a new version ships, you get a prompt with one-tap download. The iOS home-screen app updates itself together with the website.",
       "note": "When a new version is available, the app shows an update prompt — follow it to get the latest build."

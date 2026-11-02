@@ -612,6 +612,14 @@
       "step2": "首次打开：右键点击应用 → 「打开」以通过 Gatekeeper 校验。",
       "step3": ""
     },
+    "linux": {
+      "title": "Linux 桌面版",
+      "desc": "AppImage 格式，支持 Ubuntu、Debian、Fedora 等 x64 桌面系统",
+      "download": "下载",
+      "step1": "为文件添加执行权限：chmod +x crossbuy-linux.AppImage（或在文件属性中勾选「允许执行」）。",
+      "step2": "双击即可运行，无需安装。",
+      "step3": ""
+    },
     "upgrade": {
       "intro": "所有安卓与桌面客户端内置在线升级检查：新版本发布后应用内自动弹出提示，一键获取最新版；iOS 主屏幕应用随网站自动更新。",
       "note": "新版本可用时应用内会弹出升级提示，按提示操作即可更新。"

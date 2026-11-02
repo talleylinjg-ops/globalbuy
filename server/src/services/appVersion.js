@@ -14,6 +14,7 @@ const DOWNLOAD_FILES = {
   android: 'crossbuy-android.apk',
   windows: 'crossbuy-win.zip',
   mac: 'crossbuy-mac.zip',
+  linux: 'crossbuy-linux.AppImage',
 };
 
 // 仅返回实际存在的安装包地址；未部署产物时字段为 null（前端显示「即将发布」）

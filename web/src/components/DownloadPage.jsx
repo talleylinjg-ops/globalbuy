@@ -8,6 +8,7 @@ function detectPlatform() {
   if (/iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) return 'ios';
   if (/mac/i.test(ua)) return 'mac';
   if (/win/i.test(ua)) return 'windows';
+  if (/linux/i.test(ua)) return 'linux';
   return null;
 }
 
@@ -67,6 +68,14 @@ export default function DownloadPage({ t, lang }) {
   const macBtn = dl.mac ? (
     <a className="btn primary" href={dl.mac} download>
       {t('download.mac.download')} · ZIP
+    </a>
+  ) : (
+    <span className="dl-soon">{t('download.comingSoon')}</span>
+  );
+
+  const linuxBtn = dl.linux ? (
+    <a className="btn primary" href={dl.linux} download>
+      {t('download.linux.download')} · AppImage
     </a>
   ) : (
     <span className="dl-soon">{t('download.comingSoon')}</span>
@@ -145,6 +154,24 @@ export default function DownloadPage({ t, lang }) {
             <ol>
               <li>{t('download.mac.step1')}</li>
               <li>{t('download.mac.step2')}</li>
+              <li>{t('download.upgrade.note')}</li>
+            </ol>
+          </details>
+        </>
+      )}
+
+      {card(
+        'linux',
+        '🐧',
+        t('download.linux.title'),
+        t('download.linux.desc'),
+        <>
+          {linuxBtn}
+          <details className="dl-howto">
+            <summary>{t('download.howto')}</summary>
+            <ol>
+              <li>{t('download.linux.step1')}</li>
+              <li>{t('download.linux.step2')}</li>
               <li>{t('download.upgrade.note')}</li>
             </ol>
           </details>

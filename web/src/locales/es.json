@@ -618,6 +618,14 @@
       "step2": "Primer inicio: clic derecho en la app → Abrir para pasar Gatekeeper.",
       "step3": ""
     },
+    "linux": {
+      "title": "App para Linux",
+      "desc": "Formato AppImage para escritorios x64 (Ubuntu, Debian, Fedora, etc.)",
+      "download": "Descargar",
+      "step1": "Da permisos de ejecución: chmod +x crossbuy-linux.AppImage (o clic derecho → Propiedades → Permitir ejecutar).",
+      "step2": "Doble clic para ejecutar, sin necesidad de instalación.",
+      "step3": ""
+    },
     "upgrade": {
       "intro": "Todas las apps de Android y escritorio incluyen comprobación de actualizaciones: al publicarse una versión nueva recibirás un aviso con descarga de un toque. La app de pantalla de inicio de iOS se actualiza junto con la web.",
       "note": "Cuando haya una versión nueva, la app mostrará un aviso de actualización; síguelo para actualizar."

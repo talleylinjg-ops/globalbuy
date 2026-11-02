@@ -61,7 +61,8 @@
         "AppImage"
       ],
       "artifactName": "crossbuy-linux.${ext}",
-      "category": "Network"
+      "category": "Network",
+      "icon": "build/icon.png"
     }
   }
 }
