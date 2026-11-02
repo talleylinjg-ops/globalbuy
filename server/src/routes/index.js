@@ -46,7 +46,9 @@ router.get('/health', (req, res) => {
 });
 
 // 应用版本与各平台安装包下载地址（APK / 桌面客户端在线升级提示数据源）
+// 短缓存：客户端轮询频繁，60s 内重复请求直接命中浏览器/CDN 缓存
 router.get('/app/version', (req, res) => {
+  res.setHeader('Cache-Control', 'public, max-age=60');
   res.json(appVersionInfo(appVersionBaseUrl(req)));
 });
 
