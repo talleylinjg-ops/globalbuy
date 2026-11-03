@@ -59,4 +59,4 @@ Allow: /
 User-agent: Diffbot
 Allow: /
 
-Sitemap: https://xluxury.site/sitemap.xml
+Sitemap: https://crossbuy.cn/sitemap.xml

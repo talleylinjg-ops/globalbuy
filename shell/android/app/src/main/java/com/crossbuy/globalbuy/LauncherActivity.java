@@ -16,7 +16,7 @@ public class LauncherActivity extends AppCompatActivity {
     private static final String START_URL =
         System.getenv("CROSSBUY_START_URL") != null
             ? System.getenv("CROSSBUY_START_URL")
-            : "https://xluxury.site/";
+            : "https://crossbuy.cn/";
 
     private CustomTabsSession mSession;
     private boolean mLaunched = false;

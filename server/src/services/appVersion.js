@@ -3,8 +3,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 // 应用版本单一来源：发版时同步更新 web/public/app-version.json 与 sw.js 的 SW_VERSION
-export const APP_VERSION = '1.1.1';
-export const APP_BUILD = '20261030';
+export const APP_VERSION = '1.2.0';
+export const APP_BUILD = '20261103';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // 安装包目录：CI 构建产物统一复制为固定文件名，便于客户端直链下载

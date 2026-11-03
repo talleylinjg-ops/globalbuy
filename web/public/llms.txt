@@ -12,23 +12,23 @@
 
 ## Key facts
 
-- Site: https://xluxury.site/
+- Site: https://crossbuy.cn/
 - Languages: Simplified Chinese (zh-CN), English (en), Spanish (es)
-- Search URL pattern: https://xluxury.site/?q={keyword}
+- Search URL pattern: https://crossbuy.cn/?q={keyword}
 - Pre-rendered landing pages (static, crawler-friendly, fully mirrored from live data):
-  - Wireless earbuds: https://xluxury.site/p/wireless-earbuds/
-  - Phone cases: https://xluxury.site/p/phone-case/
-  - Smart watches: https://xluxury.site/p/smart-watch/
-  - Luggage: https://xluxury.site/p/luggage/
-  - Keyboards: https://xluxury.site/p/keyboard/
-  - Sneakers: https://xluxury.site/p/sneakers/
-  - Wireless chargers: https://xluxury.site/p/wireless-charger/
-  - Thermos & tumblers: https://xluxury.site/p/thermos/
-  - LED lamps: https://xluxury.site/p/led-lamp/
-  - Yoga mats: https://xluxury.site/p/yoga-mat/
-  - Cat toys: https://xluxury.site/p/cat-toys/
-  - Chinese snacks: https://xluxury.site/p/snacks/
-- Full reference for LLMs: https://xluxury.site/llms-full.txt
+  - Wireless earbuds: https://crossbuy.cn/p/wireless-earbuds/
+  - Phone cases: https://crossbuy.cn/p/phone-case/
+  - Smart watches: https://crossbuy.cn/p/smart-watch/
+  - Luggage: https://crossbuy.cn/p/luggage/
+  - Keyboards: https://crossbuy.cn/p/keyboard/
+  - Sneakers: https://crossbuy.cn/p/sneakers/
+  - Wireless chargers: https://crossbuy.cn/p/wireless-charger/
+  - Thermos & tumblers: https://crossbuy.cn/p/thermos/
+  - LED lamps: https://crossbuy.cn/p/led-lamp/
+  - Yoga mats: https://crossbuy.cn/p/yoga-mat/
+  - Cat toys: https://crossbuy.cn/p/cat-toys/
+  - Chinese snacks: https://crossbuy.cn/p/snacks/
+- Full reference for LLMs: https://crossbuy.cn/llms-full.txt
 - Currency display: buyer-selectable (USD, EUR, GBP, JPY, and 20+ more); prices auto-converted from CNY.
 - Typical delivery: 5-10 business days by economical lines, 3-7 by express lines (varies by destination).
 - Service fee: buyer-selected, default 5%, range 0-30%; shown as a separate line item.
