@@ -12,7 +12,8 @@ import { cnyToCurrency } from '../services/currency.js';
 import { sfEncrypt, sfDecrypt, sfSignature } from './sfcrypto.js';
 
 const DEFAULT_BASE = 'https://api-ifsp.sf.global';
-const DEFAULT_MSGTYPE = 'IUOP_ESTIMATE_FEE';
+// 电商业务使用 IPE_ESTIMATE_FEE（IUOP_ESTIMATE_FEE 对电商应用报 1004 没权限，顺丰官方确认）
+const DEFAULT_MSGTYPE = 'IPE_ESTIMATE_FEE';
 const tokenCache = new Map();
 const tokenInflight = new Map();
 
@@ -85,6 +86,9 @@ export class SFIntlAdapter extends CarrierAdapter {
       body: encrypted,
       timeout: 30000,
     });
+    if (process.env.SF_DEBUG) {
+      console.log('[SF_DEBUG]', msgType, 'token=', String(token).slice(0, 12), 'ts=', timestamp, 'bodyLen=', String(encrypted).length, 'resp=', JSON.stringify(res).slice(0, 200));
+    }
 
     const j = typeof res === 'object' && res !== null ? res : (() => { try { return JSON.parse(res); } catch { return null; } })();
     if (!j || typeof j !== 'object') {
@@ -92,6 +96,13 @@ export class SFIntlAdapter extends CarrierAdapter {
     }
     if (j.apiResultCode === 500 && String(j.apiErrorMsg || '').includes('token invalid') && !retried) {
       await this.getToken(true);
+      return this.callApi(msgType, biz, { retried: true });
+    }
+    // 生产网关 QPS 风控：批量连续调用会被整体拒绝（apiResultCode 500 网关限流），延迟后重试一次
+    const GW_THROTTLED = j.apiResultCode === 500 && !retried
+      && /frequency|rate|limit|too many|频繁|限流|流控/i.test(String(j.apiErrorMsg || ''));
+    if (GW_THROTTLED) {
+      await new Promise((r) => setTimeout(r, 2000));
       return this.callApi(msgType, biz, { retried: true });
     }
     if (j.apiResultCode !== 0) {
@@ -177,28 +188,37 @@ export class SFIntlAdapter extends CarrierAdapter {
       throw new CarrierError('顺丰国际未配置 appKey/appSecret/aesKey/customerCode', 'NOT_CONFIGURED');
     }
     const { actualKg, volumetricKg, chargedKg } = CarrierAdapter.chargedWeight(p.weightKg, p.dims);
-    // interProductCode 支持逗号分隔多产品码并行询价（如 "INT0014,INT0263"）
+    // interProductCode 支持逗号分隔多产品码询价（如 "INT0014,INT0263"）
     const codes = String(this.cfg.interProductCode || 'INT0263')
       .split(',').map((s) => s.trim()).filter(Boolean);
-    const settled = await Promise.allSettled(codes.map(async (code) => {
-      const data = await this.callApi(this.msgType, this.buildFeeBiz({ ...p, interProductCode: code }));
-      const d = data?.data;
-      const totalFee = Number(d?.totalFee ?? d?.totalPayFee ?? 0);
-      if (!d || totalFee <= 0) {
-        throw new CarrierError(`顺丰国际 ${code} 无可报价`, 'NO_QUOTE', data);
+    // 生产 dispatch 网关严格串行（并发请求报 30000），逐产品串行询价 + 2s 间隔
+    const results = [];
+    for (const code of codes) {
+      if (results.length) await new Promise((r) => setTimeout(r, 2000));
+      try {
+        const data = await this.callApi(this.msgType, this.buildFeeBiz({ ...p, interProductCode: code }));
+        results.push({ ok: true, data, code });
+      } catch (e) {
+        results.push({ ok: false, reason: e, code });
       }
+    }
+    const quotes = [];
+    for (const r of results) {
+      if (!r.ok) continue;
+      const d = r.data?.data;
+      // IPE_ESTIMATE_FEE 金额单位为 0.1 元（实测 0.5/1/2kg→299/372/495，即 ¥29.9/¥37.2/¥49.5，与顺丰国际小包市场价吻合）
+      const totalFee = Number(d?.totalFee ?? d?.totalPayFee ?? 0) / 10;
+      if (!d || totalFee <= 0) continue;
       const currency = String(d.currency || 'CNY').toUpperCase();
       let priceUsd;
       if (currency === 'USD') priceUsd = totalFee;
       else if (currency === 'CNY') priceUsd = cnyToCurrency(totalFee, 'USD');
-      else {
-        throw new CarrierError(`顺丰国际返回币种 ${currency} 暂不支持换算`, 'NO_QUOTE', data);
-      }
+      else continue;
       // 产品名只保留产品码（如 INT0014），费用明细为服务端中文描述，拼入名称会在非中文界面造成混排
-      return this.normalize({
+      quotes.push(this.normalize({
         carrier: this.cfg.code,
         carrierName: this.cfg.name,
-        productName: d.interProductCode || code,
+        productName: d.interProductCode || r.code,
         priceUsd: Number((priceUsd * (1 + (this.cfg.markupRate || 0))).toFixed(2)),
         currency: 'USD',
         daysMin: this.cfg.daysMin ?? 6,
@@ -209,13 +229,10 @@ export class SFIntlAdapter extends CarrierAdapter {
         actualKg,
         volumetricKg,
         raw: d,
-      }, {});
-    }));
-    const quotes = settled
-      .filter((s) => s.status === 'fulfilled' && s.value)
-      .map((s) => s.value);
+      }, {}));
+    }
     if (quotes.length === 0) {
-      const firstErr = settled.find((s) => s.status === 'rejected')?.reason;
+      const firstErr = results.find((r) => !r.ok)?.reason;
       if (firstErr) throw firstErr;
       throw new CarrierError('顺丰国际无可报价', 'NO_QUOTE');
     }

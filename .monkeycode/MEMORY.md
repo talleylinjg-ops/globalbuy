@@ -221,3 +221,26 @@ Entries discovered by the Agent during task execution should follow this format:
   - parcelInfoList[].cName（商品中文名）必须含中文，纯英文被拒报 126010「托寄物内容不允许填写纯数字」（文案误导，实为非中文校验）；沙箱对相同请求有幂等缓存会返回同一运单号，对照实验需换参
   - 生产权限缺口：IUOP_ESTIMATE_FEE/IPE_QUERY_PRODUCT_FREIGHT 待用户在开放平台申请（报 1004 无权限）；IECS 系列（下单/打单/取消）生产应用 crossWorld 已关联可用
   - 渠道配置经 .env seed 链路生效（CARRIER_SFINTL_*），VPS 上 node 直跑脚本连 MySQL 报 Access denied 是一贯坑，落库类操作一律改走 .env + 应用重启
+
+[域名操作冻结指令]
+- Date: 2026-11-01
+- Context: xLuxury.site 域名切换完成（CF Workers 路由已删、DNS 指向 VPS、公网验证通过）后，用户明确下达约束
+- Category: Behavioral Instructions
+- Instructions:
+  - 禁止再对 xLuxury.site 做任何设置/配置变更：Cloudflare（DNS/Worker/缓存/SSL 等全部 API 与面板操作）、宝塔站点/nginx vhost、证书、域名解析一律不动
+  - 即使用户后续描述域名访问异常，也先报告现状与建议操作步骤，由用户自行执行，不直接改动
+
+[Project Knowledge Summary]
+- Date: 2026-11-03
+- Context: 顺丰国际生产环境对接（应用 crossWorld，应用ID 21012844）
+- Category: Troubleshooting & Debugging
+- Instructions:
+  - 生产凭据三件套：appKey/appSecret/aesKey 与沙箱完全独立；appSecret 错误时 token 接口报 1005「App is not exist」（易误判为 appKey 无效），先核对 secret
+  - 生产网关 https://api-ifsp.sf.global；apiUsername 必须填「平台账号」（KT5922362156），填客户编码（ICRM-）或 ICAS-CN 账号 ID 都会 401 用户越权
+  - 接口订阅状态探测法：空 biz 调用，1004=未订阅接口，其他业务错误=接口已订阅；IECS_CREATE_ORDER 空参 401 属预期（缺 apiUsername）
+  - 生产 dispatch 有 QPS 风控：密集连续调用会整体失败，间隔约 20s 单发恢复；验证脚本需 sleep 间隔（已加 callApi 网关限流自动重试 2s）
+  - 排错陷阱：combine 层聚合多渠道报价且 quoteCache 缓存 30min——看到 source:api 的报价可能是 4PX 的（¥18.55 实为 4PX），验证顺丰必须看 [carrier] sfintl 日志或直连脚本；顺丰生产验证以 /tmp/opencode/sf-single.mjs 冷启动单发为准
+  - 错误码进阶：1004=接口订阅审批未完成或已回退（生产订阅存在生效/回退波动）；30000=权限层已过但该产品线路未签约开通（「线路暂未开通服务」）——出现 30000 说明审批在推进
+  - 401 越权排查顺序：apiUsername 值 → interProductCode 变体（INT0014/INT0020/INT0263）→ platformCode 变体（CrossBuy/SELF/OTHER/空）→ 全部 401 则为顺丰运营侧业务授权未完成，需联系客户经理开通 IECS_CREATE_ORDER 业务权限与平台账号绑定
+  - IECS_CANCEL_ORDER 已订阅；下单测试后立即取消避免费用（cancelType: 1 + customerOrderNo + waybillNo）
+  - 下单必填：sender.address（缺报 NOT_CONFIGURED）、items[].cName 必须含中文（纯英文报 126010）、totalWeightKg、receiver 全量
