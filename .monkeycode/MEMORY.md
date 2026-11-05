@@ -243,5 +243,7 @@ Entries discovered by the Agent during task execution should follow this format:
   - 错误码进阶：1004=接口订阅审批未完成或已回退（生产订阅存在生效/回退波动）；30000=权限层已过但该产品线路未签约开通（「线路暂未开通服务」）——出现 30000 说明审批在推进
   - 401 越权排查顺序：apiUsername 值 → interProductCode 变体（INT0014/INT0020/INT0263）→ platformCode 变体（CrossBuy/SELF/OTHER/空）→ 全部 401 则为顺丰运营侧业务授权未完成，需联系客户经理开通 IECS_CREATE_ORDER 业务权限与平台账号绑定
   - 关键结论（顺丰官方确认）：电商业务必须用 IPE_ESTIMATE_FEE，IUOP_ESTIMATE_FEE 对电商应用一律 1004；IPE 金额单位为 0.1 元（299=¥29.9，已按梯度 0.5/1/2kg→299/372/495 实测验证）；生产 dispatch 网关严格串行，并发多产品询价报 30000，quote 已改串行+2s 间隔；顺丰账户当前只签约 US 线路（INT0014/INT0263→US 可用），其他国家 30000 需客户经理开通线路
+  - apiUsername 正确值是账号「用户名」Talley（KT5922362156 是平台账号编码，填它报 401 越权；ICAS-CN 账号 ID、客户编码也都 401）
+  - 下单 5020「expressType null」是顺丰运营侧配置缺失（应用/平台账号未配置可下单产品类型），biz 传 expressType 字段无效（六变体验证）；沙箱同报文可成功，生产配置差异——已请客户经理配置；备选路径：控制台订阅 IPE_CREATE_ORDER（电商专用下单，当前 1004 未订阅）
   - IECS_CANCEL_ORDER 已订阅；下单测试后立即取消避免费用（cancelType: 1 + customerOrderNo + waybillNo）
   - 下单必填：sender.address（缺报 NOT_CONFIGURED）、items[].cName 必须含中文（纯英文报 126010）、totalWeightKg、receiver 全量

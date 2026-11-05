@@ -33,7 +33,7 @@ grep -o 'index-[A-Za-z0-9_-]*\.js' "$APP/web/dist/index.html" | head -1 || true
 
 echo '===== [4] .env 幂等补顺丰下单两行 ====='
 cd "$APP/server"
-grep -q 'CARRIER_SFINTL_API_USERNAME' .env || printf 'CARRIER_SFINTL_API_USERNAME=popsandBox\n' >> .env
+grep -q 'CARRIER_SFINTL_API_USERNAME' .env || printf 'CARRIER_SFINTL_API_USERNAME=Talley\n' >> .env
 grep -q 'CARRIER_SFINTL_ORDER_PRODUCT_CODE' .env || printf 'CARRIER_SFINTL_ORDER_PRODUCT_CODE=INT0255\n' >> .env
 echo '.env 顺丰段 OK'
 
