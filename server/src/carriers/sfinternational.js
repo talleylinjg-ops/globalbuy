@@ -14,6 +14,26 @@ import { sfEncrypt, sfDecrypt, sfSignature } from './sfcrypto.js';
 const DEFAULT_BASE = 'https://api-ifsp.sf.global';
 // 电商业务使用 IPE_ESTIMATE_FEE（IUOP_ESTIMATE_FEE 对电商应用报 1004 没权限，顺丰官方确认）
 const DEFAULT_MSGTYPE = 'IPE_ESTIMATE_FEE';
+
+// 顺丰地址大数据校验（9744000）要求美国州用两位缩写（如 CA）；用户下单可能填全名，统一规范化
+const US_STATE_ABBR = {
+  alabama: 'AL', alaska: 'AK', arizona: 'AZ', arkansas: 'AR', california: 'CA', colorado: 'CO',
+  connecticut: 'CT', delaware: 'DE', florida: 'FL', georgia: 'GA', hawaii: 'HI', idaho: 'ID',
+  illinois: 'IL', indiana: 'IN', iowa: 'IA', kansas: 'KS', kentucky: 'KY', louisiana: 'LA',
+  maine: 'ME', maryland: 'MD', massachusetts: 'MA', michigan: 'MI', minnesota: 'MN', mississippi: 'MS',
+  missouri: 'MO', montana: 'MT', nebraska: 'NE', nevada: 'NV', 'new hampshire': 'NH', 'new jersey': 'NJ',
+  'new mexico': 'NM', 'new york': 'NY', 'north carolina': 'NC', 'north dakota': 'ND', ohio: 'OH',
+  oklahoma: 'OK', oregon: 'OR', pennsylvania: 'PA', 'rhode island': 'RI', 'south carolina': 'SC',
+  'south dakota': 'SD', tennessee: 'TN', texas: 'TX', utah: 'UT', vermont: 'VT', virginia: 'VA',
+  washington: 'WA', 'west virginia': 'WV', wisconsin: 'WI', wyoming: 'WY', 'district of columbia': 'DC',
+};
+
+function normalizeUsState(v) {
+  const s = String(v || '').trim();
+  if (!s) return '';
+  if (s.length === 2) return s.toUpperCase();
+  return US_STATE_ABBR[s.toLowerCase()] || s;
+}
 const tokenCache = new Map();
 const tokenInflight = new Map();
 
@@ -315,7 +335,7 @@ export class SFIntlAdapter extends CarrierAdapter {
         contact: receiver.contact || '',
         country: receiver.country,
         postCode: receiver.postCode || '',
-        regionFirst: receiver.regionFirst || '',
+        regionFirst: normalizeUsState(receiver.regionFirst),
         regionSecond: receiver.regionSecond || '',
         regionThird: receiver.regionThird || '',
         address: receiver.address,
