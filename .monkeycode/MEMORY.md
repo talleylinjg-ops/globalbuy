@@ -23,6 +23,8 @@ Entries discovered by the Agent during task execution should follow this format:
 - Instructions:
   - [Specific knowledge points, described line by line]
 
+  - 【重要纠正 2026-11-06】xLuxury.site 是独立运营的 WordPress 站（未弃用！），xluxury_site 数据库（16G）是在用生产数据绝对不能删；域名策略=crossbuy.cn 为新品牌主域 + xLuxury.site 继续 WordPress 独立运营，两者并存；服务器上 301 配置只是 git 里的提案文件，用户从未部署——不要基于 git 文件状态推断线上真实配置
+
 ## Deduplication Strategy
 - Before adding a new entry, check for similar or identical instructions.
 - If a duplicate is found, skip the new entry or merge it with the existing one.
