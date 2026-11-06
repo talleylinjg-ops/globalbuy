@@ -15,6 +15,7 @@ import { createCarrierAdapter } from '../carriers/index.js';
 // 报价缓存：真实 API 慢（部分接口 40s+），TTL 内复用结果；失败时降级用上次成功值
 const QUOTE_TTL = 30 * 60 * 1000;
 const quoteCache = new Map(); // key: `${country}:${weightGrams}` -> { at, value }
+const quotedWarned = new Set(); // 已打过 NOT_CONFIGURED 报错日志的渠道（每进程一次）
 
 export async function getCarrierQuotes(p) {
   const key = `${p.country}:${Math.ceil((p.weightKg || 0.5) * 1000)}`;
@@ -56,7 +57,11 @@ async function fetchQuotes(p) {
         }));
       } catch (e) {
         // 真实 API 失败：该渠道标记错误并标记不可用，不回退估算
-        console.error(`[carrier] ${cfg.code} quote failed:`, e.message);
+        // 未配置类错误（NOT_CONFIGURED）每进程只打一次，避免预热循环刷屏
+        if (!quotedWarned.has(cfg.code) || e.code !== 'NOT_CONFIGURED') {
+          console.error(`[carrier] ${cfg.code} quote failed:`, e.message);
+        }
+        if (e.code === 'NOT_CONFIGURED') quotedWarned.add(cfg.code);
         return [{
           status: 'error',
           error: e.message,

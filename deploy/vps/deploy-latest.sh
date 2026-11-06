@@ -38,9 +38,12 @@ grep -q 'CARRIER_SFINTL_ORDER_PRODUCT_CODE' .env || printf 'CARRIER_SFINTL_ORDER
 echo '.env 顺丰段 OK'
 
 echo '===== [5] 重启应用 ====='
+# 部署即清空应用日志（可再生日志，防止 40G 盘被日志刷满）
+truncate -s 0 /var/log/crossbuy/*.log 2>/dev/null || true
 pm2 restart crossbuy-server >/dev/null 2>&1 || pm2 start ecosystem.config.cjs >/dev/null 2>&1
 sleep 8
 pm2 status | grep crossbuy || true
+df -h / | tail -1
 
 echo '===== [6] 全链路验证 ====='
 curl -s -m 55 -G 'http://127.0.0.1:3001/api/search' --data-urlencode 'q=连衣裙' | python3 -c "
