@@ -118,11 +118,13 @@ export class SFIntlAdapter extends CarrierAdapter {
       await this.getToken(true);
       return this.callApi(msgType, biz, { retried: true });
     }
-    // 生产网关 QPS 风控：批量连续调用会被整体拒绝（apiResultCode 500 网关限流），延迟后重试一次
-    const GW_THROTTLED = j.apiResultCode === 500 && !retried
-      && /frequency|rate|limit|too many|频繁|限流|流控/i.test(String(j.apiErrorMsg || ''));
+    // 生产网关 QPS/并发风控：批量连续调用会被整体拒绝（apiResultCode 500 网关限流），延迟后重试一次
+    const GW_THROTTLED = !retried && (
+      (j.apiResultCode === 500 && /frequency|rate|limit|too many|频繁|限流|流控/i.test(String(j.apiErrorMsg || '')))
+      || j.apiResultCode === 504
+    );
     if (GW_THROTTLED) {
-      await new Promise((r) => setTimeout(r, 2000));
+      await new Promise((r) => setTimeout(r, 3000));
       return this.callApi(msgType, biz, { retried: true });
     }
     if (j.apiResultCode !== 0) {

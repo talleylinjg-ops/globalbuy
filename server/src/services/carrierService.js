@@ -129,15 +129,17 @@ const WARM_INTERVAL_MS = 25 * 60 * 1000; // < 30min TTL，保证缓存始终新�
 export async function warmQuoteCache() {
   if (!hasRealCarrier()) return;
   let warmed = 0;
-  await Promise.allSettled(
-    WARM_COUNTRIES.map(async (country) => {
+  // 逐国串行预热：顺丰等渠道网关有并发限制，9 国并行会触发限流（504 系统繁忙）
+  for (const country of WARM_COUNTRIES) {
+    try {
       const fresh = await fetchQuotes({ country, weightKg: 0.5, valueUsd: 20, currency: 'USD' });
       if (fresh.quotes.length > 0) {
         quoteCache.set(`${country}:500`, { at: Date.now(), value: fresh });
         warmed += 1;
       }
-    })
-  );
+    } catch { /* 单国失败不影响后续 */ }
+    await new Promise((r) => setTimeout(r, 3000));
+  }
   if (warmed > 0) console.log(`[carrier] quote cache warmed for ${warmed}/${WARM_COUNTRIES.length} countries`);
 }
 
