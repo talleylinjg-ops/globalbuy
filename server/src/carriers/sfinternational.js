@@ -216,6 +216,7 @@ export class SFIntlAdapter extends CarrierAdapter {
   }
 
   async quote(p) {
+    const dbg = process.env.SF_DEBUG ? (msg) => console.error(`[SF_DEBUG] quote(${p.country},${p.weightKg}) ${msg}`) : null;
     if (!this.configured) {
       throw new CarrierError('顺丰国际未配置 appKey/appSecret/aesKey/customerCode', 'NOT_CONFIGURED');
     }
@@ -223,14 +224,18 @@ export class SFIntlAdapter extends CarrierAdapter {
     // interProductCode 支持逗号分隔多产品码询价（如 "INT0014,INT0263"）
     const codes = String(this.cfg.interProductCode || 'INT0263')
       .split(',').map((s) => s.trim()).filter(Boolean);
+    dbg && dbg(`codes=${codes.join('+')} msgType=${this.msgType}`);
     // 生产 dispatch 网关严格串行（并发请求报 30000），逐产品串行询价 + 2s 间隔
     const results = [];
     for (const code of codes) {
       if (results.length) await new Promise((r) => setTimeout(r, 2000));
       try {
+        dbg && dbg(`callApi ${code} begin`);
         const data = await this.callApi(this.msgType, this.buildFeeBiz({ ...p, interProductCode: code }));
+        dbg && dbg(`callApi ${code} done ok=${!!data?.success}`);
         results.push({ ok: true, data, code });
       } catch (e) {
+        dbg && dbg(`callApi ${code} failed: ${e.message}`);
         results.push({ ok: false, reason: e, code });
       }
     }
