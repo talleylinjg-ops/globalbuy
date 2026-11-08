@@ -61,22 +61,27 @@ export class SFIntlAdapter extends CarrierAdapter {
     // 多产品码并行询价时必须共用同一次 token 请求，否则先发出的请求会被判 invalid
     const inflight = tokenInflight.get(this.appKey);
     if (inflight) return inflight;
-    const p = (async () => {
-      const url = `${this.baseUrl}/openapi/api/token?appKey=${encodeURIComponent(this.appKey)}&appSecret=${encodeURIComponent(this.appSecret)}`;
-      const res = await httpRequest(url, { method: 'GET', timeout: 15000 });
-      const j = typeof res === 'object' && res !== null ? res : (() => { try { return JSON.parse(res); } catch { return null; } })();
-      if (!j || typeof j !== 'object') {
-        throw new CarrierError(`token 响应无法解析: ${String(res).slice(0, 120)}`, 'API_ERROR');
-      }
-      if (j.apiResultCode !== 0) {
-        throw new CarrierError(`获取 token 失败: ${j.apiErrorMsg || '未知'}（code=${j.apiResultCode}）`, 'AUTH_ERROR', j);
-      }
-      const token = j.apiResultData?.accessToken;
-      const expireIn = Number(j.apiResultData?.expireIn || 7200);
-      if (!token) throw new CarrierError('token 响应缺少 accessToken', 'API_ERROR', j);
-      tokenCache.set(this.appKey, { token, expireAt: Date.now() + expireIn * 1000 });
-      return token;
-    })();
+    // 硬超时保护：即使底层 fetch 的 abort 因任何原因失效，也保证 inflight promise 一定 settle，
+    // 否则挂死的 promise 会被并发去重复用，导致后续所有顺丰请求在本地排队挂起（零 socket 超时）
+    const p = Promise.race([
+      (async () => {
+        const url = `${this.baseUrl}/openapi/api/token?appKey=${encodeURIComponent(this.appKey)}&appSecret=${encodeURIComponent(this.appSecret)}`;
+        const res = await httpRequest(url, { method: 'GET', timeout: 15000 });
+        const j = typeof res === 'object' && res !== null ? res : (() => { try { return JSON.parse(res); } catch { return null; } })();
+        if (!j || typeof j !== 'object') {
+          throw new CarrierError(`token 响应无法解析: ${String(res).slice(0, 120)}`, 'API_ERROR');
+        }
+        if (j.apiResultCode !== 0) {
+          throw new CarrierError(`获取 token 失败: ${j.apiErrorMsg || '未知'}（code=${j.apiResultCode}）`, 'AUTH_ERROR', j);
+        }
+        const token = j.apiResultData?.accessToken;
+        const expireIn = Number(j.apiResultData?.expireIn || 7200);
+        if (!token) throw new CarrierError('token 响应缺少 accessToken', 'API_ERROR', j);
+        tokenCache.set(this.appKey, { token, expireAt: Date.now() + expireIn * 1000 });
+        return token;
+      })(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('token 请求硬超时（8s）')), 8000)),
+    ]);
     tokenInflight.set(this.appKey, p);
     try {
       return await p;
@@ -86,11 +91,15 @@ export class SFIntlAdapter extends CarrierAdapter {
   }
 
   async callApi(msgType, biz, { retried = false } = {}) {
+    const dbg = process.env.SF_DEBUG ? (step, ms) => console.error(`[SF_DEBUG] ${msgType} ${step} ${ms}ms`) : null;
+    const t0 = Date.now();
     const token = await this.getToken();
+    dbg && dbg('getToken', Date.now() - t0);
     const encrypted = sfEncrypt(JSON.stringify(biz ?? {}), this.aesKey, this.appKey);
     const timestamp = String(Date.now());
     const nonce = 'n' + crypto.randomUUID().replace(/-/g, '').slice(0, 20);
 
+    const t1 = Date.now();
     const res = await httpRequest(`${this.baseUrl}/openapi/api/dispatch`, {
       method: 'POST',
       headers: {
@@ -106,6 +115,7 @@ export class SFIntlAdapter extends CarrierAdapter {
       body: encrypted,
       timeout: 30000,
     });
+    dbg && dbg('dispatch', Date.now() - t1);
     if (process.env.SF_DEBUG) {
       console.log('[SF_DEBUG]', msgType, 'token=', String(token).slice(0, 12), 'ts=', timestamp, 'bodyLen=', String(encrypted).length, 'resp=', JSON.stringify(res).slice(0, 200));
     }
