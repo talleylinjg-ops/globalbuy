@@ -224,7 +224,7 @@ export class SFIntlAdapter extends CarrierAdapter {
     // interProductCode 支持逗号分隔多产品码询价（如 "INT0014,INT0263"）
     const codes = String(this.cfg.interProductCode || 'INT0263')
       .split(',').map((s) => s.trim()).filter(Boolean);
-    dbg && dbg(`codes=${codes.join('+')} msgType=${this.msgType}`);
+    dbg && dbg(`codes=${codes.join('+')} envPC=${process.env.CARRIER_SFINTL_PRODUCT_CODES || 'EMPTY'} cfgIPC=${this.cfg.interProductCode} cfgId=${this.cfg.id} baseUrl=${this.baseUrl}`);
     // 生产 dispatch 网关严格串行（并发请求报 30000），逐产品串行询价 + 2s 间隔
     const results = [];
     for (const code of codes) {
