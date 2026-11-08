@@ -109,6 +109,13 @@ Entries discovered by the Agent during task execution should follow this format:
   - 适配器 sfinternational.js + sfcrypto.js；fields：appKey/appSecret/aesKey/customerCode/customerType/serviceCode(=msgType)/baseUrl/interProductCode（逗号分隔多产品码并行询价，b2d1b75）
   - 2026-10-19 生产凭据四件套已配置进 MySQL settings carriers（sfintl）：appKey 39a471.../customerCode ICRM-CN032D8401/baseUrl https://api-ifsp.sf.global/serviceCode IPE_ESTIMATE_FEE/products INT0014,INT0263，enabled=false 防失真出街；生产网关实测 token 正常但 IPE/IUOP ESTIMATE_FEE 均 1004——生产应用未关联估价类 API，等用户登录 http://openapi.sf.global/ 应用详情→关联 API 勾选 ESTIMATE 接口后重测开闸；电商客户编码与快递编码体系不同（生产 ICRM-CN 前缀，测试 ICRME 前缀）
   - 2026-10-20 顺丰估价接口审批通过，生产渠道已开闸出街：IPE_ESTIMATE_FEE 实测 US 0.5kg INT0263=93.38 CNY/INT0014=299 CNY，GB/DE/AU 多国稳定，adapter 1.2s 返回 2 条；出街报价 sfintl INT0263≈13 USD/INT0014≈42 USD；改 carriers 后必须「改库→kill 服务子进程→touch index.js 重启」三步走（教训见下）
+  - 2026-11-09 顺丰 VPS 报价缺席终极排查（quote timeout 复盘）：根因=server/update-sfintl-prod.mjs（仓库内早期沙箱凭据落库脚本）曾把「沙箱凭据 ICRME000SRN93+4 码 INT0014,INT0020,INT0263,INT0131+baseUrl http://api-ifsp-sit.sf.global」upsert 进 MySQL settings kv，之后每次启动进程都读到毒配置——4 码串行询价（无效码 504+3s 重试）累计超 12s race；独立 node 脚本用 .env 直连一直成功（无 DB 毒化）造成「脚本通/进程挂」假象
+  - **carriers 真存储=MySQL settings kv（db.js 动态键提升到内存顶层），admin_db.json 只是「一次性迁移源」死文件——python/node 改 JSON 无效**；修复用项目自身：`import db.js+carrierStore.js → upsertCarrier() → saveDb()`
+  - **saveDb 是异步 fire-and-forget（saveSetting 不 await）**：独立脚本改库后必须 `await sleep(5-6s)` 再 process.exit，否则落库丢失（踩坑两次）
+  - SF_DEBUG 分步计时是排障利器：quote() 打 `codes=... envPC=... cfgIPC=... cfgId=... baseUrl=...`（配置溯源一行定案）；callApi 打 getToken/dispatch 毫秒级耗时（区分卡点）
+  - VPS SSH fail2ban 极敏感：失败 1-2 次即封 1 小时+且递进惩罚，重连间隔必须 15min+；单连接合并多操作、ControlMaster 复用
+  - 修复后公网验证（2026-11-09）：crossbuy.cn 报价 18 条=4PX 6+云途 10+顺丰 2（INT0263 $1.31/INT0014 $4.19），推荐渠道=顺丰国际；IPE 金额单位 0.1 元（299→$4.19@0.5kg）
+  - 待办：生产 pm2 仍带 SF_DEBUG=1（下次重启去掉）；server/update-sfintl-prod.mjs 沙箱毒源脚本建议用户确认后删除（或改写成生产凭据版）
 
 [前端静态快照降级层（前台浏览零依赖后端）]
 - Date: 2026-09-28
@@ -152,7 +159,7 @@ Entries discovered by the Agent during task execution should follow this format:
 - Context: 重抓快照时发现渠道报价全空，逐层排查定位凭据缺失
 - Category: Environment Configuration
 - Instructions:
-  - 渠道凭据存储优先级：admin_db.json 的 carriers 配置 > .env 静态配置（CARRIER_* 变量）> 内置默认；排查用 python 检查 .env 值长度（勿打印真实值）与 admin_db.json 的 keys
+  - 渠道凭据存储（2026-11-09 更正）：**真存储=MySQL settings kv**（db.js 动态键，启动时 initFromMysql 提升到内存顶层）；admin_db.json 仅首次迁移源、运行时无效；.env CARRIER_* 仅用于 seedFromEnv 补缺失键（不覆盖已有值）；排查顺序：MySQL settings kv > .env > 内置默认
   - 当前现状（2026-10-08）：.env 全部 CARRIER_* 为空、admin_db.json carriers 无凭据键（仅顺丰 sfintl 有生产凭据）；yuntrack/4px/dhl/ups/fedex 全部未配置
   - EMS 已对接《中小电商企业接口规范 V2.7》（4cf0c0d）：适配器按公共信封（apiCode/senderNo/authorization/timeStamp/logitcsInterface）封装，报价走 050005 预估邮费（返回人民币经 cnyToCurrency 转 USD）；凭据键 CARRIER_EMS_SENDER_NO/CARRIER_EMS_AUTHORIZATION/CARRIER_EMS_BASE_URL 等 7 个已在 .env 占位；**网关地址 V2.7 文档不含，需向邮政接入函索取**；050005 产品代码表均为国内产品（默认电商标快 115104300000691），跨境段资费待邮政国际产品接入
   - EMS 网关实测要点（2026-10-09）：地址 https://api.ems.com.cn/amp-prod-api/f/amp/api/open、POST x-www-form-urlencoded（logitcsInterface 传 JSON 字符串）；senderNo 必须用客户代码 C1100296646500（用协议客户号 1100248949682 会报「客户未关联API接口」）；白名单层之前未强制 sign 签名（signKey 已存 .env 备用）；当前阻塞：logitcsInterface 需加密（网关报「参数据加密错误」），已排除 AES-128/192 ECB/CBC、3DES、DES、SM4 多变体，沙箱密文可解密进入业务校验层，待用户提供「参数转报文」密文样本锁定算法；沙箱测试已通到 weight 格式校验（retCode B0001）
