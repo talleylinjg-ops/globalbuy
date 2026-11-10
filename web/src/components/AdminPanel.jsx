@@ -5,7 +5,7 @@ import {
   adminCreateCarrier, adminUpdateCarrier, adminDeleteCarrier, adminTestCarrier,
   adminListCustomers, adminCreateCustomer, adminUpdateCustomer, adminDeleteCustomer,
   adminListAddresses, adminCreateAddress, adminUpdateAddress, adminDeleteAddress,
-  adminListOrders, adminCreateOrder, adminUpdateOrder, adminDeleteOrder, adminShipOrder,
+  adminListOrders, adminCreateOrder, adminUpdateOrder, adminDeleteOrder, adminShipOrder, adminPrintLabel,
   adminGetSettings, adminUpdateSettings, setAdminToken, quoteCarriers,
   adminGetProfile, adminUpdateProfile, adminUpdatePassword, adminVerify,
   adminListAdmins, adminCreateAdmin, adminUpdateAdmin, adminDeleteAdmin,
@@ -274,6 +274,17 @@ export default function AdminPanel({ t }) {
     }
   };
 
+  const printLabel = async (o) => {
+    try {
+      const r = await adminPrintLabel(o.id);
+      if (r.url) window.open(r.url, '_blank', 'noopener');
+      else if (Array.isArray(r.list) && r.list.length) r.list.forEach((it) => it.url && window.open(it.url, '_blank', 'noopener'));
+      else showNotice((t('admin.labelNoUrl') || 'No label URL returned'));
+    } catch (e) {
+      showNotice(e.message);
+    }
+  };
+
   const removeOrder = async (id) => {
     if (!window.confirm(t('admin.confirmDelete'))) return;
     await adminDeleteOrder(id);
@@ -463,6 +474,7 @@ export default function AdminPanel({ t }) {
           onEdit={(o) => setOrderForm({ ...o, _editing: o })}
           onDelete={removeOrder}
           onShip={shipOrder}
+          onLabel={printLabel}
           onStatus={updateOrderStatus}
           onAddNote={addOrderNote}
           selected={selectedOrder}
@@ -1433,7 +1445,7 @@ function CustomerDetail({ customer, onEdit, onClose, t }) {
 }
 
 // ===== 订单管理（WooCommerce 风格：状态 tabs + 批量操作 + 分页） =====
-function OrdersTab({ orders, customers, query, onQuery, onAdd, onEdit, onDelete, onShip, onStatus, onAddNote, selected, onSelect, t }) {
+function OrdersTab({ orders, customers, query, onQuery, onAdd, onEdit, onDelete, onShip, onLabel, onStatus, onAddNote, selected, onSelect, t }) {
   const [statusTab, setStatusTab] = useState('all');
   const [selection, setSelection] = useState(new Set());
   const [bulkStatus, setBulkStatus] = useState('');
@@ -1551,6 +1563,11 @@ function OrdersTab({ orders, customers, query, onQuery, onAdd, onEdit, onDelete,
                     </button>
                   )}
                   {o.trackingNo && <div className="muted-note">{t('admin.tracking') || 'Tracking'}: {o.trackingNo}</div>}
+                  {(o.trackingNo || (o.parcels || []).some((pc) => pc.carrier === 'sfintl' && pc.trackingNo)) && (
+                    <button className="btn btn-ghost btn-sm" title={t('admin.printLabelTitle') || 'Print SF label PDF'} onClick={() => onLabel && onLabel(o)}>
+                      {t('admin.printLabel') || 'Label'}
+                    </button>
+                  )}
                   <button className="btn btn-ghost btn-sm danger" onClick={() => onDelete(o.id)}>{t('admin.delete')}</button>
                 </td>
               </tr>

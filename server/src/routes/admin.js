@@ -403,6 +403,34 @@ router.post('/orders/:id/ship', auth, async (req, res, next) => {
   }
 });
 
+// 订单面单打印：按订单的顺丰运单号请求面单 PDF URL（多票合并一个 PDF，前端直接打开打印）
+router.post('/orders/:id/label', auth, async (req, res, next) => {
+  try {
+    const o = getById('orders', req.params.id);
+    if (!o) return res.status(404).json({ error: 'order not found' });
+    const nos = new Set();
+    if (o.trackingNo && String(o.trackingNo).startsWith('SF')) nos.add(String(o.trackingNo));
+    for (const pc of Array.isArray(o.parcels) ? o.parcels : []) {
+      if (pc && pc.carrier === 'sfintl' && pc.trackingNo) nos.add(String(pc.trackingNo));
+    }
+    const meta = o.shippingMeta || {};
+    if (meta.sfWaybillNo) nos.add(String(meta.sfWaybillNo));
+    if (!nos.size) return res.status(400).json({ error: 'order has no SF waybill number' });
+
+    const { getCarrierConfigs } = await import('../services/carrierStore.js');
+    const { createCarrierAdapter } = await import('../carriers/index.js');
+    const cfg = getCarrierConfigs().find((c) => c.code === 'sfintl');
+    if (!cfg || !cfg.appKey || !cfg.aesKey) {
+      return res.status(400).json({ error: '顺丰国际未配置，无法打印面单' });
+    }
+    const adapter = createCarrierAdapter(cfg);
+    const r = await adapter.printLabel({ sfWaybillNos: [...nos], onePdf: true, fileFormat: 'PDF' });
+    res.json({ ok: true, ...r, waybillNos: [...nos] });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // 订单备注：追加到时间线（WooCommerce order notes 风格）
 router.post('/orders/:id/notes', auth, (req, res) => {
   const { content, type } = req.body || {};

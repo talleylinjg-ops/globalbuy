@@ -400,4 +400,31 @@ export class SFIntlAdapter extends CarrierAdapter {
       agentLabelBase64: d.agentLabelBase64 || '',
     };
   }
+
+  // 面单打印（IECS_PRINT_ORDER）：返回可直接下载的 PDF URL（onePdf=true 时多票合并一个 PDF）
+  async printLabel({ sfWaybillNos, onePdf = true, fileFormat = 'PDF' } = {}) {
+    if (!this.configured) {
+      throw new CarrierError('顺丰国际未配置 appKey/appSecret/aesKey/customerCode', 'NOT_CONFIGURED');
+    }
+    const list = (Array.isArray(sfWaybillNos) ? sfWaybillNos : [sfWaybillNos])
+      .map((n) => String(n || '').trim())
+      .filter(Boolean);
+    if (!list.length) throw new CarrierError('顺丰国际面单打印缺少运单号', 'INVALID_INPUT');
+    const data = await this.callApi('IECS_PRINT_ORDER', {
+      printWaybillNoDtoList: list.map((n) => ({ sfWaybillNo: n })),
+      apiUsername: this.cfg.apiUsername || this.customerCode,
+      onePdf,
+      fileFormat,
+    });
+    if (data && data.success === false) {
+      throw new CarrierError(`顺丰面单打印失败: ${data.msg || '未知'}（code=${data.code}）`, 'API_ERROR', data);
+    }
+    const d = data?.data || {};
+    return {
+      url: d.url || '',
+      sfWaybillNo: d.sfWaybillNo || list[0],
+      customerOrderNo: d.customerOrderNo || '',
+      list: Array.isArray(d.printWaybillNoDtoList) ? d.printWaybillNoDtoList : [],
+    };
+  }
 }

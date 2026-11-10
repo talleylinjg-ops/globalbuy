@@ -213,6 +213,9 @@ export async function adminUpdateOrder(id, data) {
 export async function adminShipOrder(id, data = {}) {
   return adminFetch(`/api/admin/orders/${id}/ship`, { method: 'POST', body: JSON.stringify(data) });
 }
+export async function adminPrintLabel(id) {
+  return adminFetch(`/api/admin/orders/${id}/label`, { method: 'POST' });
+}
 export async function adminDeleteOrder(id) {
   return adminFetch(`/api/admin/orders/${id}`, { method: 'DELETE' });
 }
