@@ -260,3 +260,8 @@ Entries discovered by the Agent during task execution should follow this format:
   - 下单 5020「expressType null」是顺丰运营侧配置缺失（应用/平台账号未配置可下单产品类型），biz 传 expressType 字段无效（六变体验证）；沙箱同报文可成功，生产配置差异——已请客户经理配置；备选路径：控制台订阅 IPE_CREATE_ORDER（电商专用下单，当前 1004 未订阅）
   - IECS_CANCEL_ORDER 已订阅；下单测试后立即取消避免费用（cancelType: 1 + customerOrderNo + waybillNo）
   - 下单必填：sender.address（缺报 NOT_CONFIGURED）、items[].cName 必须含中文（纯英文报 126010）、totalWeightKg、receiver 全量
+  - 发货取号链路已全通（2026-11-10 实测，模拟后台路由参数：US CA 94103 地址 0.5kg INT0255）→ sfWaybillNo SF6049017071291（agentCode 3PE-TE1、directionCode 29T-US-3PE）；agentLabelBase64 顺丰 IECS_CREATE_ORDER 默认不返回，returnLabelBean/returnLabel 参数均无效
+  - 面单获取走独立接口 IECSWAYBILLPRINT，当前 appKey 未开通该服务授权（1004），需客户经理在顺丰国际侧开通后适配器加 printLabel 方法
+  - 取消时序特性：取号后 5s 内立即取消报 code=500（顺丰侧运单同步延迟），间隔 20 分钟以上再取消即 success；已取消单幂等 success；测试后务必延迟取消
+  - 顺丰对相同 customerOrderNo 重复下单幂等返回同一运单号（不会重复计费）
+  - 沙箱毒源脚本 server/update-sfintl-prod.mjs 已从仓库删除（commit 684415a），VPS 副本移至 /root/update-sfintl-prod.mjs.bak；admin/admin123 默认密码已失效（用户已改密）
