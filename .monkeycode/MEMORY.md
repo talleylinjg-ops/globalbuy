@@ -265,3 +265,6 @@ Entries discovered by the Agent during task execution should follow this format:
   - 取消时序特性：取号后 5s 内立即取消报 code=500（顺丰侧运单同步延迟），间隔 20 分钟以上再取消即 success；已取消单幂等 success；测试后务必延迟取消
   - 顺丰对相同 customerOrderNo 重复下单幂等返回同一运单号（不会重复计费）
   - 沙箱毒源脚本 server/update-sfintl-prod.mjs 已从仓库删除（commit 684415a），VPS 副本移至 /root/update-sfintl-prod.mjs.bak；admin/admin123 默认密码已失效（用户已改密）
+  - 面单打印（2026-11-10 全链路打通）：接口编码 IECS_PRINT_ORDER（获取发货面单，国际件API→出口电商业务场景），biz 结构为 { printWaybillNoDtoList: [{ sfWaybillNo }], apiUsername, onePdf: true, fileFormat: "PDF" }——字段名是复数 List 形式，猜 printWaybillNoDto/waybillNoList 等 30+ 变体全报「PrintWaybillNoDto不能为空」；响应 data.url 是 PDF 直链（oss.sf-express.com:8080，约 190KB，含已取消单也能打印）
+  - 适配器已加 printLabel({sfWaybillNos, onePdf, fileFormat})；后台路由 POST /orders/:id/label 收集订单全部顺丰运单号（trackingNo+parcels.sfintl+shippingMeta）合并打印；前端 OrdersTab 已发货订单显示「打印面单」按钮 window.open PDF（d4fdfee + ba6d372 dist）
+  - VPS /opt/globalbuy 不是 git 仓库——部署必须走 deploy-latest.sh（GitHub master tarball 同步，web/dist 构建产物在仓库里需本地 build 后提交）——pm2 直接 restart 不会更新代码
