@@ -22,7 +22,13 @@ function seedFromEnv() {
       orderProductCode: process.env.CARRIER_SFINTL_ORDER_PRODUCT_CODE,
       baseUrl: process.env.CARRIER_SFINTL_BASE_URL,
     },
-    dhl: { apiKey: process.env.CARRIER_DHL_API_KEY, apiSecret: process.env.CARRIER_DHL_API_SECRET },
+    dhl: {
+      apiKey: process.env.CARRIER_DHL_API_KEY,
+      apiSecret: process.env.CARRIER_DHL_API_SECRET,
+      accountNumber: process.env.CARRIER_DHL_ACCOUNT_NUMBER,
+      baseUrl: process.env.CARRIER_DHL_BASE_URL,
+      productCode: process.env.CARRIER_DHL_PRODUCT_CODE,
+    },
     ups: { clientId: process.env.CARRIER_UPS_CLIENT_ID, clientSecret: process.env.CARRIER_UPS_CLIENT_SECRET },
     fedex: { apiKey: process.env.CARRIER_FEDEX_API_KEY, apiSecret: process.env.CARRIER_FEDEX_API_SECRET },
     ems: {

@@ -13,7 +13,7 @@ import { SFIntlAdapter } from './sfinternational.js';
 export const CARRIER_ADAPTERS = {
   yuntrack: { name: '云途物流', adapter: YunTrackAdapter, fields: ['appId', 'appToken'] },
   '4px': { name: '递四方', adapter: FourPXAdapter, fields: ['appKey', 'appSecret', 'appToken', 'methodName', 'apiVersion', 'baseUrl'] },
-  dhl: { name: 'DHL Express', adapter: DHLAdapter, fields: ['apiKey', 'apiSecret'] },
+  dhl: { name: 'DHL Express', adapter: DHLAdapter, fields: ['apiKey', 'apiSecret', 'accountNumber', 'baseUrl', 'productCode'] },
   ups: { name: 'UPS', adapter: UPSAdapter, fields: ['clientId', 'clientSecret'] },
   fedex: { name: 'FedEx', adapter: FedExAdapter, fields: ['apiKey', 'apiSecret'] },
   ems: { name: 'EMS', adapter: EMSAdapter, fields: ['senderNo', 'authorization', 'userCode', 'baseUrl', 'productCode', 'senderAddress', 'defaultReceiveInfo'] },
